@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands, tasks
 import aiohttp
 import os
+import aiosqlite
 
 class Events(commands.Cog):
     
@@ -17,6 +18,43 @@ class Events(commands.Cog):
 
             async with aiohttp.ClientSession() as cs:
                 await cs.post(url, headers = headers, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
+        except Exception as e:
+            print(e)
+
+        try:
+
+            guild = self.bot.get_guild(725860467964248075)
+            stats = {}
+
+            async with aiosqlite.connect("data/db.db") as db:
+                data = await db.execute("SELECT * from ids")
+                data = await data.fetchall()
+
+                for a in data:
+                    data = await db.execute(f"SELECT * from '{a[0]}'")
+                    data = await data.fetchall()
+                    stats[str(a[0])] = int(data[0][0])
+            
+            lb = sorted(stats, key=lambda x : stats[x], reverse=True)
+            role = guild.get_role(732621593112608809)
+
+            counter = 0
+            for a in lb:
+                if counter >= 10:
+                    pass
+                else:
+                    u = self.bot.get_user(int(a))
+                    if u:
+                        counter += 1
+                        m = guild.get_member(int(a))
+                        if m:
+                            if not role in m.roles:
+                                await m.add_roles(role)
+
+            for a in role.members:
+                if a.id not in lb:
+                    await a.remove_roles(role)
+
         except Exception as e:
             print(e)
 
