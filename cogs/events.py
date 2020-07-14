@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 import aiohttp
 import os
 import aiosqlite
+import traceback
 
 class Events(commands.Cog):
     
@@ -47,15 +48,16 @@ class Events(commands.Cog):
                         counter += 1
                         m = guild.get_member(int(a))
                         if m:
-                            if not role in m.roles:
+                            if role.id not in [a.id for a in m.roles]:
                                 await m.add_roles(role)
 
             for a in role.members:
-                if a.id not in lb:
+                print(a)
+                if int(a.id) not in [int(b) for b in lb]:
                     await a.remove_roles(role)
-
+                    print("Role removed to", a)
+                    
         except Exception as e:
-            print("TASK ERROR")
             print(e)
 
     @commands.Cog.listener()

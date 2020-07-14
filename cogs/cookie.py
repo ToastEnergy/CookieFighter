@@ -59,9 +59,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][0]) + 1
         await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
         await db.commit()
-        print(final_data)
-      except aiosqlite.OperationalError as e:
-        print(e)
+      except aiosqlite.OperationalError:
         await db.execute(f"CREATE table '{winner}' (cookies id)")
         await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
@@ -125,9 +123,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][0]) + 1
         await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
         await db.commit()
-        print(final_data)
       except aiosqlite.OperationalError as e:
-        print(e)
         await db.execute(f"CREATE table '{winner}' (cookies id)")
         await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
@@ -272,7 +268,6 @@ class Cookie(commands.Cog):
       return await ctx.send(embed = NotFound)
 
     def check(msg1):
-      print(msg1.content)
       return not msg1.author.bot and msg1.channel.id == ctx.channel.id  and msg1.content == "🍪" or msg1.content == self.bot.cookie
     
     start = time.perf_counter()
@@ -302,9 +297,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][0]) + 1
         await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
         await db.commit()
-        print(final_data)
-      except aiosqlite.OperationalError as e:
-        print(e)
+      except aiosqlite.OperationalError:
         await db.execute(f"CREATE table '{winner}' (cookies id)")
         await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
@@ -435,15 +428,10 @@ class Cookie(commands.Cog):
             final_data = int(data[0][0]) + 1
             await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
             await db.commit()
-            print(final_data)
-          except aiosqlite.OperationalError as e:
-            print(e)
-            print("Creating new table....")
+          except aiosqlite.OperationalError:
             await db.execute(f"CREATE table '{winner}' (cookies id)")
             await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
             await db.execute(f"INSERT into ids (ids) values ('{winner}')")
             await db.commit()
-            print("Table created!")
-
 def setup(bot):
     bot.add_cog(Cookie(bot))
