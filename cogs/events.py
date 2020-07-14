@@ -22,7 +22,6 @@ class Events(commands.Cog):
             print(e)
 
         try:
-
             guild = self.bot.get_guild(725860467964248075)
             stats = {}
 
@@ -56,6 +55,7 @@ class Events(commands.Cog):
                     await a.remove_roles(role)
 
         except Exception as e:
+            print("TASK ERROR")
             print(e)
 
     @commands.Cog.listener()
