@@ -10,6 +10,11 @@ import subprocess
 import asyncio
 import cookies
 import aiosqlite
+import os
+from dotenv import load_dotenv
+import aiohttp
+
+load_dotenv(dotenv_path = ".env")
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
@@ -179,6 +184,22 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             traceback.print_exc()
             error = discord.Embed(title = f"""UH! There was an error with {extension}!""", description = str(e), colour = self.bot.colour)
             await msg.edit(embed = error)
+
+    @commands.command(aliases = ["post"])
+    @commands.is_owner()
+    async def post_guild_count(self, ctx):
+            url = f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats"
+            headers = {"Authorization": str(os.environ.get("discordbotsgg"))}
+
+            url1 = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"    
+            headers1 = {"Authorization": str(os.environ.get("discordbotlist"))}
+            async with aiohttp.ClientSession() as cs:
+                    await cs.post(url, headers = headers, data = {"guildCount": len(self.bot.guilds)})
+                    await cs.post(url1, headers = headers1, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
+            await cs.close()
+            await ctx.send("""**Posted guild count on**
+    > - <https://discord.bots.gg/bots/638483485417406495>
+    > - <https://discordbotlist.com/bots/cookie-fighter>""")
     
 def setup(bot):
     bot.add_cog(Owner(bot))
