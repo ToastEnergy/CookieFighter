@@ -1,0 +1,2 @@
+# Cookie Fighter
+[Invite](https://discord.com/oauth2/authorize?client_id=638483485417406495&permissions=84032&scope=bot) | [Support Server](https://discord.gg/vCUpW9E) | [discordbotlist.com](https://discordbotlist.com/bots/cookie-fighter)
