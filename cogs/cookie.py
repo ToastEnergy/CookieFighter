@@ -354,12 +354,18 @@ class Cookie(commands.Cog):
 
         if len(PARTY_MEMBERS) <= 1:
           emb = discord.Embed(title = f"{REDTICK} **Too few players**", description = f"At least 2 players are required to start a party!", colour = self.bot.colour)
-          await msg.clear_reactions()
+          try:
+            await msg.clear_reactions()
+          except discord.MissingPermission:
+            pass
           return await msg.edit(embed = emb)
 
         mission, answer = random.choice(list(MISSIONS_AND_ANSWERS.items()))
         e = discord.Embed(title='Prepare to your mission! 5 seconds!', colour = self.bot.colour)
-        await msg.clear_reactions()
+        try:
+          await msg.clear_reactions()
+        except discord.MissingPermission:
+          pass
         await msg.edit(embed=e)
         await asyncio.sleep(5)
         e.description = mission
