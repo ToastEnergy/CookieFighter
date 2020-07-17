@@ -208,7 +208,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
         winner = str(user.id)
 
-        emb = discord.Embed(description = f"Adding **{cookies}{self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+        emb = discord.Embed(description = f"Adding **{cookies} {self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
         msg = await ctx.send(embed = emb)
       
         async with aiosqlite.connect("data/db.db") as db:
@@ -224,7 +224,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 await db.execute(f"INSERT into ids (ids) values ('{winner}')")
                 await db.commit()
 
-        emb.description = f"<a:check:726040431539912744> | Added **{cookies}{self.bot.cookie}** to {user.mention}!"
+        emb.description = f"<a:check:726040431539912744> | Added **{cookies} {self.bot.cookie}** to {user.mention}!"
         await msg.edit(embed = emb)
 
     @commands.command()
@@ -234,7 +234,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
         winner = str(user.id)
 
-        emb = discord.Embed(description = f"Removing **{cookies}{self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+        emb = discord.Embed(description = f"Removing **{cookies} {self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
         msg = await ctx.send(embed = emb)
       
         async with aiosqlite.connect("data/db.db") as db:
@@ -250,7 +250,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 await db.execute(f"INSERT into ids (ids) values ('{winner}')")
                 await db.commit()
 
-        emb.description = f"<a:check:726040431539912744> | Removed **{cookies}{self.bot.cookie}** to {user.mention}!"
+        emb.description = f"<a:check:726040431539912744> | Removed **{cookies} {self.bot.cookie}** to {user.mention}!"
         await msg.edit(embed = emb)
     
 def setup(bot):
