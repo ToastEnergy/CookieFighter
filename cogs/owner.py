@@ -200,6 +200,58 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.send("""**Posted guild count on**
     > - <https://discord.bots.gg/bots/638483485417406495>
     > - <https://discordbotlist.com/bots/cookie-fighter>""")
+
+    @commands.command()
+    @commands.is_owner()
+    async def add(self, ctx, user: discord.User, cookies: int):
+        "Add some cookies to a user"
+
+        winner = str(user.id)
+
+        emb = discord.Embed(description = f"Adding **{cookies}{self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+        msg = await ctx.send(embed = emb)
+      
+        async with aiosqlite.connect("data/db.db") as db:
+            try:
+                data = await db.execute(f"SELECT * from '{winner}'")
+                data = await data.fetchall()
+                final_data = int(data[0][0]) + cookies
+                await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
+                await db.commit()
+            except aiosqlite.OperationalError:
+                await db.execute(f"CREATE table '{winner}' (cookies id)")
+                await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
+                await db.execute(f"INSERT into ids (ids) values ('{winner}')")
+                await db.commit()
+
+        emb.description = f"<a:check:726040431539912744> | Added **{cookies}{self.bot.cookie}** to {user.mention}!"
+        await msg.edit(embed = emb)
+
+    @commands.command()
+    @commands.is_owner()
+    async def remove(self, ctx, user: discord.User, cookies: int):
+        "Remove some cookies to a user"
+
+        winner = str(user.id)
+
+        emb = discord.Embed(description = f"Removing **{cookies}{self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+        msg = await ctx.send(embed = emb)
+      
+        async with aiosqlite.connect("data/db.db") as db:
+            try:
+                data = await db.execute(f"SELECT * from '{winner}'")
+                data = await data.fetchall()
+                final_data = int(data[0][0]) - cookies
+                await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
+                await db.commit()
+            except aiosqlite.OperationalError:
+                await db.execute(f"CREATE table '{winner}' (cookies id)")
+                await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
+                await db.execute(f"INSERT into ids (ids) values ('{winner}')")
+                await db.commit()
+
+        emb.description = f"<a:check:726040431539912744> | Removed **{cookies}{self.bot.cookie}** to {user.mention}!"
+        await msg.edit(embed = emb)
     
 def setup(bot):
     bot.add_cog(Owner(bot))
