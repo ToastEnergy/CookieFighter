@@ -26,7 +26,7 @@ Command "{command}" not found
             res =  f"```{command.help}```"
 
             if command.parent:
-                name = command.parent.name, command.name
+                name = command.parent.name + " " + command.name
                 res += f"\n**Parent**: __`{command.parent}`__"
             
             else:
