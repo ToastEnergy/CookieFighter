@@ -82,8 +82,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 self._last_result = ret
                 await ctx.send(f'{value}{ret}')
 
-    @commands.command(name='set')
-    async def _set(self, ctx):
+    @commands.command()
+    async def old_set(self, ctx):
         emb = discord.Embed(description = """```
 ╔═╗╔═╗╔═╗╦╔═╦╔═╗  ╔═╗╦╔═╗╦ ╦╔╦╗╔═╗╦═╗
 ║  ║ ║║ ║╠╩╗║║╣   ╠╣ ║║ ╦╠═╣ ║ ║╣ ╠╦╝
