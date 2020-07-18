@@ -20,16 +20,14 @@ Command "{command}" not found
         if command:
             command = self.bot.get_command(command)
 
-            res =  f"```{command.help}```\n"
-
             if not command:
-                cog = self.bot.get_cog(command)
-                if not cog:
-                    return await ctx.send(embed = error)
+                return await ctx.send(embed = error)
+
+            res =  f"```{command.help}```"
 
             if command.parent:
                 name = command.parent, command.name
-                res += f"**Parent**: __`{command.parent}`__"
+                res += f"\n**Parent**: __`{command.parent}`__"
             
             else:
                 name = command.name
@@ -39,7 +37,7 @@ Command "{command}" not found
             else:
                 usage = command.name
 
-            res += f"**Usage:** __`{usage}`__"
+            res += f"**\nUsage:** __`{usage}`__"
 
             if command.aliases:
                 al = [f"__`{a}`__" for a in command.aliases]
@@ -65,9 +63,9 @@ Command "{command}" not found
                             for c in b.commands:
                                 if not c.hidden:
                                     if c.signature:
-                                        res_ += f"> `c/{c.name} {c.signature}`\n"
+                                        res_ += f"> `c/{c.parent} {c.name} {c.signature}`\n"
                                     else:
-                                        res_ += f"> `c/{c.name}`\n"
+                                        res_ += f"> `c/{c.parent} {c.name}`\n"
                         except:
                             pass
                                 
