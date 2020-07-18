@@ -252,6 +252,32 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
         emb.description = f"<a:check:726040431539912744> | Removed **{cookies} {self.bot.cookie}** to {user.mention}!"
         await msg.edit(embed = emb)
+
+    @commands.command()
+    @commands.is_owner()
+    async def set(self, ctx, user: discord.User, cookies: int):
+        "Set some cookies to a user"
+
+        winner = str(user.id)
+
+        emb = discord.Embed(description = f"Setting **{cookies} {self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+        msg = await ctx.send(embed = emb)
+      
+        async with aiosqlite.connect("data/db.db") as db:
+            try:
+                data = await db.execute(f"SELECT * from '{winner}'")
+                data = await data.fetchall()
+                final_data = cookies
+                await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
+                await db.commit()
+            except aiosqlite.OperationalError:
+                await db.execute(f"CREATE table '{winner}' (cookies id)")
+                await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
+                await db.execute(f"INSERT into ids (ids) values ('{winner}')")
+                await db.commit()
+
+        emb.description = f"<a:check:726040431539912744> | Set **{cookies} {self.bot.cookie}** to {user.mention}!"
+        await msg.edit(embed = emb)
     
 def setup(bot):
     bot.add_cog(Owner(bot))
