@@ -253,9 +253,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         emb.description = f"<a:check:726040431539912744> | Removed **{cookies} {self.bot.cookie}** to {user.mention}!"
         await msg.edit(embed = emb)
 
-    @commands.command()
+    @commands.command(name = "set")
     @commands.is_owner()
-    async def set(self, ctx, user: discord.User, cookies: int):
+    async def set_(self, ctx, user: discord.User, cookies: int):
         "Set some cookies to a user"
 
         winner = str(user.id)
