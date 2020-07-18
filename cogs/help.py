@@ -42,11 +42,11 @@ Command "{command}" not found
             if command.aliases:
                 al = [f"__`{a}`__" for a in command.aliases]
                 res += f"\n**Aliases:** {' '.join(al)}"
-                
+
             try:
                 sub = [f"__`{a}`__" for a in command.commands]
                 res += f"\n**Subcommands:** {' '.join(sub)}"
-            else:
+            except:
                 pass
 
             emb.description = res
