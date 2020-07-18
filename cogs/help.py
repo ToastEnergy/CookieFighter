@@ -35,13 +35,17 @@ Command "{command}" not found
             if command.signature:
                 usage = f"{name} {command.signature}"
             else:
-                usage = command.name
+                usage = name
 
             res += f"**\nUsage:** __`{usage}`__"
 
             if command.aliases:
                 al = [f"__`{a}`__" for a in command.aliases]
                 res += f"\n**Aliases:** {' '.join(al)}"
+
+            if command.commands:
+                sub = [f"__`{a}`__" for a in command.commands]
+                res += f"\n**Subcommands:** {' '.join(sub)}"
 
             emb.description = res
             return await ctx.send(embed = emb)
