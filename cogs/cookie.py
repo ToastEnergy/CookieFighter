@@ -78,7 +78,7 @@ class Cookie(commands.Cog):
     except:
       print(traceback.print_exc())
 
-  @commands.command()
+  @commands.command(aliases = ["m"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
