@@ -190,16 +190,20 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     async def post_guild_count(self, ctx):
             url = f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats"
             headers = {"Authorization": str(os.environ.get("discordbotsgg"))}
-
             url1 = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"    
             headers1 = {"Authorization": str(os.environ.get("discordbotlist"))}
+            url2 = f"https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats"
+            headers2 = {"Authorization": str(os.environ.get("discordextremelist")), "Content-Type": "application/json"}
+
             async with aiohttp.ClientSession() as cs:
                     await cs.post(url, headers = headers, data = {"guildCount": len(self.bot.guilds)})
                     await cs.post(url1, headers = headers1, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
+                    await cs.post(url2, headers = headers2, data = {"guildCount": len(self.bot.guilds)})
             await cs.close()
             await ctx.send("""**Posted guild count on**
-    > - <https://discord.bots.gg/bots/638483485417406495>
-    > - <https://discordbotlist.com/bots/cookie-fighter>""")
+> - <https://discord.bots.gg/bots/638483485417406495>
+> - <https://discordbotlist.com/bots/cookie-fighter>
+> - <https://discordextremelist.xyz/en-US/bots/638483485417406495>""")
 
     @commands.command()
     @commands.is_owner()
