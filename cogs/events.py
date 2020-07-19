@@ -14,11 +14,19 @@ class Events(commands.Cog):
     @tasks.loop(minutes = 30)
     async def update_stats(self):
         try:
-            url = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"
-            headers = {"Authorization": str(os.environ.get("discordbotlist"))}
+            url = f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats"
+            headers = {"Authorization": str(os.environ.get("discordbotsgg"))}
+            url1 = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"    
+            headers1 = {"Authorization": str(os.environ.get("discordbotlist"))}
+            url2 = f"https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats"
+            headers2 = {"Authorization": str(os.environ.get("discordextremelist")), "Content-Type": "application/json"}
 
             async with aiohttp.ClientSession() as cs:
-                await cs.post(url, headers = headers, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
+                    await cs.post(url, headers = headers, data = {"guildCount": len(self.bot.guilds)})
+                    await cs.post(url1, headers = headers1, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
+                    await cs.post(url2, headers = headers2, data = {"guildCount": len(self.bot.guilds)})
+            await cs.close()
+
         except Exception as e:
             print(e)
 
