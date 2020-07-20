@@ -15,7 +15,7 @@ bot.load_extension("jishaku")
 @bot.event
 async def on_ready():
     print("ready as", bot.user)
-    await bot.change_presence(activity = discord.Activity(type = discord.ActivityType.listening, name = "c/help"))
+    await bot.change_presence(activity = discord.Activity(type = discord.ActivityType.listening, name = "c/help"), status = discord.Status.idle)
     cmd = bot.get_command("jishaku")
     cmd.hidden = True
 
