@@ -111,6 +111,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 **Some links that could help you.**
 > Support Server: https://discord.gg/vCUpW9E
 > Bot Invite: https://bit.ly/cookiefighter
+> Top.GG: [Click Here](https://top.gg/servers/725860467964248075)
 """, colour = self.bot.colour)
         emb.set_author(name = self.bot.user.name, icon_url = str(self.bot.user.avatar_url_as(static_format = "png")))
         await ctx.send(embed = emb)
