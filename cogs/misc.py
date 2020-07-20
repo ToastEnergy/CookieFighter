@@ -29,6 +29,7 @@ Fight your friends and be the first to catch the cookie!
 Prefix: `c/`
 [Invite Me]({discord.utils.oauth_url(self.bot.user.id, permissions = discord.Permissions(permissions = 84032))})
 [Support Server](https://discord.gg/vCUpW9E)
+[Vote the Bot](https://top.gg/bot/638483485417406495/vote)
 [Support Bot Development](https://www.paypal.me/cookiefighterbot)""")
                 emb.add_field(name = "Info", value = f"""```prolog
 Devs: {" & ".join(owners)}
