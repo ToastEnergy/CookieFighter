@@ -4,6 +4,7 @@ import aiohttp
 import os
 import aiosqlite
 import traceback
+import humanize
 
 class Events(commands.Cog):
     
@@ -88,7 +89,7 @@ class Events(commands.Cog):
 🆔 | {guild.id}
 👤 | {guild.owner}
 🔢 | {guild.member_count} Members
-🍰 | Created at {guild.created_at.strftime("%m / %d / %Y (%H:%M)")}""", colour = discord.Colour.green())
+🍰 | Created {humanize.naturaltime(guild.created_at)}""", colour = discord.Colour.green())
         emb.set_footer(text = f"{len(self.bot.guilds)} guilds", icon_url = self.bot.user.avatar_url)
         emb.set_thumbnail(url = guild.icon_url)
         if guild.banner:
@@ -104,7 +105,7 @@ class Events(commands.Cog):
 🆔 | {guild.id}
 👤 | {guild.owner}
 🔢 | {guild.member_count} Members
-🍰 | Created at {guild.created_at.strftime("%m / %d / %Y (%H:%M)")}""", colour = discord.Colour.red())
+🍰 | Created {humanize.naturaltime(guild.created_at)}""", colour = discord.Colour.red())
         emb.set_footer(text = f"{len(self.bot.guilds)} guilds", icon_url = self.bot.user.avatar_url)
         emb.set_thumbnail(url = guild.icon_url)
         if guild.banner:
