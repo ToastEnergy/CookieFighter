@@ -72,5 +72,10 @@ Memory: {memory}%```""")
                 emb = discord.Embed(description = f"**Response:** `{duration:.2f}ms`\n**Latency:** `{pong}ms`", colour = self.bot.colour)
                 await msg.edit(content=None, embed = emb)
 
+        @commands.command()
+        async def vote(self, ctx):
+                "Vote the bot on top.gg"
+                await ctx.send(f"https://top.gg/bot/{self.bot.user.id}/vote")
+
 def setup(bot):
     bot.add_cog(Misc(bot))
