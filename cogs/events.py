@@ -127,5 +127,39 @@ class Events(commands.Cog):
         emb.set_footer(text = "#" + ctx.channel.name)
         await channel.send(embed = emb)
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        if payload.guild_id != 725860467964248075:
+            return 
+        if payload.message_id == 734861410567192628:
+            if payload.emoji.name == "📰":
+                guild = self.bot.get_guild(guild_id)
+                r = guild.get_role(734859787388321854)
+                m = guild.get_member(payload.user_id)
+                await m.add_roles(r)
+
+            elif payload.emoji.name == "🎉":
+                guild = self.bot.get_guild(guild_id)
+                r = guild.get_role(734859719482671145)
+                m = guild.get_member(payload.user_id)
+                await m.add_roles(r)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        if payload.guild_id != 725860467964248075:
+            return 
+        if payload.message_id == 734861410567192628:
+            if payload.emoji.name == "📰":
+                guild = self.bot.get_guild(guild_id)
+                r = guild.get_role(734859787388321854)
+                m = guild.get_member(payload.user_id)
+                await m.remove_roles(r)
+
+            elif payload.emoji.name == "🎉":
+                guild = self.bot.get_guild(guild_id)
+                r = guild.get_role(734859719482671145)
+                m = guild.get_member(payload.user_id)
+                await m.remove_roles(r)
+
 def setup(bot):
     bot.add_cog(Events(bot))
