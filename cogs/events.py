@@ -133,13 +133,13 @@ class Events(commands.Cog):
             return 
         if payload.message_id == 734861410567192628:
             if payload.emoji.name == "📰":
-                guild = self.bot.get_guild(guild_id)
+                guild = self.bot.get_guild(payload.guild_id)
                 r = guild.get_role(734859787388321854)
                 m = guild.get_member(payload.user_id)
                 await m.add_roles(r)
 
             elif payload.emoji.name == "🎉":
-                guild = self.bot.get_guild(guild_id)
+                guild = self.bot.get_guild(payload.guild_id)
                 r = guild.get_role(734859719482671145)
                 m = guild.get_member(payload.user_id)
                 await m.add_roles(r)
@@ -150,13 +150,13 @@ class Events(commands.Cog):
             return 
         if payload.message_id == 734861410567192628:
             if payload.emoji.name == "📰":
-                guild = self.bot.get_guild(guild_id)
+                guild = self.bot.get_guild(payload.guild_id)
                 r = guild.get_role(734859787388321854)
                 m = guild.get_member(payload.user_id)
                 await m.remove_roles(r)
 
             elif payload.emoji.name == "🎉":
-                guild = self.bot.get_guild(guild_id)
+                guild = self.bot.get_guild(payload.guild_id)
                 r = guild.get_role(734859719482671145)
                 m = guild.get_member(payload.user_id)
                 await m.remove_roles(r)
