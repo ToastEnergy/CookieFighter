@@ -369,8 +369,8 @@ class Cookie(commands.Cog):
         await msg.edit(embed=e)
         await asyncio.sleep(5)
         e.description = mission
-        await msg.delete()
-        msg = await ctx.send(embed=e)
+        # await msg.delete()
+        await msg.edit(embed=e)
 
         def _check(msg):
             return msg.author.id in PARTY_MEMBERS and msg.channel.id == ctx.channel.id and msg.content.lower() in answer
