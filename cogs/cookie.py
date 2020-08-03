@@ -103,9 +103,11 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
-  async def milk(self, ctx):
+  async def milk(self, ctx, timeout: float = 120):
 
     "Spawn a milk in the chat, first one to take it wins!"
+
+    if timeout > 300: timeout = 300
 
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
     count.set_footer(text = "First one to take the milk wins🥛!")
@@ -128,7 +130,19 @@ class Cookie(commands.Cog):
 
     start = time.perf_counter()
     await asyncio.sleep(0.25)
-    msg0 = await self.bot.wait_for("reaction_add", check = check)
+    try:
+      msg0 = await self.bot.wait_for("reaction_add", check = check, timeout = timeout)
+
+    except asyncio.TimeoutError:
+      emb.description = "Nobody drunk the milk!"
+      try:
+        await msg.edit(embed = emb)
+        await msg.remove_reaction(self.bot.milk, ctx.guild.me)
+      except:
+        emb.description = "The original message got deleted, I can't end the game!"
+        await ctx.send(embed = emb)
+
+      return
     end = time.perf_counter()
     duration = (end - start) 
     emb.set_author(name = "We have a winner!", icon_url = str(msg0[1].avatar_url_as(static_format = "png")))
