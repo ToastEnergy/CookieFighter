@@ -451,6 +451,8 @@ class Cookie(commands.Cog):
 
     try:
 
+      emb = discord.Embed(description = "Are you sure you want to delete all your cookies? Reply with `yes` if you agree.")
+      await ctx.send(embed = emb)
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
       if msg.content == "yes":
