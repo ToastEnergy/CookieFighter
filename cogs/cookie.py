@@ -52,7 +52,7 @@ class Cookie(commands.Cog):
       emb.description = "Nobody ate the cookie!"
       try:
         await msg.edit(embed = emb)
-        await msg.remove_reactions(self.bot.cookie, ctx.guild.me)
+        await msg.remove_reaction(self.bot.cookie, ctx.guild.me)
       except:
         emb.description = "The original message got deleted, I can't end the game!"
         await ctx.send(embed = emb)
