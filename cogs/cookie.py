@@ -359,7 +359,7 @@ class Cookie(commands.Cog):
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
         await db.commit()
 
-  @type_.error
+  @type.error
   async def type_error(self, ctx, error):
     if isinstance(error, commands.BadArgument):
       emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
