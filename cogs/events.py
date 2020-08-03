@@ -75,7 +75,11 @@ class Events(commands.Cog):
             return
 
         if ctx.command in [self.bot.get_command("cookie"), self.bot.get_command("milk"), self.bot.get_command("type")]:
-            return
+            if isinstance(error, commands.BadArgument):
+                emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
+                return await ctx.send(embed = emb)
+            
+            else: pass
 
         elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
             emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)

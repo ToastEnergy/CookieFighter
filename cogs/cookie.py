@@ -93,12 +93,6 @@ class Cookie(commands.Cog):
     except:
       print(traceback.print_exc())
 
-  @cookie.error
-  async def cookie_error(self, ctx, error):
-    if isinstance(error, commands.BadArgument):
-      emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
-      await ctx.send(embed = emb)
-
   @commands.command(aliases = ["m"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
@@ -176,12 +170,6 @@ class Cookie(commands.Cog):
       
     except:
       print(traceback.print_exc())
-
-  @milk.error
-  async def milk_error(self, ctx, error):
-    if isinstance(error, commands.BadArgument):
-      emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
-      await ctx.send(embed = emb)
 
   @commands.group(aliases = ["lb", "top"], invoke_without_command = True)
   async def leaderboard(self, ctx):
@@ -359,12 +347,6 @@ class Cookie(commands.Cog):
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
         await db.commit()
 
-  @type.error
-  async def type_error(self, ctx, error):
-    if isinstance(error, commands.BadArgument):
-      emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
-      await ctx.send(embed = emb)
-    
   @commands.command()
   @commands.max_concurrency(1, BucketType.channel)
   async def party(self, ctx):
