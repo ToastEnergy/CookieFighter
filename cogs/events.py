@@ -74,7 +74,7 @@ class Events(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             return
 
-        if ctx.command == self.bot.get_command("cookie"):
+        if ctx.command in [self.bot.get_command("cookie"), self.bot.get_command("milk"), self.bot.get_command("type")]:
             return
 
         elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):

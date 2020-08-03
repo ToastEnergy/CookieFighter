@@ -177,6 +177,12 @@ class Cookie(commands.Cog):
     except:
       print(traceback.print_exc())
 
+  @milk.error
+  async def milk_error(self, ctx, error):
+    if isinstance(error, commands.BadArgument):
+      emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
+      await ctx.send(embed = emb)
+
   @commands.group(aliases = ["lb", "top"], invoke_without_command = True)
   async def leaderboard(self, ctx):
     "Top Cookie users"
@@ -275,8 +281,10 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
-  async def _type(self, ctx):
+  async def _type(self, ctx, timeout: float = 120):
     "First one to send the cookie emoji wins!"
+
+    if timeout > 300: timeout = 300
 
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
     count.set_footer(text = "First one to send a cookie wins🍪!")
@@ -307,7 +315,20 @@ class Cookie(commands.Cog):
     
     start = time.perf_counter()
     await asyncio.sleep(0.25)
-    msg0 = await self.bot.wait_for("message", check = check)
+    try:
+      msg0 = await self.bot.wait_for("message", check = check, timeout = timeout)
+
+    except asyncio.TimeoutError:
+      emb.description = "Nobody ate the cookie!"
+      try:
+        await msg.edit(embed = emb)
+        await msg.remove_reaction(self.bot.cookie, ctx.guild.me)
+      except:
+        emb.description = "The original message got deleted, I can't end the game!"
+        await ctx.send(embed = emb)
+
+      return
+      
     end = time.perf_counter()
     duration = (end - start) 
     emb.set_author(name = "We have a winner!", icon_url = str(msg0.author.avatar_url_as(static_format = "png")))
