@@ -328,7 +328,7 @@ class Cookie(commands.Cog):
         await ctx.send(embed = emb)
 
       return
-      
+
     end = time.perf_counter()
     duration = (end - start) 
     emb.set_author(name = "We have a winner!", icon_url = str(msg0.author.avatar_url_as(static_format = "png")))
@@ -358,6 +358,12 @@ class Cookie(commands.Cog):
         await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
         await db.commit()
+
+  @type_.error
+  async def type_error(self, ctx, error):
+    if isinstance(error, commands.BadArgument):
+      emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
+      await ctx.send(embed = emb)
     
   @commands.command()
   @commands.max_concurrency(1, BucketType.channel)
