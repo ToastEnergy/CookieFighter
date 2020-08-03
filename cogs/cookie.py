@@ -94,7 +94,7 @@ class Cookie(commands.Cog):
       print(traceback.print_exc())
 
   @cookie.error
-  async def cookie_erro(self, ctx, error):
+  async def cookie_error(self, ctx, error):
     if isinstance(error, commands.BadArgument):
       emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
       await ctx.send(embed = emb)

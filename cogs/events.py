@@ -74,6 +74,9 @@ class Events(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             return
 
+        if ctx.command == self.bot.get_command("cookie"):
+            return
+
         elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
             emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
             return await ctx.send(embed = emb, delete_after = 3)
