@@ -18,7 +18,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user)
-  async def cookie(self, ctx, timeout = 120):
+  async def cookie(self, ctx, timeout: float = 120):
 
     "Spawn a cookie in the chat, first one to take it wins! You can also set a cusotom timeout in seconds (default is 120, max in 300)"
 
