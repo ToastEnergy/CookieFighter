@@ -451,7 +451,7 @@ class Cookie(commands.Cog):
 
     try:
 
-      emb = discord.Embed(description = "Are you sure you want to delete all your cookies? Reply with `yes` if you agree.")
+      emb = discord.Embed(description = "Are you sure you want to delete all your cookies? Reply with `yes` if you agree.", colour = self.bot.colour)
       await ctx.send(embed = emb)
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
@@ -476,7 +476,7 @@ class Cookie(commands.Cog):
             pass 
 
     emb = discord.Embed(description = f"<a:check:726040431539912744> | Removed all your cookies.", colour = self.bot.colour)
-    await ctx.send(emb)
+    await ctx.send(embed = emb)
 
 def setup(bot):
     bot.add_cog(Cookie(bot))
