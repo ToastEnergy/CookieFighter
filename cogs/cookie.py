@@ -441,5 +441,40 @@ class Cookie(commands.Cog):
             await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
             await db.execute(f"INSERT into ids (ids) values ('{winner}')")
             await db.commit()
+
+  @commands.command()
+  async def delete(self, ctx):
+    "Delete all your cookies"
+
+    def check(m):
+      return m.author == ctx.author and m.channel == ctx.channel
+
+    try:
+
+      msg = await self.bot.wait_for("message", check = check, timeout = 30)
+
+      if msg.content == "yes":
+        pass 
+
+      else:  
+        emb = discord.Embed(description = "<a:fail:727212831782731796> | Aborted")
+        return await ctx.send(embed = emb)
+
+    except asyncio.TimeoutError:
+      emb = discord.Embed(description = "<a:fail:727212831782731796> | Time out, aborted")
+      return await ctx.send(embed = emb)
+
+    winner = str(ctx.author.id)
+  
+    async with aiosqlite.connect("data/db.db") as db:
+        try:
+            await db.execute(f"DROP TABLE '{winner}'")
+            await db.commit()
+        except aiosqlite.OperationalError:
+            pass 
+
+    emb = discord.Embed(description = f"<a:check:726040431539912744> | Removed all your cookies.", colour = self.bot.colour)
+    await ctx.send(emb)
+
 def setup(bot):
     bot.add_cog(Cookie(bot))
