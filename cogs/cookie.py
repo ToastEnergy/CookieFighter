@@ -20,7 +20,7 @@ class Cookie(commands.Cog):
   @commands.cooldown(1, 5, BucketType.user)
   async def cookie(self, ctx, timeout: float = 120):
 
-    "Spawn a cookie in the chat, first one to take it wins! You can also set a cusotom timeout in seconds (default is 120, max in 300)"
+    "Spawn a cookie in the chat, first one to take it wins! You can also set a cusotom timeout in seconds (default is 120, max is 300)"
 
     if timeout > 300: timeout = 300
 
@@ -92,6 +92,12 @@ class Cookie(commands.Cog):
       
     except:
       print(traceback.print_exc())
+
+  @cookie.error
+  async def cookie_erro(self, ctx, error):
+    if isinstance(error, commands.BadArgument):
+      emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
+      await ctx.send(embed = emb)
 
   @commands.command(aliases = ["m"])
   @commands.guild_only()
