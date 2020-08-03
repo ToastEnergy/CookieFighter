@@ -459,11 +459,11 @@ class Cookie(commands.Cog):
         pass 
 
       else:  
-        emb = discord.Embed(description = "<a:fail:727212831782731796> | Aborted")
+        emb = discord.Embed(description = "<a:fail:727212831782731796> | Aborted", colour = self.bot.colour)
         return await ctx.send(embed = emb)
 
     except asyncio.TimeoutError:
-      emb = discord.Embed(description = "<a:fail:727212831782731796> | Time out, aborted")
+      emb = discord.Embed(description = "<a:fail:727212831782731796> | Time out, aborted", colour = self.bot.colour)
       return await ctx.send(embed = emb)
 
     winner = str(ctx.author.id)
