@@ -31,7 +31,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         def predicate(self, ctx):
             check = asyncio.run(self.dblpy.get_user_vote(ctx.author.id))
             return check == True
-        return commands.checl(predicate)
+        return commands.check(predicate)
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
