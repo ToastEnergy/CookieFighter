@@ -13,9 +13,10 @@ class Cookie(commands.Cog):
   
   def __init__(self, bot):
     self.bot = bot
+    self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
 
-  def voted(self):
-    def predicate(self, ctx):
+  def voted():
+    def predicate(ctx):
         check = asyncio.run(self.dblpy.get_user_vote(ctx.author.id))
         return check == True
     return commands.check(predicate)
