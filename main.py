@@ -22,12 +22,6 @@ async def on_ready():
     cmd = bot.get_command("jishaku")
     cmd.hidden = True
 
-def voted():
-    def predicate(ctx):
-        check = asyncio.run(dblpy.get_user_vote(ctx.author.id))
-        return check == True
-    return commands.check(predicate)
-
 for a in os.listdir("./cogs"):
     if a.endswith(".py"):
         bot.load_extension(f"cogs.{a[:-3]}")

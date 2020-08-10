@@ -16,12 +16,6 @@ class Cookie(commands.Cog):
     self.bot = bot
     self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
 
-  def voted():
-    def predicate(ctx):
-        check = asyncio.run(self.dblpy.get_user_vote(ctx.author.id))
-        return check == True
-    return commands.check(predicate)
-
   @commands.command(aliases = ["cookies", "c"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
@@ -357,9 +351,14 @@ class Cookie(commands.Cog):
 
   @commands.command()
   @commands.max_concurrency(1, BucketType.channel)
-  @voted()
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
+
+    check = await self.dblpy.get_user_vote(310472816430546967)
+
+    if not check:
+      emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1/2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = self.bot.colour)
+      return await ctx.send(embed = emb)
 
     GREENTICK = self.bot.get_emoji(726040431539912744)
     REDTICK = self.bot.get_emoji(727212831782731796 )
