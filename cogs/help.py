@@ -20,7 +20,7 @@ Command "{command}" not found
         if command:
             command = self.bot.get_command(command)
 
-            if not command:
+            if not command or command.name == "jishaku":
                 return await ctx.send(embed = error)
 
             res =  f"```{command.help}```"
@@ -54,28 +54,29 @@ Command "{command}" not found
         
         res = ""
         for a in self.bot.cogs:
-            res_ = f"__`{str(a)}`__\n"
-            cog = self.bot.get_cog(a)
-            cog_cmds = cog.get_commands()
-            act_cmds = [a for a in cog_cmds if not a.hidden]
-            if len(act_cmds) >= 1:
-                for b in cog_cmds:
-                    if not b.hidden:
-                        if b.signature:
-                            res_ += f"> `c/{b.name} {b.signature}`\n"
-                        else:
-                            res_ += f"> `c/{b.name}`\n"
-                        try:
-                            for c in b.commands:
-                                if not c.hidden:
-                                    if c.signature:
-                                        res_ += f"> `c/{c.parent} {c.name} {c.signature}`\n"
-                                    else:
-                                        res_ += f"> `c/{c.parent} {c.name}`\n"
-                        except:
-                            pass
-                                
-                res += f"{res_}\n"
+            if str(a) != "Jishaku":
+                res_ = f"__`{str(a)}`__\n"
+                cog = self.bot.get_cog(a)
+                cog_cmds = cog.get_commands()
+                act_cmds = [a for a in cog_cmds if not a.hidden]
+                if len(act_cmds) >= 1:
+                    for b in cog_cmds:
+                        if not b.hidden:
+                            if b.signature:
+                                res_ += f"> `c/{b.name} {b.signature}`\n"
+                            else:
+                                res_ += f"> `c/{b.name}`\n"
+                            try:
+                                for c in b.commands:
+                                    if not c.hidden:
+                                        if c.signature:
+                                            res_ += f"> `c/{c.parent} {c.name} {c.signature}`\n"
+                                        else:
+                                            res_ += f"> `c/{c.parent} {c.name}`\n"
+                            except:
+                                pass
+                                    
+                    res += f"{res_}\n"
 
         emb.description = f"""```
 ╔═╗╔═╗╔═╗╦╔═╦╔═╗  ╔═╗╦╔═╗╦ ╦╔╦╗╔═╗╦═╗
