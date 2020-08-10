@@ -14,6 +14,12 @@ class Cookie(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
+  def voted(self):
+    def predicate(self, ctx):
+        check = asyncio.run(self.dblpy.get_user_vote(ctx.author.id))
+        return check == True
+    return commands.check(predicate)
+
   @commands.command(aliases = ["cookies", "c"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
@@ -349,7 +355,7 @@ class Cookie(commands.Cog):
 
   @commands.command()
   @commands.max_concurrency(1, BucketType.channel)
-  @self.voted()
+  @voted()
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
 
