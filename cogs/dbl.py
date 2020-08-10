@@ -22,5 +22,10 @@ class TopGG(commands.Cog):
         ch = self.bot.get_channel(725860667772502016)
         await ch.send(data)
 
+    @commands.Cog.listener()
+    async def on_dbl_test(self, data):
+        ch = self.bot.get_channel(725860667772502016)
+        await ch.send(data)
+
 def setup(bot):
     bot.add_cog(TopGG(bot))
