@@ -29,7 +29,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     def voted(self):
         def predicate(self, ctx):
-            check = await self.dblpy.get_user_vote(ctx.author.id)
+            check = asyncio.run(self.dblpy.get_user_vote(ctx.author.id))
             return check == True
         return commands.checl(predicate)
 
