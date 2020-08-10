@@ -13,6 +13,7 @@ import aiosqlite
 import os
 from dotenv import load_dotenv
 import aiohttp
+import dbl
 
 load_dotenv(dotenv_path = ".env")
 
@@ -24,6 +25,13 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
         self._last_result = None
+        self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
+
+    def voted(self):
+        def predicate(self, ctx):
+            check = await self.dblpy.get_user_vote(ctx.author.id)
+            return check == True
+        return commands.checl(predicate)
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
