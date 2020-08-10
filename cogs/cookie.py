@@ -349,7 +349,7 @@ class Cookie(commands.Cog):
 
   @commands.command()
   @commands.max_concurrency(1, BucketType.channel)
-  @voted()
+  @commands.voted()
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
 
