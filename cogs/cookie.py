@@ -354,7 +354,7 @@ class Cookie(commands.Cog):
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
 
-    check = await self.dblpy.get_user_vote(310472816430546967)
+    check = await self.dblpy.get_user_vote(ctx.author.id)
 
     if not check:
       emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1/2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = self.bot.colour)
