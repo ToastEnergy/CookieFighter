@@ -15,8 +15,6 @@ bot.launchtime = datetime.now()
 bot.remove_command("help")
 bot.load_extension("jishaku")
 
-dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
-
 @bot.event
 async def on_ready():
     print("ready as", bot.user)
