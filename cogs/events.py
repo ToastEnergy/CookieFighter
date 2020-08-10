@@ -103,6 +103,7 @@ class Events(commands.Cog):
             emb.set_image(url = guild.banner_url)
         
         await ch.send(embed = emb)
+        await ch.edit(topic = f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} users")
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
@@ -119,6 +120,7 @@ class Events(commands.Cog):
             emb.set_image(url = guild.banner_url)
         
         await ch.send(embed = emb)
+        await ch.edit(topic = f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} users")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -126,6 +128,15 @@ class Events(commands.Cog):
             if member.bot:
                 r = member.guild.get_role(726172396062769182)
                 await member.add_roles(r)
+
+            ch = self.bot.get_channel(725909095017873492)
+            await ch.edit(topic = f"Hello new people!\n{member.guild.member_count} members")
+    
+    @commands.Cog.listener()
+    async def on_member_removed(self, member):
+        if member.guild.id == 725860467964248075:
+            ch = self.bot.get_channel(725909095017873492)
+            await ch.edit(topic = f"Hello new people!\n{member.guild.member_count} members")
 
     @commands.Cog.listener()
     async def on_command(self, ctx):

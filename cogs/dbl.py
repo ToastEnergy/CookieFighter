@@ -17,5 +17,10 @@ class TopGG(commands.Cog):
     async def on_guild_post(self):
         print("Server count posted successfully")
 
+    @commands.Cog.listener()
+    async def on_dbl_vote(self, data):
+        ch = self.bot.get_channel(725860667772502016)
+        await ch.send(data)
+
 def setup(bot):
     bot.add_cog(TopGG(bot))
