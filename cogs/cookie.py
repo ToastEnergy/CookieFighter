@@ -498,6 +498,14 @@ class Cookie(commands.Cog):
   async def send(self, ctx, user: discord.User, cookies: int):
     "Gift cookies to a user"
 
+    if user.bot:
+      emb = discord.Embed(description = "nah, robot don't eat cookies.", colour = self.bot.colour)
+      return await ctx.send(embed = emb)
+
+    if user.id == ctx.author.id:
+      emb = discord.Embed(description = "mh.. why would give yourself something that you already have?", colour = self.bot.colour)
+      return await ctx.send(embed = emb)
+
     def check(m):
       return m.author == ctx.author and m.channel == ctx.channel
 
@@ -531,14 +539,14 @@ class Cookie(commands.Cog):
         final_data = int(data[0][0]) - cookies
 
         if final_data < 0:
-          emb = discord.Embed(description = "<a:fail:727212831782731796> | You don't have enough cookies!", colour = self.bot.colour)
-          return await ctx.send(embed = emb)
+          emb.description = "<a:fail:727212831782731796> | You don't have enough cookies!"
+          return await msg.edit(embed = emb)
 
         await db.execute(f"UPDATE '{author}' set cookies = '{final_data}'")
 
       except aiosqlite.OperationalError:
-        emb = discord.Embed(description = "<a:fail:727212831782731796> | You don't have enough cookies!", colour = self.bot.colour)
-        return await ctx.send(embed = emb)
+        emb.description = "<a:fail:727212831782731796> | You don't have enough cookies!"
+        return await msg.edit(embed = emb)
 
       try:
         data = await db.execute(f"SELECT * from '{winner}'")
