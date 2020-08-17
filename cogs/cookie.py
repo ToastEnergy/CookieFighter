@@ -543,6 +543,7 @@ class Cookie(commands.Cog):
           return await msg.edit(embed = emb)
 
         await db.execute(f"UPDATE '{author}' set cookies = '{final_data}'")
+        await db.commit()
 
       except aiosqlite.OperationalError:
         emb.description = "<a:fail:727212831782731796> | You don't have enough cookies!"
@@ -553,7 +554,6 @@ class Cookie(commands.Cog):
         data = await data.fetchall()
         final_data = int(data[0][0]) + cookies
         await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
-
         await db.commit()
 
       except aiosqlite.OperationalError:

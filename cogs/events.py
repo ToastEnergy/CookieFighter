@@ -81,6 +81,13 @@ class Events(commands.Cog):
             
             else: pass
 
+        elif ctx.command == self.bot.get_command("send"):
+            if isinstance(error, commands.BadArgument):
+                emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `send @user 40`", colour = self.bot.colour)
+                return await ctx.send(embed = emb)
+            
+            else: pass
+
         elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
             emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
             return await ctx.send(embed = emb, delete_after = 3)
