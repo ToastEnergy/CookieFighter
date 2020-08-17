@@ -225,7 +225,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 await db.commit()
             except aiosqlite.OperationalError:
                 await db.execute(f"CREATE table '{winner}' (cookies id)")
-                await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
+                await db.execute(f"INSERT into '{winner}' (cookies) values ('{cookies}')")
                 await db.execute(f"INSERT into ids (ids) values ('{winner}')")
                 await db.commit()
 

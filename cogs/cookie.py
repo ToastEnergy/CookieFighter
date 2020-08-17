@@ -349,7 +349,7 @@ class Cookie(commands.Cog):
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
         await db.commit()
 
-  @commands.command()
+  @commands.command(aliases = ["p"])
   @commands.max_concurrency(1, BucketType.channel)
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
@@ -357,7 +357,7 @@ class Cookie(commands.Cog):
     check = await self.dblpy.get_user_vote(ctx.author.id)
 
     if not check:
-      emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1/2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = self.bot.colour)
+      emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1-2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = self.bot.colour)
       return await ctx.send(embed = emb)
 
     GREENTICK = self.bot.get_emoji(726040431539912744)
@@ -493,6 +493,69 @@ class Cookie(commands.Cog):
             await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
             await db.execute(f"INSERT into ids (ids) values ('{winner}')")
             await db.commit()
+
+  @commands.command(aliases = ["gift"])
+  async def send(self, ctx, user: discord.User, cookies: int):
+    "Gift cookies to a user"
+
+    def check(m):
+      return m.author == ctx.author and m.channel == ctx.channel
+
+    try:
+
+      emb = discord.Embed(description = f"Are you sure you want to gift **{cookies} {self.bot.cookie}** to **{str(user)}**? Reply with `yes` if you agree.", colour = self.bot.colour)
+      await ctx.send(embed = emb)
+      msg = await self.bot.wait_for("message", check = check, timeout = 30)
+
+      if msg.content == "yes":
+        pass 
+
+      else:  
+        emb = discord.Embed(description = "<a:fail:727212831782731796> | Aborted", colour = self.bot.colour)
+        return await ctx.send(embed = emb)
+
+    except asyncio.TimeoutError:
+      emb = discord.Embed(description = "<a:fail:727212831782731796> | Time out, aborted", colour = self.bot.colour)
+      return await ctx.send(embed = emb)
+
+    winner = str(user.id)
+    author = str(ctx.author.id)
+
+    emb = discord.Embed(description = f"Adding **{cookies} {self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+    msg = await ctx.send(embed = emb)
+
+    async with aiosqlite.connect("data/db.db") as db:
+      try:
+        data = await db.execute(f"SELECT * from '{author}'")
+        data = await data.fetchall()
+        final_data = int(data[0][0]) - cookies
+
+        if final_data < 0:
+          emb = discord.Embed(description = "<a:fail:727212831782731796> | You don't have enough cookies!", colour = self.bot.colour)
+          return await ctx.send(embed = emb)
+
+        await db.execute(f"UPDATE '{author}' set cookies = '{final_data}'")
+
+      except aiosqlite.OperationalError:
+        emb = discord.Embed(description = "<a:fail:727212831782731796> | You don't have enough cookies!", colour = self.bot.colour)
+        return await ctx.send(embed = emb)
+
+      try:
+        data = await db.execute(f"SELECT * from '{winner}'")
+        data = await data.fetchall()
+        final_data = int(data[0][0]) + cookies
+        await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
+
+        await db.commit()
+
+      except aiosqlite.OperationalError:
+        await db.execute(f"CREATE table '{winner}' (cookies id)")
+        await db.execute(f"INSERT into '{winner}' (cookies) values ('{cookies}')")
+        await db.execute(f"INSERT into ids (ids) values ('{winner}')")
+        await db.commit()
+
+    emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {self.bot.cookie}** to {str(user)}!"
+    await msg.edit(embed = emb)
 
   @commands.command()
   async def delete(self, ctx):
