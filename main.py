@@ -7,6 +7,10 @@ import asyncio
 
 load_dotenv(dotenv_path=".env")
 
+os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
+os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
+os.environ["JISHAKU_HIDE"] = "True"
+
 bot = commands.AutoShardedBot(command_prefix = commands.when_mentioned_or("c/"), case_insensitive = True, description = "Fight your friends and be the first to catch the cookie!")
 bot.cookie = "<:mc_cookie:726184620164382741>"
 bot.milk = "<:mc_milk:726522958847279174>"
