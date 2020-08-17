@@ -529,7 +529,7 @@ class Cookie(commands.Cog):
     winner = str(user.id)
     author = str(ctx.author.id)
 
-    emb = discord.Embed(description = f"Adding **{cookies} {self.bot.cookie}** to {user.mention}...", colour = self.bot.colour)
+    emb = discord.Embed(description = f"Adding **{cookies} {self.bot.cookie}** to **{user.mention}**...", colour = self.bot.colour)
     msg = await ctx.send(embed = emb)
 
     async with aiosqlite.connect("data/db.db") as db:
