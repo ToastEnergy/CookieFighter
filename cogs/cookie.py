@@ -562,7 +562,7 @@ class Cookie(commands.Cog):
         await db.execute(f"INSERT into ids (ids) values ('{winner}')")
         await db.commit()
 
-    emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {self.bot.cookie}** to {str(user)}!"
+    emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {self.bot.cookie}** to **{str(user)}**!"
     await msg.edit(embed = emb)
 
   @commands.command()
