@@ -184,9 +184,13 @@ class Cookie(commands.Cog):
       data = await data.fetchall()
 
       for a in data:
-        data = await db.execute(f"SELECT * from '{a[0]}'")
-        data = await data.fetchall()
-        stats[str(a[0])] = int(data[0][0])
+
+        try:
+          data = await db.execute(f"SELECT * from '{a[0]}'")
+          data = await data.fetchall()
+          stats[str(a[0])] = int(data[0][0])
+        except aiosqlite.OperationalError:
+          pass
     
     lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
