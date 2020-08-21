@@ -94,7 +94,10 @@ class Events(commands.Cog):
 
         elif isinstance(error, commands.NotOwner):
             if ctx.command == self.bot.get_command("prefix"):
-                await ctx.reinvoke()
+                if ctx.author.id in [488398758812319745, 326736523494031360]:
+                    await ctx.reinvoke()
+                else:
+                    pass
         
         emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
         await ctx.send(embed = emb)
