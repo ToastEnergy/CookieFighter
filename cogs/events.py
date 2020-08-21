@@ -93,9 +93,9 @@ class Events(commands.Cog):
             return await ctx.send(embed = emb, delete_after = 3)
 
         elif isinstance(error, commands.MissingPermissions):
-            if ctx.command == self.bot.get_command("prefix"):
+            if ctx.command in [self.bot.get_command("prefix"), self.bot.get_command("prefix reset")]:
                 if ctx.author.id in [488398758812319745, 326736523494031360]:
-                    await ctx.reinvoke()
+                    return await ctx.reinvoke()
                 else:
                     pass
         
