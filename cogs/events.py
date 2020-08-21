@@ -194,5 +194,25 @@ class Events(commands.Cog):
                 m = guild.get_member(payload.user_id)
                 await m.remove_roles(r)
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        await bot.process_commands(message)
+        
+        if message.content == self.bot.user.mention:
+            async with aiosqlite.connect("data/db.db") as db:
+                data = await db.execute(f"select * from prefixes where guild = {message.guild.id}")
+                data = await data.fetchall()
+
+            if len(data) == 0:
+                prefix = "c/"
+
+            else:
+                prefix = data[0][1]
+
+            emb = discord.Embed(f"Hey there! My prefix is {prefix}, do `{prefix}help` to get more help!", colour = self.bot.colour)
+            emb.set_author(name = message.author, icon_url = str(message.author.avatar_url_as(static_format = "png")))
+
+            return await message.channel.send(embed = emb)
+
 def setup(bot):
     bot.add_cog(Events(bot))
