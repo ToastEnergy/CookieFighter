@@ -91,6 +91,10 @@ class Events(commands.Cog):
         elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
             emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
             return await ctx.send(embed = emb, delete_after = 3)
+
+        elif isinstance(error, commands.NotOwner):
+            if ctx.command == self.bot.get_command("prefix"):
+                await ctx.reinvoke()
         
         emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
         await ctx.send(embed = emb)

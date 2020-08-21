@@ -4,9 +4,9 @@ import platform
 import psutil
 from datetime import datetime
 import time
+import aiosqlite
 
 class Misc(commands.Cog):
-        
         def __init__(self, bot):
                 self.bot = bot
 
@@ -76,6 +76,29 @@ Memory: {memory}%```""")
         async def vote(self, ctx):
                 "Vote the bot on top.gg"
                 await ctx.send(f"https://top.gg/bot/{self.bot.user.id}/vote")
+
+        @commands.group(aliases = ["setprefix"], invoke_without_command = True)
+        @commands.has_permissions(manage_roles = True)
+        async def prefix(self, ctx, *, prefix):
+                "Change server prefix"
+
+                async with aiosqlite.connect("data/db.db") as db:
+                        await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
+                        await db.execute(f"INSERT into prefixes (guild, prefix) VALUES ({ctx.guild.id}, '{prefix}')")
+                        await db.commit()
+
+                emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix changed to **{prefix}**", colour = self.bot.colour)
+                await ctx.send(embed = emb)
+
+        @prefix.command()
+        @commands.has_permissions(manage_roles = True)
+        async def reset(self, ctx):
+                async with aiosqlite.connect("data/db.db") as db:
+                        await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
+                        await db.commit()
+
+                emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix reset to **c/**", colour = self.bot.colour)
+                await ctx.send(embed = emb)
 
 def setup(bot):
     bot.add_cog(Misc(bot))
