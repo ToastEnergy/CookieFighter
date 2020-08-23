@@ -36,13 +36,11 @@ class Events(commands.Cog):
             stats = {}
 
             async with aiosqlite.connect("data/db.db") as db:
-                data = await db.execute("SELECT * from ids")
+                data = await db.execute("SELECT * from users")
                 data = await data.fetchall()
 
                 for a in data:
-                    data = await db.execute(f"SELECT * from '{a[0]}'")
-                    data = await data.fetchall()
-                    stats[str(a[0])] = int(data[0][0])
+                    stats[str(a[0])] = int(a[1])
             
             lb = sorted(stats, key=lambda x : stats[x], reverse=True)
             role = guild.get_role(732621593112608809)
