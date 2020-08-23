@@ -14,6 +14,7 @@ class Events(commands.Cog):
 
     @tasks.loop(minutes = 30)
     async def update_stats(self):
+        await self.bot.wait_until_ready()
         try:
             url = f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats"
             headers = {"Authorization": str(os.environ.get("discordbotsgg"))}
