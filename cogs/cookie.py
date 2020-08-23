@@ -68,19 +68,19 @@ class Cookie(commands.Cog):
     await msg.edit(embed = emb)
 
     winner = str(msg0[1].id)
-      
+
     async with aiosqlite.connect("data/db.db") as db:
-      try:
-        data = await db.execute(f"SELECT * from '{winner}'")
-        data = await data.fetchall()
-        final_data = int(data[0][0]) + 1
-        await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
-        await db.commit()
-      except aiosqlite.OperationalError:
-        await db.execute(f"CREATE table '{winner}' (cookies id)")
-        await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
-        await db.execute(f"INSERT into ids (ids) values ('{winner}')")
-        await db.commit()
+      data = await db.execute(f"SELECT * from users where user = '{winner}'")
+      data = await data.fetchall()
+
+      if len(data) == 0:
+        await db.execute(f"INSERT into users (user, cookies) VALUES ('{winner}', 1)")
+
+      else:
+        final_data = int(data[0][1]) + 1
+        await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
+
+      await db.commit()
 
     await asyncio.sleep(1.5)
     try:
@@ -146,19 +146,19 @@ class Cookie(commands.Cog):
     await msg.edit(embed = emb)
 
     winner = str(msg0[1].id)
-      
+
     async with aiosqlite.connect("data/db.db") as db:
-      try:
-        data = await db.execute(f"SELECT * from '{winner}'")
-        data = await data.fetchall()
-        final_data = int(data[0][0]) + 1
-        await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
-        await db.commit()
-      except aiosqlite.OperationalError as e:
-        await db.execute(f"CREATE table '{winner}' (cookies id)")
-        await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
-        await db.execute(f"INSERT into ids (ids) values ('{winner}')")
-        await db.commit()
+      data = await db.execute(f"SELECT * from users where user = '{winner}'")
+      data = await data.fetchall()
+
+      if len(data) == 0:
+        await db.execute(f"INSERT into users (user, cookies) VALUES ('{winner}', 1)")
+
+      else:
+        final_data = int(data[0][1]) + 1
+        await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
+
+      await db.commit()
 
     await asyncio.sleep(1.5)
     try:
@@ -214,19 +214,16 @@ class Cookie(commands.Cog):
     stats = {}
 
     async with aiosqlite.connect("data/db.db") as db:
-      data = await db.execute("SELECT * from ids")
+      data = await db.execute("SELECT * from users")
       data = await data.fetchall()
 
-      for a in data:
-        data = await db.execute(f"SELECT * from '{a[0]}'")
-        data = await data.fetchall()
-        stats[str(a[0])] = int(data[0][0])
+      for value in data:
+        stats[str(value[0])] = int(value[1])
     
     lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
-    res = ""
-
     counter = 0
+    res = ""
 
     for a in lb:
 
@@ -481,19 +478,19 @@ class Cookie(commands.Cog):
               except:
                 pass
               winner = str(message.author.id)
-      
+
         async with aiosqlite.connect("data/db.db") as db:
-          try:
-            data = await db.execute(f"SELECT * from '{winner}'")
-            data = await data.fetchall()
-            final_data = int(data[0][0]) + 1
-            await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
-            await db.commit()
-          except aiosqlite.OperationalError:
-            await db.execute(f"CREATE table '{winner}' (cookies id)")
-            await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
-            await db.execute(f"INSERT into ids (ids) values ('{winner}')")
-            await db.commit()
+          data = await db.execute(f"SELECT * from users where user = '{winner}'")
+          data = await data.fetchall()
+
+          if len(data) == 0:
+            await db.execute(f"INSERT into users (user, cookies) VALUES ('{winner}', 1)")
+
+          else:
+            final_data = int(data[0][1]) + 1
+            await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
+
+          await db.commit()
 
   @commands.command(aliases = ["gift"])
   async def send(self, ctx, user: discord.User, cookies: int):
