@@ -590,11 +590,8 @@ class Cookie(commands.Cog):
     winner = str(ctx.author.id)
   
     async with aiosqlite.connect("data/db.db") as db:
-        try:
-            await db.execute(f"DROP TABLE '{winner}'")
-            await db.commit()
-        except aiosqlite.OperationalError:
-            pass 
+          await db.execute(f"UPDATE users set cookies = 0 where user = {winner}")
+          await db.commit()
 
     emb = discord.Embed(description = f"<a:check:726040431539912744> | Removed all your cookies.", colour = self.bot.colour)
     await ctx.send(embed = emb)
