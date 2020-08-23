@@ -252,9 +252,9 @@ class Cookie(commands.Cog):
 
     async with aiosqlite.connect("data/db.db") as db:
       try:
-        data = await db.execute(f"SELECT * from '{user.id}'")
+        data = await db.execute(f"SELECT * from users where user = {user.id}")
         data = await data.fetchall()
-        cookies = int(data[0][0])
+        cookies = int(data[0][1])
       except aiosqlite.OperationalError:
         cookies = 0
       await db.commit()
