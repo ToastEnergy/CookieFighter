@@ -335,20 +335,20 @@ class Cookie(commands.Cog):
     except:
       pass
 
-    winner = str(msg0.author.id)
+    winner = int(msg0.author.id)
 
     async with aiosqlite.connect("data/db.db") as db:
-      try:
-        data = await db.execute(f"SELECT * from '{winner}'")
-        data = await data.fetchall()
-        final_data = int(data[0][0]) + 1
-        await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
-        await db.commit()
-      except aiosqlite.OperationalError:
-        await db.execute(f"CREATE table '{winner}' (cookies id)")
-        await db.execute(f"INSERT into '{winner}' (cookies) values ('1')")
-        await db.execute(f"INSERT into ids (ids) values ('{winner}')")
-        await db.commit()
+      data = await db.execute(f"SELECT * from users where user = '{winner}'")
+      data = await data.fetchall()
+
+      if len(data) == 0:
+        await db.execute(f"INSERT into users (user, cookies) VALUES ('{winner}', 1)")
+
+      else:
+        final_data = int(data[0][1]) + 1
+        await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
+
+      await db.commit()
 
   @commands.command(aliases = ["p"])
   @commands.max_concurrency(1, BucketType.channel)
