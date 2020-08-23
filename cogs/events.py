@@ -61,10 +61,8 @@ class Events(commands.Cog):
                                 await m.add_roles(role)
 
             for a in role.members:
-                print(a)
                 if int(a.id) not in [int(b) for b in lb]:
                     await a.remove_roles(role)
-                    print("Role removed to", a)
                     
         except Exception as e:
             print(e)
@@ -196,9 +194,14 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        await bot.process_commands(message)
+
+        if not message.guild:
+            mention = self.bot.user.mention
+
+        else:
+            mention = message.guild.me.mention
         
-        if message.content == self.bot.user.mention:
+        if message.content == str(mention):
             async with aiosqlite.connect("data/db.db") as db:
                 data = await db.execute(f"select * from prefixes where guild = {message.guild.id}")
                 data = await data.fetchall()
@@ -209,8 +212,9 @@ class Events(commands.Cog):
             else:
                 prefix = data[0][1]
 
-            emb = discord.Embed(f"Hey there! My prefix is {prefix}, do `{prefix}help` to get more help!", colour = self.bot.colour)
+            emb = discord.Embed(description = f"Hey there! My prefix is `{prefix}`, do `{prefix}help` to get more help!", colour = self.bot.colour)
             emb.set_author(name = message.author, icon_url = str(message.author.avatar_url_as(static_format = "png")))
+
 
             return await message.channel.send(embed = emb)
 
