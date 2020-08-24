@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 import asyncio
 import sqlite3
+import aiosqlite
 
 load_dotenv(dotenv_path=".env")
 
@@ -45,6 +46,20 @@ async def on_ready():
     await bot.change_presence(activity = discord.Activity(type = discord.ActivityType.listening, name = "c/help"), status = discord.Status.idle)
     cmd = bot.get_command("jishaku")
     cmd.hidden = True
+
+@bot.check
+async def blacklist(ctx):
+  async with aiosqlite.connect("data/db.db") as db:
+    data = await db.execute(f"SELECT * from blacklist where user = {ctx.author.id}")
+    data = await data.fetchall()
+
+  if len(data) == 1:
+    emb = discord.Embed(description = f"<a:fail:727212831782731796> | {ctx.author.mention} you can't use the bot because you are blacklisted!", colour = bot.colour)
+    await ctx.send(embed = emb, delete_after = 5)
+    return False
+
+  else:
+    return True
 
 for a in os.listdir("./cogs"):
     if a.endswith(".py"):
