@@ -284,7 +284,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         emb.description = f"<a:check:726040431539912744> | Set **{cookies} {self.bot.cookie}** to {user.mention}!"
         await msg.edit(embed = emb)
 
-    @commands.group(invoke_without_command = True)
+    @commands.group(invoke_without_command = True, aliases = ["sql"])
     @commands.is_owner()
     async def sqlite(self, ctx, *, command):
         "run a sqlite command"
@@ -301,7 +301,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
             await db.commit()
 
-        await ctx.message.add_emoji("<a:check:726040431539912744>")
+        await ctx.message.add_reaction("<a:check:726040431539912744>")
     
 def setup(bot):
     bot.add_cog(Owner(bot))
