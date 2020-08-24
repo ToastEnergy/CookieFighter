@@ -545,7 +545,7 @@ class Cookie(commands.Cog):
       await db.execute(f"UPDATE users set cookies = {final_data} where user = {ctx.author.id}")
       await db.commit()
 
-      data = await db.execute(f"SELECT * from users where user = {winner}'")
+      data = await db.execute(f"SELECT * from users where user = {winner}")
       data = await data.fetchall()
 
       if len(data) == 0:
@@ -556,7 +556,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][0]) + cookies
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {ctx.author.id}")
         await db.commit()
-        
+
     emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {self.bot.cookie}** to **{str(user)}**!"
     await msg.edit(embed = emb)
 
