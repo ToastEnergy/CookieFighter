@@ -524,42 +524,39 @@ class Cookie(commands.Cog):
       emb = discord.Embed(description = "<a:fail:727212831782731796> | Time out, aborted", colour = self.bot.colour)
       return await ctx.send(embed = emb)
 
-    winner = str(user.id)
-    author = str(ctx.author.id)
-
+    winner = user.id
     emb = discord.Embed(description = f"Adding **{cookies} {self.bot.cookie}** to **{user.mention}**...", colour = self.bot.colour)
     msg = await ctx.send(embed = emb)
 
     async with aiosqlite.connect("data/db.db") as db:
-      try:
-        data = await db.execute(f"SELECT * from '{author}'")
-        data = await data.fetchall()
-        final_data = int(data[0][0]) - cookies
+      data = await db.execute(f"SELECT * from users where user = {ctx.author.id}")
+      data = await data.fetchall()
 
-        if final_data < 0:
-          emb.description = "<a:fail:727212831782731796> | You don't have enough cookies!"
-          return await msg.edit(embed = emb)
+      if len(data) == 0:
+        emb.description = "<a:fail:727212831782731796> | You don't have any cookie!"
+        return await msg.edit(embed = emb)
 
-        await db.execute(f"UPDATE '{author}' set cookies = '{final_data}'")
-        await db.commit()
+      final_data = int(data[0][1]) - cookies
 
-      except aiosqlite.OperationalError:
+      if final_data < 0:
         emb.description = "<a:fail:727212831782731796> | You don't have enough cookies!"
         return await msg.edit(embed = emb)
 
-      try:
-        data = await db.execute(f"SELECT * from '{winner}'")
-        data = await data.fetchall()
+      await db.execute(f"UPDATE users set cookies = {final_data} where user = {ctx.author.id}")
+      await db.commit()
+
+      data = await db.execute(f"SELECT * from users where user = {winner}'")
+      data = await data.fetchall()
+
+      if len(data) == 0:
+        await db.execute(f"isnert into users (user, cookies) VALUES ({winner}, {cookies})")
+        await db.commit()
+      
+      else:
         final_data = int(data[0][0]) + cookies
-        await db.execute(f"UPDATE '{winner}' set cookies = '{final_data}'")
+        await db.execute(f"UPDATE users set cookies = {final_data} where user = {ctx.author.id}")
         await db.commit()
-
-      except aiosqlite.OperationalError:
-        await db.execute(f"CREATE table '{winner}' (cookies id)")
-        await db.execute(f"INSERT into '{winner}' (cookies) values ('{cookies}')")
-        await db.execute(f"INSERT into ids (ids) values ('{winner}')")
-        await db.commit()
-
+        
     emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {self.bot.cookie}** to **{str(user)}**!"
     await msg.edit(embed = emb)
 
