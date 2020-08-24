@@ -78,6 +78,9 @@ class Events(commands.Cog):
             
             else: pass
 
+        elif isinstance(error, commands.CheckFailure):
+            return 
+
         elif ctx.command == self.bot.get_command("send"):
             if isinstance(error, commands.BadArgument):
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `send @user 40`", colour = self.bot.colour)
