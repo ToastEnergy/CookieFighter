@@ -283,6 +283,25 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
         emb.description = f"<a:check:726040431539912744> | Set **{cookies} {self.bot.cookie}** to {user.mention}!"
         await msg.edit(embed = emb)
+
+    @commands.group(invoke_without_command = True)
+    @commands.is_owner()
+    async def sqlite(self, ctx, *, command):
+        "run a sqlite command"
+
+        command = eval(f"f'{command}'")
+        
+        async with aiosqlite.connect("data/db.db") as db:
+            data = await db.execute(command)
+
+            if command.lower().startswith("select"):
+                data = await data.fetchall()
+                emb = discord.Embed(description = f"```py\n{data}\n```", colour = self.bot.colour)
+                await ctx.send(embed = emb)
+
+            await db.commit()
+
+        await ctx.message.add_emoji("<a:check:726040431539912744>")
     
 def setup(bot):
     bot.add_cog(Owner(bot))
