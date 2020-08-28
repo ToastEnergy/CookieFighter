@@ -189,8 +189,11 @@ class Cookie(commands.Cog):
       
       for stat in data:
         nums[stat[1]] = {"time": stat[2], "user": stat[0]}
-
-      lb = {data['user']: data['time'] for s1, data in sorted(nums.items(), key=lambda k: abs(k[1]['time']-number))}
+      
+      for data in range(len(nums)):
+        number = min(nums, key=lambda x:abs(nums[x]["time"]-number))
+        lb[number] = nums[number]
+        nums.pop(number)
 
       res = ""
 
