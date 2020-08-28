@@ -180,8 +180,6 @@ class Cookie(commands.Cog):
   async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users"
 
-    stats = {}
-
     if number:
       async with aiosqlite.connect("data/db.db") as db:
         data = await db.execute("SELECT * from results")
@@ -200,6 +198,7 @@ class Cookie(commands.Cog):
         nums.pop(number)
         
     else:
+      stats = {}
       async with aiosqlite.connect("data/db.db") as db:
         data = await db.execute("SELECT * from users")
         data = await data.fetchall()
@@ -207,7 +206,7 @@ class Cookie(commands.Cog):
         for value in data:
           stats[str(value[0])] = int(value[1])
     
-    lb = sorted(stats, key=lambda x : stats[x], reverse=True)
+        lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
     res = ""
 
