@@ -81,7 +81,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
-      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
       await db.commit()
 
     await asyncio.sleep(1.5)
@@ -160,7 +160,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
-      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
       await db.commit()
 
     await asyncio.sleep(1.5)
@@ -380,7 +380,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
         
-      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
       await db.commit()
 
   @commands.command(aliases = ["p"])
@@ -526,7 +526,7 @@ class Cookie(commands.Cog):
             final_data = int(data[0][1]) + 1
             await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
-          await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
+          await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
           await db.commit()
 
   @commands.command(aliases = ["gift"])
