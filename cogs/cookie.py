@@ -81,7 +81,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
-      await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
       await db.commit()
 
     await asyncio.sleep(1.5)
@@ -160,7 +160,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
-      await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
       await db.commit()
 
     await asyncio.sleep(1.5)
@@ -188,12 +188,12 @@ class Cookie(commands.Cog):
       nums = {}
       
       for stat in data:
-        nums[stat[0]] = stat[1]
+        nums[stat[0]] = {"time": stat[2], "id": stat[1]}
 
       lb = {}
 
       for data in range(len(nums)):
-        number = min(nums, key=lambda x:abs(nums[x]-69))
+        number = min(nums, key=lambda x:abs(nums[x]["time"]-69))
         lb[number] = nums[number]
         nums.pop(number)
 
@@ -210,7 +210,7 @@ class Cookie(commands.Cog):
           u = self.bot.get_user(int(data))
           if u:
             counter += 1
-            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]} {self.bot.cookie}**"
+            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]["time"]} {self.bot.cookie}**"
         
     else:
       stats = {}
@@ -380,7 +380,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
         
-      await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
       await db.commit()
 
   @commands.command(aliases = ["p"])
@@ -526,7 +526,7 @@ class Cookie(commands.Cog):
             final_data = int(data[0][1]) + 1
             await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
-          await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
+          await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.2f}')")
           await db.commit()
 
   @commands.command(aliases = ["gift"])
