@@ -196,6 +196,21 @@ class Cookie(commands.Cog):
         number = min(nums, key=lambda x:abs(nums[x]-69))
         lb[number] = nums[number]
         nums.pop(number)
+
+      res = ""
+
+      counter = 0
+
+      for data in lb:
+
+        if counter >= 10:
+          break
+        
+        else:
+          u = self.bot.get_user(int(data))
+          if u:
+            counter += 1
+            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]} {self.bot.cookie}**"
         
     else:
       stats = {}
@@ -208,20 +223,20 @@ class Cookie(commands.Cog):
     
         lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
-    res = ""
+        res = ""
 
-    counter = 0
+        counter = 0
 
-    for a in lb:
+        for data in lb:
 
-      if counter >= 10:
-        pass
-      
-      else:
-        u = self.bot.get_user(int(a))
-        if u:
-          counter += 1
-          res += f"\n**{counter}.** `{str(u)}` - **{stats[str(a)]} {self.bot.cookie}**"
+          if counter >= 10:
+            break
+          
+          else:
+            u = self.bot.get_user(int(data))
+            if u:
+              counter += 1
+              res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
     emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
