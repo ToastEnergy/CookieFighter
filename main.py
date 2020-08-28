@@ -56,7 +56,7 @@ async def blacklist(ctx):
   if len(data) == 1:
     emb = discord.Embed(description = f"<a:fail:727212831782731796> | {ctx.author.mention} you can't use the bot because you are blacklisted!", colour = bot.colour)
     await ctx.send(embed = emb, delete_after = 5)
-    return False
+    raise discord.ext.commands.errors.CheckFailure("Blacklisted")
 
   else:
     return True
