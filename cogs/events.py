@@ -71,15 +71,15 @@ class Events(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             return
 
+        elif isinstance(error, commands.CheckFailure):
+            return 
+
         if ctx.command in [self.bot.get_command("cookie"), self.bot.get_command("milk"), self.bot.get_command("type")]:
             if isinstance(error, commands.BadArgument):
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
                 return await ctx.send(embed = emb)
             
             else: pass
-
-        elif isinstance(error, commands.CheckFailure):
-            return 
 
         elif ctx.command == self.bot.get_command("send"):
             if isinstance(error, commands.BadArgument):
