@@ -185,17 +185,10 @@ class Cookie(commands.Cog):
         data = await db.execute("SELECT * from results")
         data = await data.fetchall()
 
-      nums = {}
-      
-      for stat in data:
-        nums[stat[1]] = {"time": stat[2], "user": stat[0]}
-
       lb = {}
       
-      for data in range(len(nums)):
-        number = min(nums, key=lambda x:abs(nums[x]["time"]-number))
-        lb[number] = nums[number]
-        nums.pop(number)
+      for stat in sorted(data, key=lambda d: abs(number-d[2])):
+        lb[stat[1]] = {"time": stat[2], "user": stat[0]}
 
       res = ""
 
