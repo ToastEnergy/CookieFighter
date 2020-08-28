@@ -210,7 +210,7 @@ class Cookie(commands.Cog):
           u = self.bot.get_user(int(data))
           if u:
             counter += 1
-            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]["time"]} {self.bot.cookie}**"
+            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']} {self.bot.cookie}**"
         
     else:
       stats = {}
