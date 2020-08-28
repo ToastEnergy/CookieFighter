@@ -180,7 +180,7 @@ class Cookie(commands.Cog):
   async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users"
 
-    if number:
+    if number is not None:
       async with aiosqlite.connect("data/db.db") as db:
         data = await db.execute("SELECT * from results")
         data = await data.fetchall()
