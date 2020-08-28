@@ -80,6 +80,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
+      await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
       await db.commit()
 
     await asyncio.sleep(1.5)
