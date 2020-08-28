@@ -193,7 +193,7 @@ class Cookie(commands.Cog):
       lb = {}
 
       for data in range(len(nums)):
-        number = min(nums, key=lambda x:abs(nums[x]["time"]-69))
+        number = min(nums, key=lambda x:abs(nums[x]["time"]-number))
         lb[number] = nums[number]
         nums.pop(number)
 
