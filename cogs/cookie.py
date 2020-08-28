@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 import aiosqlite
 import dbl
+from typing import Union
 
 class Cookie(commands.Cog):
   
@@ -159,6 +160,7 @@ class Cookie(commands.Cog):
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
+      await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
       await db.commit()
 
     await asyncio.sleep(1.5)
@@ -175,17 +177,35 @@ class Cookie(commands.Cog):
       print(traceback.print_exc())
 
   @commands.group(aliases = ["lb", "top"], invoke_without_command = True)
-  async def leaderboard(self, ctx):
+  async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users"
 
     stats = {}
 
-    async with aiosqlite.connect("data/db.db") as db:
-      data = await db.execute("SELECT * from users")
-      data = await data.fetchall()
+    if number:
+      async with aiosqlite.connect("data/db.db") as db:
+        data = await db.execute("SELECT * from results")
+        data = await data.fetchall()
 
-      for value in data:
-        stats[str(value[0])] = int(value[1])
+      nums = {}
+      
+      for stat in data:
+        nums[stat[0]] = stat[1]
+
+      lb = {}
+
+      for data in range(len(nums)):
+        number = min(nums, key=lambda x:abs(nums[x]-69))
+        lb[number] = nums[number]
+        nums.pop(number)
+        
+    else:
+      async with aiosqlite.connect("data/db.db") as db:
+        data = await db.execute("SELECT * from users")
+        data = await data.fetchall()
+
+        for value in data:
+          stats[str(value[0])] = int(value[1])
     
     lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
@@ -345,7 +365,8 @@ class Cookie(commands.Cog):
       else:
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
-
+        
+      await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
       await db.commit()
 
   @commands.command(aliases = ["p"])
@@ -491,6 +512,7 @@ class Cookie(commands.Cog):
             final_data = int(data[0][1]) + 1
             await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
 
+          await db.execute(f"INSERT into results (user, time) VALUES ('{winner}', '{duration:.2f}')")
           await db.commit()
 
   @commands.command(aliases = ["gift"])
