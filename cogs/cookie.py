@@ -188,7 +188,7 @@ class Cookie(commands.Cog):
       nums = {}
       
       for stat in data:
-        nums[stat[0]] = {"time": stat[2], "id": stat[1]}
+        nums[stat[1]] = {"time": stat[2], "user": stat[0]}
 
       lb = {}
 
@@ -207,7 +207,7 @@ class Cookie(commands.Cog):
           break
         
         else:
-          u = self.bot.get_user(int(data))
+          u = self.bot.get_user(int(lb[data]["user"]))
           if u:
             counter += 1
             res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']} {self.bot.cookie}**"
