@@ -189,6 +189,8 @@ class Cookie(commands.Cog):
       
       for stat in data:
         nums[stat[1]] = {"time": stat[2], "user": stat[0]}
+
+      lb = {}
       
       for data in range(len(nums)):
         number = min(nums, key=lambda x:abs(nums[x]["time"]-number))
