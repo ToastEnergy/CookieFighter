@@ -89,7 +89,7 @@ class Events(commands.Cog):
             else: pass
 
         elif ctx.command == self.bot.get_command("leaderboard"):
-            if isinstance(error, commands.BadArgument):
+            if isinstance(error, commands.BadArgument) or str(error) == 'Could not convert "number" into int or float.':
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `leaderboard 69` or `leaderboard 4.20`", colour = self.bot.colour)
                 return await ctx.send(embed = emb)
             
