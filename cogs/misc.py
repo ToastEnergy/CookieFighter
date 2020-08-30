@@ -82,6 +82,10 @@ Memory: {memory}%```""")
         async def prefix(self, ctx, *, prefix):
                 "Change server prefix"
 
+                if len(prefix) > 36:
+                        emb = discord.Embed(description = f"<a:fail:727212831782731796> | The prefix can't be longer than **36** characters!", colour = self.bot.colour)
+                        return await ctx.send(embed = emb)
+
                 async with aiosqlite.connect("data/db.db") as db:
                         await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
                         await db.execute(f"INSERT into prefixes (guild, prefix) VALUES ({ctx.guild.id}, '{prefix}')")

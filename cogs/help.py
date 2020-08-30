@@ -98,7 +98,7 @@ Command "{command}" not found
 Server Prefix: **{prefix}**
 
 {res}"""
-        emb.set_footer(text = f"Need more help? Use \"c/help <command>\".", icon_url = str(ctx.author.avatar_url_as(static_format = "png")))
+        emb.set_footer(text = f"Need more help? Use \"{prefix}help <command>\".", icon_url = str(ctx.author.avatar_url_as(static_format = "png")))
         await ctx.send(embed = emb)
 
 def setup(bot):
