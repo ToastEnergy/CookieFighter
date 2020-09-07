@@ -210,7 +210,7 @@ class Events(commands.Cog):
         else:
             mention = message.guild.me.mention
         
-        if message.content == str(mention):
+        if message.content == str(mention) and message.author != self.bot.user:
             async with aiosqlite.connect("data/db.db") as db:
                 data = await db.execute(f"select * from prefixes where guild = {message.guild.id}")
                 data = await data.fetchall()
