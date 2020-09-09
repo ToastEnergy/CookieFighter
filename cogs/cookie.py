@@ -178,7 +178,7 @@ class Cookie(commands.Cog):
 
   @commands.group(aliases = ["lb", "top"], invoke_without_command = True)
   async def leaderboard(self, ctx, number: Union[int, float] = None):
-    "Top Cookie users"
+    "Top Cookie users, if a number is specified it will return the closest results to that number."
 
     if number is not None:
       async with aiosqlite.connect("data/db.db") as db:
