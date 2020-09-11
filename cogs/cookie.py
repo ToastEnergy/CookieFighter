@@ -543,7 +543,7 @@ class Cookie(commands.Cog):
       await ctx.send(embed = emb)
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
-      if msg.content == "yes":
+      if msg.content.lower() == "yes":
         pass 
 
       else:  
@@ -603,7 +603,7 @@ class Cookie(commands.Cog):
       await ctx.send(embed = emb)
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
-      if msg.content == "yes":
+      if msg.content.lower() == "yes":
         pass 
 
       else:  
