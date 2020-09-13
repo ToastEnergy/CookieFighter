@@ -167,7 +167,6 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
             error = discord.Embed(title = f"""UH! There was an error with {extension}!""", description = str(e), colour = self.bot.colour)
             await msg.edit(embed = error)
-        
 
     @commands.command()
     @commands.is_owner()
