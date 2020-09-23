@@ -11,40 +11,41 @@ import aiosqlite
 import dbl
 from typing import Union
 
-async def check_perms(ctx):
-  error = False
-  emb = discord.Embed(description = f"I'm missing these permissions to run the command `{ctx.command}`:\n", colour = ctx.bot.colour)
-  embed = True
-
-  if not ctx.guild.me.permissions_in(ctx.channel).use_external_emojis:
-    emb.description += "• Use external emojis\n"
-    error = True
-
-  if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
-    emb.description += "• Read message history\n"
-    error = True
-  
-  if not ctx.guild.me.permissions_in(ctx.channel).embed_links:
-    emb.description += "• Embed links"
-    embed = False
-    error = True
-
-  if error:
-    if embed:
-      await ctx.send(embed = emb)
-      return False
-
-    else:
-      await ctx.send(emb.description)
-      return False
-
-  return True
-
 class Cookie(commands.Cog):
   
   def __init__(self, bot):
     self.bot = bot
     self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
+    self.bot.add_check(self.check_perms)
+
+  async def check_perms(self, ctx):
+    error = False
+    emb = discord.Embed(description = f"I'm missing these permissions to run the command `{ctx.command}`:\n", colour = ctx.bot.colour)
+    embed = True
+
+    if not ctx.guild.me.permissions_in(ctx.channel).use_external_emojis:
+      emb.description += "**• Use external emojis**\n"
+      error = True
+
+    if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
+      emb.description += "**• Read message history**\n"
+      error = True
+    
+    if not ctx.guild.me.permissions_in(ctx.channel).embed_links:
+      emb.description += "**• Embed links**"
+      embed = False
+      error = True
+
+    if error:
+      if embed:
+        await ctx.send(embed = emb)
+        return False
+
+      else:
+        await ctx.send(emb.description)
+        return False
+
+    return True
 
   @commands.command(aliases = ["cookies", "c"])
   @commands.guild_only()
