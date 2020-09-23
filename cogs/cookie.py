@@ -16,7 +16,6 @@ class Cookie(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
     self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
-    self.bot.add_check(self.check_perms)
 
   async def check_perms(self, ctx):
     error = False
@@ -132,6 +131,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
+  @commands.check(check_perms)
   async def milk(self, ctx, timeout: float = 120):
 
     "Spawn a milk in the chat, first one to take it wins!"
@@ -208,6 +208,7 @@ class Cookie(commands.Cog):
       print(traceback.print_exc())
 
   @commands.group(aliases = ["lb", "top"], invoke_without_command = True)
+  @commands.check(check_perms)
   async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users, if a number is specified it will return the closest results to that number."
 
@@ -267,6 +268,7 @@ class Cookie(commands.Cog):
     await ctx.send(embed = emb)
 
   @leaderboard.command(aliases = ["guild"], invoke_without_command = True)
+  @commands.check(check_perms)
   async def server(self, ctx):
     "Top Cookie users in the actual server"
 
@@ -301,6 +303,7 @@ class Cookie(commands.Cog):
     await ctx.send(embed = emb)
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
+  @commands.check(check_perms)
   async def stats(self, ctx, *, user: discord.User = None):
     "Check User stats"
     
@@ -328,6 +331,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
+  @commands.check(check_perms)
   async def _type(self, ctx, timeout: float = 120):
     "First one to send the cookie emoji wins!"
 
@@ -409,6 +413,7 @@ class Cookie(commands.Cog):
 
   @commands.command(aliases = ["p"])
   @commands.max_concurrency(1, BucketType.channel)
+  @commands.check(check_perms)
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
 
@@ -554,6 +559,7 @@ class Cookie(commands.Cog):
           await db.commit()
 
   @commands.command(aliases = ["gift"])
+  @commands.check(check_perms)
   async def send(self, ctx, user: discord.User, cookies: int):
     "Gift cookies to a user"
 
@@ -622,6 +628,7 @@ class Cookie(commands.Cog):
     await msg.edit(embed = emb)
 
   @commands.command()
+  @commands.check(check_perms)
   async def delete(self, ctx):
     "Delete all your cookies"
 
