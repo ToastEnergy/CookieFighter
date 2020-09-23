@@ -224,7 +224,6 @@ class Events(commands.Cog):
             emb = discord.Embed(description = f"Hey there! My prefix is `{prefix}`, do `{prefix}help` to get more help!", colour = self.bot.colour)
             emb.set_author(name = message.author, icon_url = str(message.author.avatar_url_as(static_format = "png")))
 
-
             return await message.channel.send(embed = emb)
 
 def setup(bot):

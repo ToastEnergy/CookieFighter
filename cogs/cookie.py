@@ -11,6 +11,35 @@ import aiosqlite
 import dbl
 from typing import Union
 
+async def check_perms(ctx):
+  error = False
+  emb = discord.Embed(description = f"I'm missing these permissions to run the command `{ctx.command}`:\n", colour = ctx.bot.colour)
+  embed = True
+
+  if not ctx.guild.me.permissions_in(ctx.channel).use_external_emojis:
+    emb.description += "• Use external emojis\n"
+    error = True
+
+  if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
+    emb.description += "• Read message history\n"
+    error = True
+  
+  if not ctx.guild.me.permissions_in(ctx.channel).embed_links:
+    emb.description += "• Embed links"
+    embed = False
+    error = True
+
+  if error:
+    if embed:
+      await ctx.send(embed = emb)
+      return False
+
+    else:
+      await ctx.send(emb.description)
+      return False
+
+  return True
+
 class Cookie(commands.Cog):
   
   def __init__(self, bot):
@@ -21,6 +50,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user)
+  @commands.check(check_perms)
   async def cookie(self, ctx, timeout: float = 120):
 
     "Spawn a cookie in the chat, first one to take it wins! You can also set a cusotom timeout in seconds (default is 120, max is 300)"
