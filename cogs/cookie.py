@@ -11,13 +11,7 @@ import aiosqlite
 import dbl
 from typing import Union
 
-class Cookie(commands.Cog):
-  
-  def __init__(self, bot):
-    self.bot = bot
-    self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
-
-  async def check_perms(self, ctx):
+async def check_perms(ctx):
     error = False
     emb = discord.Embed(description = f"I'm missing these permissions to run the command `{ctx.command}`:\n", colour = ctx.bot.colour)
     embed = True
@@ -45,6 +39,12 @@ class Cookie(commands.Cog):
         return False
 
     return True
+
+class Cookie(commands.Cog):
+  
+  def __init__(self, bot):
+    self.bot = bot
+    self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
 
   @commands.command(aliases = ["cookies", "c"])
   @commands.guild_only()
