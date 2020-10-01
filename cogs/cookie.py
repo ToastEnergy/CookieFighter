@@ -483,6 +483,7 @@ class Cookie(commands.Cog):
           pass
         await msg.edit(embed=e)
         await asyncio.sleep(5)
+        e.title = None
         e.description = mission
         await msg.delete()
         msg = await ctx.send(embed=e)
