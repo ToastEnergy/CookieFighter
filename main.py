@@ -35,6 +35,7 @@ def get_prefix(bot, message):
 bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, description = "Fight your friends and be the first to catch the cookie!")
 bot.cookie = "<:mc_cookie:726184620164382741>"
 bot.oreo = "<:oreo:761274120821276702>"
+bot.gocciola = "<:gocciola:747247300803297290>"
 bot.milk = "<:mc_milk:726522958847279174>"
 bot.clock = "<a:mc_clock:748835359991005215>"
 bot.colour = 0xd8ad6a

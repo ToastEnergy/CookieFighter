@@ -57,7 +57,7 @@ class Cookie(commands.Cog):
 
     if timeout > 300: timeout = 300
 
-    emoji = random.choice([self.bot.cookie, self.bot.oreo])
+    emoji = random.choice([self.bot.cookie, self.bot.oreo, self.bot.gocciola])
 
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
     count.set_footer(text = "First one to take the cookie wins🍪!")
@@ -76,7 +76,7 @@ class Cookie(commands.Cog):
     await msg.add_reaction(emoji)
 
     def check(reaction, user):
-      return user.bot is False and str(reaction.emoji) in [self.bot.cookie, self.bot.oreo] and reaction.message.id == msg.id
+      return user.bot is False and str(reaction.emoji) in [self.bot.cookie, self.bot.oreo, self.bot.gocciola] and reaction.message.id == msg.id
 
     start = time.perf_counter()
     await asyncio.sleep(0.25)
