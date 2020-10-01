@@ -427,7 +427,7 @@ class Cookie(commands.Cog):
     REDTICK = self.bot.get_emoji(727212831782731796 )
     EMOJIS = [GREENTICK, REDTICK]
     # MISSIONS_AND_ANSWERS = {f"First one to eat the cookie wins{self.bot.cookie}!": ["REACTION", self.bot.cookie], f"First one to drink the milk wins{self.bot.milk}!": ["REACTION", self.bot.milk]}
-    MISSIONS_AND_ANSWERS = {'Who first sends the cookie emoji, win!': ["🍪", "<:mc_cookie:726184620164382741>"], "What we are drinking with cookies?": ["🥛", "milk"], f"First one to take the cookie wins{self.bot.cookie}!": ["REACTION", self.bot.cookie], f"First one to eat the milk wins{self.bot.milk}!": ["REACTION", self.bot.milk]}
+    MISSIONS_AND_ANSWERS = {'Who first sends the cookie emoji, win!': ["🍪", "<:mc_cookie:726184620164382741>"], "What we are drinking with cookies?": ["🥛", "milk"], "Which food connects black and white?": ["oreo", self.bot.oreo], f"First one to take the cookie wins{self.bot.cookie}!": ["REACTION", self.bot.cookie], f"First one to eat the milk wins{self.bot.milk}!": ["REACTION", self.bot.milk]}
     SECONDS = 10.0
     NotFound = discord.Embed(description = "<a:fail:727212831782731796> someone deleted my message and I can't continue the game!", colour = self.bot.colour)
 
