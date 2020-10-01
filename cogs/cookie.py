@@ -57,6 +57,8 @@ class Cookie(commands.Cog):
 
     if timeout > 300: timeout = 300
 
+    emoji = random.choice([self.bot.cookie, self.bot.oreo])
+
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
     count.set_footer(text = "First one to take the cookie wins🍪!")
 
@@ -69,12 +71,12 @@ class Cookie(commands.Cog):
       number -= 1
       await asyncio.sleep(1)
 
-    emb = discord.Embed(description = f"First one to take the cookie wins{self.bot.cookie}!", colour = self.bot.colour)
+    emb = discord.Embed(description = f"First one to take the cookie wins{emoji}!", colour = self.bot.colour)
     await msg.edit(embed = emb)
-    await msg.add_reaction(self.bot.cookie)
+    await msg.add_reaction(emoji)
 
     def check(reaction, user):
-      return user.bot is False and str(reaction.emoji) == self.bot.cookie and reaction.message.id == msg.id
+      return user.bot is False and str(reaction.emoji) in [self.bot.cookie, self.bot.oreo] and reaction.message.id == msg.id
 
     start = time.perf_counter()
     await asyncio.sleep(0.25)
@@ -95,7 +97,7 @@ class Cookie(commands.Cog):
     end = time.perf_counter()
     duration = (end - start) 
     emb.set_author(name = "We have a winner!", icon_url = str(msg0[1].avatar_url_as(static_format = "png")))
-    emb.description = f"{msg0[1].mention} won and ate the cookie {self.bot.cookie} in `{duration:.2f}` seconds!"
+    emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!"
     await msg.edit(embed = emb)
 
     winner = str(msg0[1].id)
@@ -121,7 +123,7 @@ class Cookie(commands.Cog):
       others = "\n".join([a.mention for a in users if a.id != int(winner) and a.bot is False])
 
       if len(others) >= 1:
-        emb.description = f"{msg0[1].mention} won and ate the cookie {self.bot.cookie} in `{duration:.2f}` seconds!\n\nOther players:\n{others}"
+        emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!\n\nOther players:\n{others}"
         await msg.edit(embed = emb)    
       
     except:
