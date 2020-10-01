@@ -57,7 +57,7 @@ class Cookie(commands.Cog):
 
     if timeout > 300: timeout = 300
 
-    emoji = random.choice([self.bot.cookie, self.bot.oreo, self.bot.gocciola])
+    emoji = random.choice([self.bot.gocciola, self.bot.cookie, self.bot.oreo])
 
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
     count.set_footer(text = "First one to take the cookie wins🍪!")
@@ -87,7 +87,7 @@ class Cookie(commands.Cog):
       emb.description = "Nobody ate the cookie!"
       try:
         await msg.edit(embed = emb)
-        await msg.remove_reaction(self.bot.cookie, ctx.guild.me)
+        await msg.remove_reaction(emoji, ctx.guild.me)
       except:
         emb.description = "The original message got deleted, I can't end the game!"
         await ctx.send(embed = emb)
