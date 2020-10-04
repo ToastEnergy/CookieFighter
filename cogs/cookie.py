@@ -418,10 +418,7 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
-    
-    if ctx.author.id not in [488398758812319745, 326736523494031360]:
-      return await ctx.send("Sorry, the command `party` is locked at the moment, we're fixing some bugs.")
-
+  
     check = await self.dblpy.get_user_vote(ctx.author.id)
 
     if not check:
@@ -472,7 +469,7 @@ class Cookie(commands.Cog):
     except asyncio.TimeoutError:
         partymembers_loop.cancel()
 
-        if len(PARTY_MEMBERS) <= 0:
+        if len(PARTY_MEMBERS) <= 1:
           emb = discord.Embed(title = f"{REDTICK} **Too few players**", description = f"At least 2 players are required to start a party!", colour = self.bot.colour)
           try:
             await msg.clear_reactions()
