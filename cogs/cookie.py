@@ -418,6 +418,9 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
+    
+    if ctx.author.id not in [488398758812319745, 326736523494031360]:
+      return await ctx.send("Sorry, the command `party` is locked at the moment, we're fixing some bugs.")
 
     check = await self.dblpy.get_user_vote(ctx.author.id)
 
@@ -446,9 +449,9 @@ class Cookie(commands.Cog):
         if not PARTY_MEMBERS:
             return 
 
-        PARTY_MENTINOS = '\n'.join(list((_msg.guild.get_member(member_id)).mention for member_id in PARTY_MEMBERS))
+        PARTY_MENTIONS = '\n'.join(list((_msg.guild.get_member(member_id)).mention for member_id in PARTY_MEMBERS))
         e = _msg.embeds[0].copy()
-        e.description = f"{description} \n\n__**PARTY PARTICIPANTS**__: \n{PARTY_MENTINOS}"
+        e.description = f"{description} \n\n__**PARTY PARTICIPANTS**__: \n{PARTY_MENTIONS}"
         await _msg.edit(embed=e)
 
     def check(reaction, user):
