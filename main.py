@@ -32,7 +32,7 @@ def get_prefix(bot, message):
 
   return prefix
 
-intents = discord.Intents.default()
+intents = discord.Intents()
 intents.members = True
 
 bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, description = "Fight your friends and be the first to catch the cookie!", intents = intents)
