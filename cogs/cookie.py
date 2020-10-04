@@ -446,10 +446,10 @@ class Cookie(commands.Cog):
         if not PARTY_MEMBERS:
             return 
 
-        PARTY_MENTINOS = '\n'.join(list((msg.guild.get_member(member_id)).mention for member_id in PARTY_MEMBERS))
-        e = msg.embeds[0].copy()
+        PARTY_MENTINOS = '\n'.join(list((_msg.guild.get_member(member_id)).mention for member_id in PARTY_MEMBERS))
+        e = _msg.embeds[0].copy()
         e.description = f"{description} \n\n__**PARTY PARTICIPANTS**__: \n{PARTY_MENTINOS}"
-        await msg.edit(embed=e)
+        await _msg.edit(embed=e)
 
     def check(reaction, user):
         if reaction.emoji not in EMOJIS or reaction.message.channel.id != ctx.channel.id or reaction.message.id != msg.id or user.bot:
