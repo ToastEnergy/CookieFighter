@@ -34,6 +34,7 @@ def get_prefix(bot, message):
 
 intents = discord.Intents.default()
 intents.members = True
+intents.presences = True
 
 bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, description = "Fight your friends and be the first to catch the cookie!", intents = intents)
 bot.cookie = "<:mc_cookie:726184620164382741>"
