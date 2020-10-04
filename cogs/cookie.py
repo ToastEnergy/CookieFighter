@@ -442,7 +442,7 @@ class Cookie(commands.Cog):
     msg = await ctx.send(embed=e)
     [await msg.add_reaction(str(e)) for e in EMOJIS]
 
-    PARTY_MEMBERS = list()
+    PARTY_MEMBERS = []
 
     @tasks.loop(seconds=2)
     async def partymembers_loop(_msg):
@@ -472,7 +472,7 @@ class Cookie(commands.Cog):
     except asyncio.TimeoutError:
         partymembers_loop.cancel()
 
-        if len(PARTY_MEMBERS) <= 1:
+        if len(PARTY_MEMBERS) <= 0:
           emb = discord.Embed(title = f"{REDTICK} **Too few players**", description = f"At least 2 players are required to start a party!", colour = self.bot.colour)
           try:
             await msg.clear_reactions()
