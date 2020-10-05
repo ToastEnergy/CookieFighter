@@ -60,7 +60,7 @@ class Cookie(commands.Cog):
     emoji = random.choice([self.bot.gocciola, self.bot.cookie, self.bot.oreo])
 
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
-    count.set_footer(text = "First one to take the cookie wins🍪!")
+    count.set_footer(text = "First one to take the cookie wins 🍪!")
 
     msg = await ctx.send(embed = count)
     number = 2
@@ -71,7 +71,7 @@ class Cookie(commands.Cog):
       number -= 1
       await asyncio.sleep(1)
 
-    emb = discord.Embed(description = f"First one to take the cookie wins{emoji}!", colour = self.bot.colour)
+    emb = discord.Embed(description = f"First one to take the cookie wins {emoji}!", colour = self.bot.colour)
     await msg.edit(embed = emb)
     await msg.add_reaction(emoji)
 
@@ -141,7 +141,7 @@ class Cookie(commands.Cog):
     if timeout > 300: timeout = 300
 
     count = discord.Embed(title = "**3**", colour = self.bot.colour)
-    count.set_footer(text = "First one to take the milk wins🥛!")
+    count.set_footer(text = "First one to take the milk wins 🥛!")
 
     msg = await ctx.send(embed = count)
     number = 2
@@ -152,7 +152,7 @@ class Cookie(commands.Cog):
       number -= 1
       await asyncio.sleep(1)
 
-    emb = discord.Embed(description = f"First one to take the cookie wins{self.bot.milk}!", colour = self.bot.colour)
+    emb = discord.Embed(description = f"First one to take the cookie wins {self.bot.milk}!", colour = self.bot.colour)
     await msg.edit(embed = emb)
     await msg.add_reaction(self.bot.milk)
 
@@ -357,7 +357,7 @@ class Cookie(commands.Cog):
       number -= 1
       await asyncio.sleep(1)
 
-    emb = discord.Embed(description = f"First one to send a cookie in the chat wins{self.bot.cookie}!", colour = self.bot.colour)
+    emb = discord.Embed(description = f"First one to send a cookie in the chat wins {self.bot.cookie}!", colour = self.bot.colour)
     try:
       await msg.edit(embed = emb)
     except discord.NotFound:
@@ -429,7 +429,7 @@ class Cookie(commands.Cog):
     REDTICK = self.bot.get_emoji(727212831782731796 )
     EMOJIS = [GREENTICK, REDTICK]
     # MISSIONS_AND_ANSWERS = {f"First one to eat the cookie wins{self.bot.cookie}!": ["REACTION", self.bot.cookie], f"First one to drink the milk wins{self.bot.milk}!": ["REACTION", self.bot.milk]}
-    MISSIONS_AND_ANSWERS = {'Who first sends the cookie emoji, win!': ["🍪", "<:mc_cookie:726184620164382741>"], "What we are drinking with cookies?": ["🥛", "milk"], "Which food connects black and white?": ["oreo", self.bot.oreo], f"First one to take the cookie wins{self.bot.cookie}!": ["REACTION", self.bot.cookie], f"First one to eat the milk wins{self.bot.milk}!": ["REACTION", self.bot.milk]}
+    MISSIONS_AND_ANSWERS = {'Who first sends the cookie emoji, win!': ["🍪", "<:mc_cookie:726184620164382741>"], "What we are drinking with cookies?": ["🥛", "milk"], "Which food connects black and white?": ["oreo", self.bot.oreo], f"First one to take the cookie wins {self.bot.cookie}!": ["REACTION", self.bot.cookie], f"First one to eat the milk wins {self.bot.milk}!": ["REACTION", self.bot.milk]}
     SECONDS = 10.0
     NotFound = discord.Embed(description = "<a:fail:727212831782731796> someone deleted my message and I can't continue the game!", colour = self.bot.colour)
 
