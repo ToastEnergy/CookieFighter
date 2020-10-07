@@ -422,8 +422,11 @@ class Cookie(commands.Cog):
     check = await self.dblpy.get_user_vote(ctx.author.id)
 
     if not check:
-      emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1-2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = self.bot.colour)
-      return await ctx.send(embed = emb)
+      if ctx.author.id in [326736523494031360, 488398758812319745]:
+        pass
+      else:
+        emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1-2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = self.bot.colour)
+        return await ctx.send(embed = emb)
 
     GREENTICK = self.bot.get_emoji(726040431539912744)
     REDTICK = self.bot.get_emoji(727212831782731796 )
