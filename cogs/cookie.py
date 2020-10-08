@@ -295,7 +295,7 @@ class Cookie(commands.Cog):
         pass
       
       else:
-          u = self.bot.get_user(int(data)) 
+          u = self.bot.get_user(int(data[0])) 
 
           if u:
             if u.id in [a.id for a in ctx.guild.members]:
