@@ -214,6 +214,8 @@ class Cookie(commands.Cog):
   async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users, if a number is specified it will return the closest results to that number."
 
+    return await ctx.send("sorry, this command is disabled at the moment.")
+
     if number is not None:
       async with aiosqlite.connect("data/db.db") as db:
         data = await db.execute("SELECT * from results")
@@ -274,6 +276,8 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def server(self, ctx):
     "Top Cookie users in the actual server"
+    
+    return await ctx.send("sorry, this command is disabled at the moment.")
 
     stats = {}
 
@@ -295,7 +299,7 @@ class Cookie(commands.Cog):
         pass
       
       else:
-          u = self.bot.get_user(int(data[0])) 
+          u = self.bot.get_user(int(stats[a][0])) 
 
           if u:
             if u.id in [a.id for a in ctx.guild.members]:
@@ -310,6 +314,8 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def stats(self, ctx, *, user: discord.User = None):
     "Check User stats"
+
+    return await ctx.send("sorry, this command is disabled at the moment.")
     
     user = user or ctx.author
 
@@ -420,6 +426,8 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
+
+    return await ctx.send("sorry, this command is disabled at the moment.")
   
     check = await self.dblpy.get_user_vote(ctx.author.id)
 
