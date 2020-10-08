@@ -235,12 +235,6 @@ class Cookie(commands.Cog):
         
         else:
             u = self.bot.get_user(int(lb[data]["user"])) 
-            if not u:
-              try:
-                u = await self.bot.fetch_user(int(lb[data]["user"]))
-
-              except:
-                u = None
 
             if u:
               counter += 1
@@ -268,13 +262,6 @@ class Cookie(commands.Cog):
           
           else:
             u = self.bot.get_user(int(data)) 
-
-            if not u:
-              try:
-                await self.bot.fetch_user(int(data))
-              except:
-                u = None
-
             if u:
               counter += 1
               res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
@@ -308,22 +295,12 @@ class Cookie(commands.Cog):
         pass
       
       else:
-        try:
           u = self.bot.get_user(int(data)) 
-
-          if not u:
-            try:
-              u = self.bot.fetch_user(int(data))
-            except:
-              u = None
 
           if u:
             if u.id in [a.id for a in ctx.guild.members]:
               counter += 1
               res += f"\n**{counter}.** `{str(u)}` - **{stats[str(a)]} {self.bot.cookie}**"
-
-        except:
-          pass
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
     emb.set_author(name = f"{ctx.guild.name} Leaderboard", icon_url = str(ctx.guild.icon_url_as(static_format = "png")))
