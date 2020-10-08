@@ -264,13 +264,17 @@ class Cookie(commands.Cog):
             break
           
           else:
-            try:
-              u = self.bot.get_user(int(data)) if self.bot.get_user(int(lb[data]["user"])) else await self.bot.fetch_user(int(data))
-              if u:
-                counter += 1
-                res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
-            except:
-              pass
+            u = self.bot.get_user(int(data)) 
+            
+            if not u:
+              try:
+                await self.bot.fetch_user(int(data))
+              except:
+                u = None
+
+            if u:
+              counter += 1
+              res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
     emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
@@ -309,7 +313,7 @@ class Cookie(commands.Cog):
               u = self.bot.fetch_user(int(data))
             except:
               u = None
-              
+
           if u:
             if u.id in [a.id for a in ctx.guild.members]:
               counter += 1
