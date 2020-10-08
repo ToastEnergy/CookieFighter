@@ -1,10 +1,6 @@
-import discord
+import discord, humanize, psutil, platform, time, aiosqlite
 from discord.ext import commands
-import platform
-import psutil
 from datetime import datetime
-import time
-import aiosqlite
 
 class Misc(commands.Cog):
         def __init__(self, bot):
