@@ -234,10 +234,14 @@ class Cookie(commands.Cog):
           break
         
         else:
-          u = self.bot.get_user(int(lb[data]["user"]))
-          if u:
-            counter += 1
-            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
+          try:
+            u = self.bot.get_user(int(lb[data]["user"])) if self.bot.get_user(int(lb[data]["user"])) else await self.bot.fetch_user(int(lb[data]["user"]))
+            if u:
+              counter += 1
+              res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
+
+          except:
+            pass
         
     else:
       stats = {}
@@ -260,10 +264,13 @@ class Cookie(commands.Cog):
             break
           
           else:
-            u = self.bot.get_user(int(data))
-            if u:
-              counter += 1
-              res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
+            try:
+              u = self.bot.get_user(int(data)) if self.bot.get_user(int(lb[data]["user"])) else await self.bot.fetch_user(int(data))
+              if u:
+                counter += 1
+                res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
+            except:
+              pass
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
     emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
@@ -294,11 +301,15 @@ class Cookie(commands.Cog):
         pass
       
       else:
-        u = self.bot.get_user(int(a))
-        if u:
-          if u.id in [a.id for a in ctx.guild.members]:
-            counter += 1
-            res += f"\n**{counter}.** `{str(u)}` - **{stats[str(a)]} {self.bot.cookie}**"
+        try:
+          u = self.bot.get_user(int(data)) if self.bot.get_user(int(a)) else await self.bot.fetch_user(int(a))
+          if u:
+            if u.id in [a.id for a in ctx.guild.members]:
+              counter += 1
+              res += f"\n**{counter}.** `{str(u)}` - **{stats[str(a)]} {self.bot.cookie}**"
+
+        except:
+          pass
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
     emb.set_author(name = f"{ctx.guild.name} Leaderboard", icon_url = str(ctx.guild.icon_url_as(static_format = "png")))
@@ -449,7 +460,7 @@ class Cookie(commands.Cog):
         if not PARTY_MEMBERS:
             return 
 
-        PARTY_MENTIONS = '\n'.join(list((_msg.guild.get_member(member_id)).mention for member_id in PARTY_MEMBERS))
+        PARTY_MENTIONS = '\n'.join(list((self.bot.get_user(member_id) if self.bot.get_user(member_id) else await self.bot.fetch_user(member_id)).mention for member_id in PARTY_MEMBERS))
         e = _msg.embeds[0].copy()
         e.description = f"{description} \n\n__**PARTY PARTICIPANTS**__: \n{PARTY_MENTIONS}"
         await _msg.edit(embed=e)
