@@ -241,13 +241,10 @@ class Cookie(commands.Cog):
 
               except:
                 u = None
-                
+
             if u:
               counter += 1
               res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
-
-          except:
-            pass
         
     else:
       stats = {}
