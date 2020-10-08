@@ -234,8 +234,14 @@ class Cookie(commands.Cog):
           break
         
         else:
-          try:
-            u = self.bot.get_user(int(lb[data]["user"])) if self.bot.get_user(int(lb[data]["user"])) else await self.bot.fetch_user(int(lb[data]["user"]))
+            u = self.bot.get_user(int(lb[data]["user"])) 
+            if not u:
+              try:
+                u = await self.bot.fetch_user(int(lb[data]["user"]))
+
+              except:
+                u = None
+                
             if u:
               counter += 1
               res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
@@ -265,7 +271,7 @@ class Cookie(commands.Cog):
           
           else:
             u = self.bot.get_user(int(data)) 
-            
+
             if not u:
               try:
                 await self.bot.fetch_user(int(data))
