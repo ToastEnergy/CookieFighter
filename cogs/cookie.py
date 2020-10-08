@@ -302,7 +302,14 @@ class Cookie(commands.Cog):
       
       else:
         try:
-          u = self.bot.get_user(int(data)) if self.bot.get_user(int(a)) else await self.bot.fetch_user(int(a))
+          u = self.bot.get_user(int(data)) 
+
+          if not u:
+            try:
+              u = self.bot.fetch_user(int(data))
+            except:
+              u = None
+              
           if u:
             if u.id in [a.id for a in ctx.guild.members]:
               counter += 1
