@@ -176,12 +176,20 @@ class Events(commands.Cog):
                 guild = self.bot.get_guild(payload.guild_id)
                 r = guild.get_role(734859787388321854)
                 m = guild.get_member(payload.user_id)
+
+                if not m:
+                    m = await guild.fetch_member(payload.user_id)
+
                 await m.add_roles(r)
 
             elif payload.emoji.name == "🎉":
                 guild = self.bot.get_guild(payload.guild_id)
                 r = guild.get_role(734859719482671145)
                 m = guild.get_member(payload.user_id)
+
+                if not m:
+                    m = await guild.fetch_member(payload.user_id)
+                    
                 await m.add_roles(r)
 
     @commands.Cog.listener()
