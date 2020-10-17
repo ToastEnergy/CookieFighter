@@ -216,6 +216,9 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
 
+        if not self.bot.get_user(message.author.id):
+            await self.bot.fetch_user(message.author.id)
+
         if not message.guild:
             mention = self.bot.user.mention
 
