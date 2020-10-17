@@ -214,9 +214,6 @@ class Cookie(commands.Cog):
   async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users, if a number is specified it will return the closest results to that number."
 
-    if ctx.author.id not in self.bot.owner_ids:
-      return await ctx.send("sorry, this command is disabled at the moment.")
-
     if number is not None:
       async with aiosqlite.connect("data/db.db") as db:
         data = await db.execute("SELECT * from results")
