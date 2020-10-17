@@ -589,7 +589,14 @@ class Cookie(commands.Cog):
                 await msg.delete()
               except discord.NotFound:
                 return await ctx.send(embed = NotFound)
-              members = [ctx.guild.get_member(a) for a in PARTY_MEMBERS]
+              members = []
+              for id in PARTY_MEMBERS:
+                u = self.bot.get_user(id)
+
+                if not u:
+                  u = await self.bot.fetch_user(id)
+
+                members.append(u)
               e = discord.Embed(title="**Cookies Party Missions 🎉**", description="{} Participants:\n{}".format(len(PARTY_MEMBERS), '\n'.join([a.mention for a in members])), timestamp=datetime.utcnow(), colour = self.bot.colour)
               e.set_author(name=f"{message.author.display_name} Won in {duration:.2f} seconds!🎉", icon_url=message.author.avatar_url)
               e.set_footer(text='The party ends at')
