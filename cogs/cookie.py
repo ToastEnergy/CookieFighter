@@ -477,12 +477,22 @@ class Cookie(commands.Cog):
         if not PARTY_MEMBERS:
             return 
 
-        PARTY_MENTIONS = '\n'.join(list((self.bot.get_user(member_id) if self.bot.get_user(member_id) else await self.bot.fetch_user(member_id)).mention for member_id in PARTY_MEMBERS))
+        PARTY_MENTIONS = []
+
+        for user in PARTY_MEMBERS:
+          u = self.bot.get_user(user)
+          
+          if not u:
+            u = await self.bot.fetch_user(user)
+
+          PARTY_MENTIONS.append(u.mention)
+
         e = _msg.embeds[0].copy()
         e.description = f"{description} \n\n__**PARTY PARTICIPANTS**__: \n{PARTY_MENTIONS}"
         await _msg.edit(embed=e)
 
     def check(reaction, user):
+
         if reaction.emoji not in EMOJIS or reaction.message.channel.id != ctx.channel.id or reaction.message.id != msg.id or user.bot:
             return False
         if reaction.emoji.id == GREENTICK.id:
