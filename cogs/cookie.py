@@ -291,7 +291,8 @@ class Cookie(commands.Cog):
   async def server(self, ctx):
     "Top Cookie users in the actual server"
     
-    return await ctx.send("sorry, this command is disabled at the moment.")
+    if ctx.author.id not in self.bot.owner_ids:
+      return await ctx.send("sorry, this command is disabled at the moment.")
 
     stats = {}
 
@@ -314,6 +315,12 @@ class Cookie(commands.Cog):
       
       else:
           u = self.bot.get_user(int(stats[a][0])) 
+
+          if not u:
+              try:
+                u = await self.bot.get_user(int(stats[a][0]))
+              except:
+                u = None
 
           if u:
             if u.id in [a.id for a in ctx.guild.members]:
