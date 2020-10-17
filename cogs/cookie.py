@@ -445,7 +445,8 @@ class Cookie(commands.Cog):
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
 
-    return await ctx.send("sorry, this command is disabled at the moment.")
+    if ctx.author.id not in self.bot.owner_ids:
+      return await ctx.send("sorry, this command is disabled at the moment.")
   
     check = await self.dblpy.get_user_vote(ctx.author.id)
 
