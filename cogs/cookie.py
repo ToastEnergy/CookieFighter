@@ -330,12 +330,10 @@ class Cookie(commands.Cog):
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
   @commands.check(check_perms)
-  async def stats(self, ctx, *, user: discord.User = None):
+  async def stats(self, ctx):
     "Check User stats"
-
-    return await ctx.send("sorry, this command is disabled at the moment.")
     
-    user = user or ctx.author
+    user = ctx.author
 
     async with aiosqlite.connect("data/db.db") as db:
       data = await db.execute(f"SELECT * from users where user = {user.id}")
@@ -622,6 +620,8 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def send(self, ctx, user: discord.User, cookies: int):
     "Gift cookies to a user"
+
+    return await ctx.send("sorry, this command is disabled at the moment.")
 
     if user.bot:
       emb = discord.Embed(description = "nah, robot don't eat cookies.", colour = self.bot.colour)
