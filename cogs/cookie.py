@@ -486,7 +486,9 @@ class Cookie(commands.Cog):
           if not u:
             u = await self.bot.fetch_user(user)
 
-          PARTY_MENTIONS.append(u.mention)
+          PARTY_MENTIONS.append(f"• {u.mention}")
+
+        PARTY_MENTIONS = "\n".join(PARTY_MENTIONS)
 
         e = _msg.embeds[0].copy()
         e.description = f"{description} \n\n__**PARTY PARTICIPANTS**__: \n{PARTY_MENTIONS}"
@@ -555,9 +557,18 @@ class Cookie(commands.Cog):
             await msg.delete()
           except discord.NotFound:
             return await ctx.send(embed = NotFound)
-          members = [ctx.guild.get_member(a) for a in PARTY_MEMBERS]
+          # members = [ctx.guild.get_member(a) for a in PARTY_MEMBERS]
+          members = []
+          for id in PARTY_MEMBERS:
+            u = self.bot.get_user(id)
+
+            if not u:
+              u = await self.bot.fetch_user(id)
+
+            members.append(u)
+
           e = discord.Embed(title="**Cookies Party Missions 🎉**", description="{} Participants:\n{}".format(len(PARTY_MEMBERS), '\n'.join([a.mention for a in members])), timestamp=datetime.utcnow(), colour = self.bot.colour)
-          e.set_author(name=f"{user.display_name} Won in {duration:.2f} seconds!🎉", icon_url = str(user.avatar_url_as(static_format = "png")))
+          e.set_author(name=f"{user.name} Won in {duration:.2f} seconds!🎉", icon_url = str(user.avatar_url_as(static_format = "png")))
           e.set_footer(text='The party ends at')
           msg = await ctx.send(embed=e)
           await msg.add_reaction("🎉")
