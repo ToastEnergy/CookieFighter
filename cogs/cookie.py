@@ -234,17 +234,10 @@ class Cookie(commands.Cog):
           break
         
         else:
-            u = self.bot.get_user(int(lb[data]["user"])) 
+            u = await self.bot.get_user(int(lb[data]["user"]))
 
-            if not u:
-              try:
-                u = await self.bot.get_user(int(lb[data]["user"]))
-              except:
-                u = None
-
-            if u:
-              counter += 1
-              res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
+            counter += 1
+            res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
         
     else:
       stats = {}
