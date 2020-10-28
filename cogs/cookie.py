@@ -234,7 +234,7 @@ class Cookie(commands.Cog):
           break
         
         else:
-            u = await self.bot.get_user(int(lb[data]["user"]))
+            u = await self.bot.fetch_user(int(lb[data]["user"]))
 
             counter += 1
             res += f"\n**{counter}.** `{str(u)}` - **{lb[data]['time']}s {self.bot.clock}**"
@@ -260,7 +260,7 @@ class Cookie(commands.Cog):
             break
           
           else:
-            u = await self.bot.get_user(int(data))
+            u = await self.bot.fetch_user(int(data))
             counter += 1
             res += f"\n**{counter}.** `{str(u)}` - **{stats[str(data)]} {self.bot.cookie}**"
 
