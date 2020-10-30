@@ -246,7 +246,8 @@ class Cookie(commands.Cog):
 
             if u:
               counter += 1
-              res += f"\n**{counter}.** `{discord.utils.escape_markdown(str(u))}` - **{lb[data]['time']}s {self.bot.clock}**"
+              user = str(u).replace("`", "")
+              res += f"\n**{counter}.** `{discord.utils.escape_markdown(str(user))}` - **{lb[data]['time']}s {self.bot.clock}**"
         
     else:
       stats = {}
@@ -279,7 +280,8 @@ class Cookie(commands.Cog):
                 
             if u:
               counter += 1
-              res += f"\n**{counter}.** `{discord.utils.escape_markdown(str(u))}` - **{stats[str(data)]} {self.bot.cookie}**"
+              user = str(u).replace("`", "")
+              res += f"\n**{counter}.** `{discord.utils.escape_markdown(str(user))}` - **{stats[str(data)]} {self.bot.cookie}**"
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
     emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
