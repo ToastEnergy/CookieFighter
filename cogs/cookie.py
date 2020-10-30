@@ -246,7 +246,7 @@ class Cookie(commands.Cog):
 
             if u:
               counter += 1
-              user = str(u).replace("`", "")
+              user = str(u).replace("`", "").replace("˞˞", "")
               res += f"\n**{counter}.** `{user}` - **{lb[data]['time']}s {self.bot.clock}**"
         
     else:
@@ -280,7 +280,7 @@ class Cookie(commands.Cog):
                 
             if u:
               counter += 1
-              user = str(u).replace("`", "")
+              user = str(u).replace("`", "").replace("˞˞", "")
               res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
