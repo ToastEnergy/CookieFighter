@@ -349,9 +349,6 @@ class Cookie(commands.Cog):
       else:
         cookies = int(data[0][1])
 
-      await db.commit()
-      await db.close()
-
     emb = discord.Embed(description = f"**{cookies}** Cookies {self.bot.cookie}!", colour = self.bot.colour)
     emb.set_author(name = user.name, icon_url = user.avatar_url_as(static_format="png"))
 
