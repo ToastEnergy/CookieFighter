@@ -13,7 +13,7 @@ class Misc(commands.Cog):
                 library = discord.__version__
                 memory = psutil.virtual_memory()[2]
                 cpu = psutil.cpu_percent()
-                owners = [str(self.bot.get_user(a)) for a in self.bot.owner_ids]
+                owners = [str(await self.bot.fetch_user(a)) for a in self.bot.owner_ids]
 
                 emb = discord.Embed(colour = self.bot.colour, description = f"""```
 ╔═╗╔═╗╔═╗╦╔═╦╔═╗  ╔═╗╦╔═╗╦ ╦╔╦╗╔═╗╦═╗
