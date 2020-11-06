@@ -35,7 +35,7 @@ def get_prefix(bot, message):
 intents = discord.Intents.default()
 # intents.members = True
 
-bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, description = "Fight your friends and be the first to catch the cookie!", intents = intents, owner_ids = [488398758812319745, 326736523494031360, 771316465789960203])
+bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, description = "Fight your friends and be the first to catch the cookie!", intents = intents, owner_ids = [488398758812319745, 326736523494031360, 771316465789960203, 691289686093725736])
 bot.cookie = "<:mc_cookie:726184620164382741>"
 bot.oreo = "<:oreo:761274120821276702>"
 bot.gocciola = "<:gocciola:747247300803297290>"
