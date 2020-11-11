@@ -352,6 +352,9 @@ class Cookie(commands.Cog):
           except:
             return await ctx.send("user not found")
 
+        else:
+          return await ctx.send("user not found")
+          
     async with aiosqlite.connect("data/db.db") as db:
       data = await db.execute(f"SELECT * from users where user = {user.id}")
       data = await data.fetchall()
