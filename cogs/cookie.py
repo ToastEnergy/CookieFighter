@@ -46,6 +46,40 @@ class Cookie(commands.Cog):
     self.bot = bot
     self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
 
+  async def user_converter(self, ctx, user):
+    "convert an id or a mention into a user"
+
+    if ctx.message.mentions:
+      user_id = ctx.message.mentions[0].id
+      try:
+        user = await self.bot.fetch_user(user_id)
+        return user
+
+      except:
+        pass
+    
+    try:
+      user = await self.bot.fetch_user(int(user))
+    except:
+      raise commands.UserNotFound(commands.UserNotFound(user))
+
+  async def member_converter(self, ctx, member):
+    "convert an id or a mention into a member"
+
+    if ctx.message.mentions:
+      member_id = ctx.message.mentions[0].id
+      try:
+        member = await ctx.guild.fetch_user(member_id)
+        return member
+
+      except:
+        pass
+    
+    try:
+      member = await ctx.guild.fetch_user(int(member))
+    except:
+      raise commands.MemberNotFound(commands.UserNotFound(member))
+
   @commands.command(aliases = ["cookies", "c"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
@@ -334,13 +368,17 @@ class Cookie(commands.Cog):
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
   @commands.check(check_perms)
-  async def stats(self, ctx):
+  async def stats(self, ctx, user = None):
     "Check User stats"
-    
-    user = ctx.author
+
+    try:
+      member = await self.member_converter(ctx, user)
+
+    except:
+      member = ctx.author
 
     async with aiosqlite.connect("data/db.db") as db:
-      data = await db.execute(f"SELECT * from users where user = {user.id}")
+      data = await db.execute(f"SELECT * from users where user = {member.id}")
       data = await data.fetchall()
 
       if len(data) == 0:
@@ -350,7 +388,7 @@ class Cookie(commands.Cog):
         cookies = int(data[0][1])
 
     emb = discord.Embed(description = f"**{cookies}** Cookies {self.bot.cookie}!", colour = self.bot.colour)
-    emb.set_author(name = user.name, icon_url = user.avatar_url_as(static_format="png"))
+    emb.set_author(name = member.display_name, icon_url = member.avatar_url_as(static_format="png"))
 
     await ctx.send(embed = emb)
 
