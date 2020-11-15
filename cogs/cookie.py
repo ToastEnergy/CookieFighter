@@ -295,41 +295,43 @@ class Cookie(commands.Cog):
     if ctx.author.id not in self.bot.owner_ids:
       return await ctx.send("sorry, this command is disabled at the moment.")
 
-    stats = {}
+    await ctx.trigger_typing()
 
+    stats = {}
     async with aiosqlite.connect("data/db.db") as db:
       data = await db.execute("SELECT * from users")
       data = await data.fetchall()
 
       for value in data:
         stats[str(value[0])] = int(value[1])
-    
-    lb = sorted(stats, key=lambda x : stats[x], reverse=True)
+  
+      lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
-    counter = 0
-    res = ""
+      res = ""
 
-    for a in lb:
+      counter = 0
 
-      if counter >= 10:
-        pass
-      
-      else:
-          u = self.bot.get_user(int(stats[a][0])) 
+      for data in lb:
+
+        if counter >= 10:
+          break
+        
+        else:
+          u = ctx.guild.get_member(int(data)) 
 
           if not u:
-              try:
-                u = await self.bot.get_user(int(stats[a][0]))
-              except:
-                u = None
-
+            try:
+              u = await ctx.guild.fetch_member(int(data))
+            except:
+              u = None
+              
           if u:
-            if u.id in [a.id for a in ctx.guild.members]:
-              counter += 1
-              res += f"\n**{counter}.** `{str(u)}` - **{stats[str(a)]} {self.bot.cookie}**"
+            counter += 1
+            user = str(u).replace("`", "")
+            res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
-    emb.set_author(name = f"{ctx.guild.name} Leaderboard", icon_url = str(ctx.guild.icon_url_as(static_format = "png")))
+    emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
     await ctx.send(embed = emb)
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
