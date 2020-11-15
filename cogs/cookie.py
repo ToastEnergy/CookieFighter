@@ -287,7 +287,7 @@ class Cookie(commands.Cog):
     emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
     await ctx.send(embed = emb)
 
-  @leaderboard.command(aliases = ["guild"], invoke_without_command = True)
+  @leaderboard.command(aliases = ["guild"])
   @commands.check(check_perms)
   async def server(self, ctx):
     "Top Cookie users in the actual server"
