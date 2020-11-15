@@ -14,7 +14,7 @@
 # ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
 # ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
 
-import discord, os, functools, aiosqlite
+import discord, os, functools, aiosqlite, random
 from discord.ext import commands
 from datetime import datetime
 
@@ -65,6 +65,33 @@ async def quickembed(ctx, text):
     "Make a quick embed (automatically sends it)"
     emb = discord.Embed(description = text, colour = 0xd8ad6a)
     await ctx.channel.send(embed = emb)
+
+async def guild_settings(guild_id):
+    async with aiosqlite.connect("data/db.db") as db:
+        data = await db.execute(f"select * from settings where id = {guild_id}")
+        data = await data.fetchall()
+
+    default = {"colour": 0xd8ad6a, "timeout": 120, "emoji": random.choice(["<:mc_cookie:726184620164382741>", "<:gocciola:747247300803297290>", "<:oreo:761274120821276702>"])}
+
+    if len(data) == 0:
+        options = default
+
+    else:
+        colour = data[0][1]
+        emoji = data[0][2]
+        timeout = data[0][3]
+        
+        if str(colour) == "0": colour = None
+        if str(emoji) == "0": emoji = None
+        if str(timeout) == "0": emoji = None
+
+        options = {
+            colour: colour,
+            emoji: emoji,
+            timeout: timeout
+        }
+
+    return options
 
 class Git:
     def __init__(self, loop):
