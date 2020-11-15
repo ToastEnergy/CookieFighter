@@ -297,7 +297,7 @@ class Cookie(commands.Cog):
 
     async with ctx.typing():
 
-      msg = await ctx.send("due to the new discord intents this will take a while", embed = discord.Embed(title=self.bot.clock,colour=self.bot.colour)) 
+      msg = await ctx.send("due to the new discord intents this will take a while", embed = discord.Embed(title=self.bot.clock,colour=f"{self.bot.colour} | loading...")) 
 
       stats = {}
       async with aiosqlite.connect("data/db.db") as db:
