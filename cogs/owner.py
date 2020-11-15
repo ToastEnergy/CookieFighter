@@ -141,11 +141,12 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def reload(self, ctx, extension=None):
 
-        await self.git.pull()
-
         if not extension:
             emb = discord.Embed(title = f"{self.bot.clock} | reloading extensions", colour = self.bot.colour, description = "")
             msg = await ctx.send(embed = emb)
+
+            await self.git.pull()
+
             errors = ""
             for ext in os.listdir("./cogs"):
                 if ext.endswith(".py"):
@@ -165,7 +166,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         emb = discord.Embed(title = 'Loading...', colour = self.bot.colour)
         emb1 = discord.Embed(title = f'Reloaded {extension}!', colour = self.bot.colour)
         msg = await ctx.send(embed = emb)
-        await asyncio.sleep(0.5)
+        await self.git.pull()
         
         try:    
             self.bot.unload_extension(f'cogs.{extension}')
