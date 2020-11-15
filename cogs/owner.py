@@ -150,8 +150,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             for ext in os.listdir("./cogs"):
                 if ext.endswith(".py"):
                     try:
-                        self.bot.unload_extension(f'cogs.{extension[:-3]}')
-                        self.bot.load_extension(f'cogs.{extension[:-3]}')
+                        self.bot.unload_extension(f'cogs.{ext[:-3]}')
+                        self.bot.load_extension(f'cogs.{ext[:-3]}')
                         emb.description += f"<a:check:726040431539912744> | {ext}\n"
 
                     except Exception as e:
