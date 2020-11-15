@@ -12,7 +12,7 @@ class Settings(commands.Cog):
         "setup the bot for your guild"
 
         options = ["colour", "emoji", "timeout"]
-        cookie = random.choice([self.bot.cookie, self.bot.gocciola, self.bot.oreo])
+        cookie = random.choice([f"__{self.bot.cookie}__", f"__{self.bot.gocciola}__", f"__{self.bot.oreo}__"])
         a = f"\n{cookie} " # cuz \n raise an error with f-strings
         prefix = await cookies.guild_prefix(ctx.guild.id)
 
