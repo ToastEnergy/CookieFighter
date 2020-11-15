@@ -64,11 +64,11 @@ class Git:
         os.system("git pull origin master")
 
     async def pull(self):
-        sync_process = functools.partial(sync_pull)
+        sync_process = functools.partial(self.sync_pull)
         await self.loop.run_in_executor(None, sync_process)
 
     async def push(self):
-        sync_process = functools.partial(sync_push)
+        sync_process = functools.partial(self.sync_push)
         await self.loop.run_in_executor(None, sync_process)
 
     
