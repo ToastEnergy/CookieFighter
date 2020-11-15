@@ -60,15 +60,17 @@ class Git:
     def sync_pull(self):
         os.system("git pull origin master")
 
-    def sync_push(self):
-        os.system("git pull origin master")
+    def sync_push(self, commit):
+        os.system("git add .")
+        os.system(f'git commit -m "{commit}"')
+        os.system("git push origin master")
 
     async def pull(self):
         sync_process = functools.partial(self.sync_pull)
         await self.loop.run_in_executor(None, sync_process)
 
-    async def push(self):
-        sync_process = functools.partial(self.sync_push)
+    async def push(self, commit="auto push"):
+        sync_process = functools.partial(self.sync_push, commit)
         await self.loop.run_in_executor(None, sync_process)
 
     
