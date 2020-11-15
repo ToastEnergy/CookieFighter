@@ -291,13 +291,10 @@ class Cookie(commands.Cog):
   @commands.check(check_perms)
   async def server(self, ctx):
     "Top Cookie users in the actual server"
-    
-    if ctx.author.id not in self.bot.owner_ids:
-      return await ctx.send("sorry, this command is disabled at the moment.")
 
     async with ctx.typing():
-
-      msg = await ctx.send("due to the new discord intents this will take a while", embed = discord.Embed(title=f"{self.bot.clock} | loading...",colour=self.bot.colour)) 
+      emb = discord.Embed(title=f"{self.bot.clock} | loading...",colour=self.bot.colour)
+      msg = await ctx.send("due to the new discord intents this will take a while", embed = emb) 
 
       stats = {}
       async with aiosqlite.connect("data/db.db") as db:
@@ -332,9 +329,9 @@ class Cookie(commands.Cog):
               user = str(u).replace("`", "")
               res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
 
-      emb = discord.Embed(description = res, colour = self.bot.colour)
-      emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
-      await msg.edit(embed = emb, content = None)
+    emb = discord.Embed(description = res, colour = self.bot.colour)
+    emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
+    await msg.edit(embed = emb, content = None)
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
   @commands.check(check_perms)
