@@ -147,7 +147,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             emb = discord.Embed(title = f"{self.bot.clock} | reloading extensions", colour = self.bot.colour, description = "")
             msg = await ctx.send(embed = emb)
             errors = ""
-            for ext in os.listdir(os.listdir("./cogs")):
+            for ext in os.listdir("./cogs"):
                 if ext.endswith(".py"):
                     try:
                         self.bot.unload_extension(f'cogs.{extension[:-3]}')
