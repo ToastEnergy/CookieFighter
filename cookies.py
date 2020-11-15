@@ -14,7 +14,7 @@
 # ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
 # ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
 
-import discord, os, functools
+import discord, os, functools, aiosqlite
 from discord.ext import commands
 from datetime import datetime
 
@@ -47,6 +47,19 @@ def betterEmbed(**para):
                       pass
 
     return embed
+
+async def guild_prefix(guild_id):
+    async with aiosqlite.connect("data/db.db") as db:
+        data = await db.execute(f"select * from prefixes where guild = {guild_id}")
+        data = await data.fetchall()
+
+    if len(data) == 0:
+        prefix = "c/"
+
+    else:
+        prefix = data[0][1]
+
+    return prefix
 
 async def quickembed(ctx, text):
     "Make a quick embed (automatically sends it)"
