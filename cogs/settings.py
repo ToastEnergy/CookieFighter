@@ -16,7 +16,7 @@ class Settings(commands.Cog):
         a = f"\n{cookie} " # cuz \n raise an error with f-strings
         prefix = await cookies.guild_prefix(ctx.guild.id)
 
-        emb = discord.Embed(description=f"**Available Settings**\n\n {cookie}{a.join(options)}\n\n**use** `{prefix}settings [setting name] [option]` to set-up the bot\n**example**: `{prefix}settings colour #ffffff`", colour=self.bot.colour)
+        emb = discord.Embed(description=f"**Available Settings**\n\n{cookie} {a.join(options)}\n\n**use** `{prefix}settings [setting name] [option]` to set-up the bot\n**example**: `{prefix}settings colour #ffffff`", colour=self.bot.colour)
         emb.set_author(name=f"{ctx.guild.name} settings",icon_url=str(ctx.guild.icon_url_as(static_format="png")))
 
         await ctx.send(embed=emb)
