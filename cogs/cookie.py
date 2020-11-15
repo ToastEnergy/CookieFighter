@@ -295,44 +295,46 @@ class Cookie(commands.Cog):
     if ctx.author.id not in self.bot.owner_ids:
       return await ctx.send("sorry, this command is disabled at the moment.")
 
-    await ctx.trigger_typing()
+    async with ctx.typing():
 
-    stats = {}
-    async with aiosqlite.connect("data/db.db") as db:
-      data = await db.execute("SELECT * from users")
-      data = await data.fetchall()
+      msg = await ctx.send("due to the new discord intents this will take a while", embed = discord.Embed(title=self.bot.clock,colour=self.bot.colour)) 
 
-      for value in data:
-        stats[str(value[0])] = int(value[1])
-  
-      lb = sorted(stats, key=lambda x : stats[x], reverse=True)
+      stats = {}
+      async with aiosqlite.connect("data/db.db") as db:
+        data = await db.execute("SELECT * from users")
+        data = await data.fetchall()
 
-      res = ""
+        for value in data:
+          stats[str(value[0])] = int(value[1])
+    
+        lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
-      counter = 0
+        res = ""
 
-      for data in lb:
+        counter = 0
 
-        if counter >= 10:
-          break
-        
-        else:
-          u = ctx.guild.get_member(int(data)) 
+        for data in lb:
 
-          if not u:
-            try:
-              u = await ctx.guild.fetch_member(int(data))
-            except:
-              u = None
-              
-          if u:
-            counter += 1
-            user = str(u).replace("`", "")
-            res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
+          if counter >= 10:
+            break
+          
+          else:
+            u = ctx.guild.get_member(int(data)) 
 
-    emb = discord.Embed(description = res, colour = self.bot.colour)
-    emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
-    await ctx.send(embed = emb)
+            if not u:
+              try:
+                u = await ctx.guild.fetch_member(int(data))
+              except:
+                u = None
+                
+            if u:
+              counter += 1
+              user = str(u).replace("`", "")
+              res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
+
+      emb = discord.Embed(description = res, colour = self.bot.colour)
+      emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
+      await msg.edit(embed = emb, content = None)
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
   @commands.check(check_perms)
