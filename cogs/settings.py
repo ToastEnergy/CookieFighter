@@ -13,6 +13,7 @@ class Settings(commands.Cog):
 
         if not option:
             guild_options = await cookies.guild_settings(ctx.guild.id)
+            guild_options["colour"] = str(discord.Colour(guild_options["colour"]))
             prefix = await cookies.guild_prefix(ctx.guild.id)
 
             options = ["__colour__", "__emoji__", "__timeout__"]
@@ -28,7 +29,9 @@ class Settings(commands.Cog):
 
 **Current Settings**
 
-{cookie} {a.join([f'__{opt}__: `{guild_options[opt]}`' for opt in guild_options])}
+{cookie} __colour__: `{guild_options['colour']}`
+{cookie} __emoji__: {guild_options['emoji']}
+{cookie} __timeout__: `{guild_options['timeout']}s`
 """, colour=self.bot.colour)
             emb.set_author(name=f"{ctx.guild.name} settings",icon_url=str(ctx.guild.icon_url_as(static_format="png")))
 
