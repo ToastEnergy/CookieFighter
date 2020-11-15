@@ -330,7 +330,7 @@ class Cookie(commands.Cog):
               res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
 
     emb = discord.Embed(description = res, colour = self.bot.colour)
-    emb.set_author(name = ctx.guild.name, icon_url = str(ctx.guild.icon_url_as(staic_format="png")))
+    emb.set_author(name = ctx.guild.name, icon_url = str(ctx.guild.icon_url_as(static_format="png")))
     await msg.edit(embed = emb, content = None)
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
