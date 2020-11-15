@@ -111,7 +111,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         "Restart the bot"
         emb = discord.Embed(description = "Restarting the bot...", colour = self.bot.colour)
         await ctx.send(embed = emb)
-        subprocess.call('sudo python3 main.py', shell=True)
+        subprocess.call('python3 main.py', shell=True)
         await self.bot.close()  
 
     @commands.command()
