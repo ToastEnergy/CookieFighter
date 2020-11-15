@@ -1,4 +1,4 @@
-import discord, aiosqlite, cookies
+import discord, aiosqlite, cookies, random
 from discord.ext import commands
 
 class Settings(commands.Cog):
@@ -10,12 +10,13 @@ class Settings(commands.Cog):
     @commands.has_permissions(manage_messages = True)
     async def settings(self, ctx):
         "setup the bot for your guild"
-        
+
         options = ["colour", "emoji", "timeout"]
-        a = "\n" # cuz \n raise an error with f-strings
+        cookie = random.choice([self.bot.cookie, self.bot.gocciola, self.bot.oreo])
+        a = f"\n• {cookie}" # cuz \n raise an error with f-strings
         prefix = await cookies.guild_prefix(ctx.guild.id)
 
-        emb = discord.Embed(description=f"**Available Settings**{a.join(options)}\nuse `{prefix}settings [setting name] [option]` to set-up the bot\nExample: `{prefix}settings colour #ffffff`", colour=self.bot.colour)
+        emb = discord.Embed(description=f"**Available Settings**\n{a.join(options)}\n\n**use** `{prefix}settings [setting name] [option]` to set-up the bot\n**Example**: `{prefix}settings colour #ffffff`", colour=self.bot.colour)
         emb.set_author(name=f"{ctx.guild.name} settings",icon_url=str(ctx.guild.icon_url_as(static_format="png")))
 
         await ctx.send(embed=emb)
