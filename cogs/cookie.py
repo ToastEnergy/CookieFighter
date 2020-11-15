@@ -636,10 +636,22 @@ class Cookie(commands.Cog):
 
   @commands.command(aliases = ["gift"])
   @commands.check(check_perms)
-  async def send(self, ctx, user: discord.User, cookies: int):
+  async def send(self, ctx, user, cookies: int):
     "Gift cookies to a user"
 
-    return await ctx.send("sorry, this command is disabled at the moment.")
+    try:
+      user = await self.bot.fetch_user(int(user))
+
+    except:
+      if ctx.message.mentions:
+        try:
+          user = await self.bot.fetch_user(int(ctx.message.mentions[0].id))
+
+        except:
+          return await ctx.send("user not found")
+
+      else:
+        return await ctx.send("user not found")
 
     if user.bot:
       emb = discord.Embed(description = "nah, robot don't eat cookies.", colour = self.bot.colour)
