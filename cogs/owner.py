@@ -1,29 +1,19 @@
-import discord
+import discord, traceback, io, textwrap, sys, copy, subprocess, asyncio, cookies, aiosqlite, os, aiohttp
 from discord.ext import commands
-import traceback
-import io
 from contextlib import redirect_stdout
-import textwrap
-import sys
-import copy
-import subprocess
-import asyncio
-import cookies
-import aiosqlite
-import os
 from dotenv import load_dotenv
-import aiohttp
 
 load_dotenv(dotenv_path = ".env")
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
-
-    async def cog_check(self, ctx):
-        return await self.bot.is_owner(ctx.author)
     
     def __init__(self, bot):
         self.bot = bot
         self._last_result = None
+        self.git = cookies.Git(self.bot.loop)
+
+    async def cog_check(self, ctx):
+        return await self.bot.is_owner(ctx.author)
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
@@ -149,7 +139,28 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def reload(self, ctx, extension):
+    async def reload(self, ctx, extension=None):
+
+        await self.git.pull()
+
+        if not extension:
+            emb = discord.Embed(title = f"{self.bot.clock} | reloading extensions", colour = self.bot.colour, description = "")
+            msg = await ctx.send(embed = emb)
+            errors = ""
+            for ext in os.listdir(os.listdir("./cogs")):
+                if ext.endswith(".py"):
+                    try:
+                        self.bot.unload_extension(f'cogs.{extension[:-3]}')
+                        self.bot.load_extension(f'cogs.{extension[:-3]}')
+                        emb.description += f"<a:check:726040431539912744> | {ext}\n"
+
+                    except Exception as e:
+                        emb.description += f"<a:fail:727212831782731796> | {ext}\n"
+                        errors += f"• {e}\n"
+
+            emb.description += f"\n{errors}"
+            emb.title = None
+            return await msg.edit(embed = emb, content = None)
         
         emb = discord.Embed(title = 'Loading...', colour = self.bot.colour)
         emb1 = discord.Embed(title = f'Reloaded {extension}!', colour = self.bot.colour)

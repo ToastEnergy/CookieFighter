@@ -14,7 +14,7 @@
 # ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
 # ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
 
-import discord
+import discord, os, functools
 from discord.ext import commands
 from datetime import datetime
 
@@ -52,3 +52,23 @@ async def quickembed(ctx, text):
     "Make a quick embed (automatically sends it)"
     emb = discord.Embed(description = text, colour = 0xd8ad6a)
     await ctx.channel.send(embed = emb)
+
+class Git:
+    def __init__(self, loop):
+        self.loop = loop
+
+    def sync_pull(self):
+        os.system("git pull origin master")
+
+    def sync_push(self):
+        os.system("git pull origin master")
+
+    async def pull(self):
+        sync_process = functools.partial(sync_pull)
+        await self.loop.run_in_executor(None, sync_process)
+
+    async def push(self):
+        sync_process = functools.partial(sync_push)
+        await self.loop.run_in_executor(None, sync_process)
+
+    
