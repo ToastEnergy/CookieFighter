@@ -13,7 +13,7 @@ class Settings(commands.Cog):
 
         if not option:
             guild_options = await cookies.guild_settings(ctx.guild.id)
-            guild_options["colour"] = str(discord.Colour(guild_options["colour"]))
+            guild_options["colour"] = str(discord.Colour(int(guild_options["colour"])))
 
             if guild_options["emoji_default"] == True:
                 guild_options["emoji"] = f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
