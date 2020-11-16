@@ -60,7 +60,7 @@ class Settings(commands.Cog):
                     options.remove(option)
 
                     if len(data) == 0:
-                        await db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES ('{ctx.guild.id}', '{value}' '0', '0')")
+                        await db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES ('{ctx.guild.id}', '{value}', '0', '0')")
                         await db.commit()
 
                     else:
