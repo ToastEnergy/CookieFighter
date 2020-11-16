@@ -48,6 +48,9 @@ class Settings(commands.Cog):
                 if option == "color":
                     option == "colour"
 
+                if option == "colour":
+                    option = int(f"0x{option[1:]}")
+
                 options = ["colour", "emoji", "timeout"]
                 if option not in options:
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option")
