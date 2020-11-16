@@ -11,8 +11,9 @@ class Settings(commands.Cog):
     async def settings(self, ctx, option=None, value=None):
         "setup the bot for your guild"
 
+        guild_options = await cookies.guild_settings(ctx.guild.id)
+
         if not option:
-            guild_options = await cookies.guild_settings(ctx.guild.id)
             guild_options["colour"] = str(discord.Colour(int(guild_options["colour"])))
 
             if guild_options["emoji_default"] == True:
@@ -55,7 +56,7 @@ class Settings(commands.Cog):
 
                 options = ["colour", "emoji", "timeout"]
                 if option not in options:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option")
+                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option", colour = guild_options["colour"])
                     return await ctx.send(embed=emb)
 
                 async with aiosqlite.connect("data/db.db") as db:
@@ -72,7 +73,7 @@ class Settings(commands.Cog):
                         await db.execute(f"update settings set colour={value} where id={ctx.guild.id}")
                         await db.commit()
                 
-            emb = discord.Embed(title = "<a:check:726040431539912744> | done!", description = f"**{option}** for **{ctx.guild.name}** updated to **{value}**")
+            emb = discord.Embed(title = "<a:check:726040431539912744> | done!", description = f"**{option}** for **{ctx.guild.name}** updated to **{value}**", colour = guild_options["colour"])
             await ctx.send(embed = emb)
 
 def setup(bot):

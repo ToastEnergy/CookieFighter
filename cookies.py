@@ -71,7 +71,7 @@ async def guild_settings(guild_id):
         data = await db.execute(f"select * from settings where id = {guild_id}")
         data = await data.fetchall()
 
-    default = {"colour": 0xd8ad6a, "timeout": 120, "emoji": random.choice(["<:mc_cookie:726184620164382741>", "<:gocciola:747247300803297290>", "<:oreo:761274120821276702>"]), "emoji_default": True}
+    default = {"colour": 14200170, "timeout": 120, "emoji": random.choice(["<:mc_cookie:726184620164382741>", "<:gocciola:747247300803297290>", "<:oreo:761274120821276702>"]), "emoji_default": True}
 
     if len(data) == 0:
         options = default
@@ -81,15 +81,22 @@ async def guild_settings(guild_id):
         emoji = data[0][2]
         timeout = data[0][3]
         
-        if str(colour) == "0": colour = None
-        if str(emoji) == "0": emoji = None
-        if str(timeout) == "0.0": emoji = None
+        if str(colour) == "0": colour = default["color"]
+
+        if str(emoji) == "0": 
+            emoji = default["emoji"] 
+            e_d = True
+
+        else:
+            e_d = False
+
+        if str(timeout) == "0.0": timeout = default["timeout"]
 
         options = {
             "colour": int(colour),
             "emoji": emoji,
             "timeout": timeout,
-            "emoji_default": False
+            "emoji_default": e_d
         }
 
     return options
