@@ -49,7 +49,7 @@ class Settings(commands.Cog):
                     option == "colour"
 
                 if option == "colour":
-                    option = int(f"0x{option[1:]}")
+                    value = int(f"0x{value[1:]}")
 
                 options = ["colour", "emoji", "timeout"]
                 if option not in options:
