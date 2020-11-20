@@ -70,10 +70,17 @@ class Settings(commands.Cog):
                         await db.commit()
 
                     else:
-                        await db.execute(f"update settings set {option}='{value}' where id='{ctx.guild.id}'")
+                        if type(value) == str:
+                            await db.execute(f"update settings set {option}='{value}' where id='{ctx.guild.id}'")
+
+                        else:
+                            await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
+                            
                         await db.commit()
+
+            guild_options = await cookies.guild_settings(ctx.guild.id)
                 
-            emb = discord.Embed(title = "<a:check:726040431539912744> | done!", description = f"**{option}** for **{ctx.guild.name}** updated to **{value}**", colour = guild_options["colour"])
+            emb = discord.Embed(title = "<a:check:726040431539912744> | one!", description = f"**{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
 
 def setup(bot):
