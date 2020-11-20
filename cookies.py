@@ -93,7 +93,7 @@ async def guild_settings(guild_id):
         if str(timeout) == "0.0": timeout = default["timeout"]
 
         options = {
-            "colour": int(colour),
+            "colour": colour,
             "emoji": emoji,
             "timeout": timeout,
             "emoji_default": e_d
