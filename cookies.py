@@ -81,7 +81,7 @@ async def guild_settings(guild_id):
         emoji = data[0][2]
         timeout = data[0][3]
         
-        if str(colour) == "0": colour = default["color"]
+        if str(colour) == "0": colour = default["colour"]
 
         if str(emoji) == "0": 
             emoji = default["emoji"] 
