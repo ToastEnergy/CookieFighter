@@ -220,8 +220,23 @@ class Cookie(commands.Cog):
 
     await ctx.trigger_typing()
 
-    opt = await cookies.guild_settings(ctx.guild.id)
-    colour = int(opt["colour"])
+    if not ctx.guild:
+      colour = self.bot.colour
+      emoji = self.bot.cookie
+
+    else:
+      opt = await cookies.guild_settings(ctx.guild.id)
+      colour = int(opt["colour"])
+      emoji = opt["emoji"]
+      if opt["emoji_default"] == False:
+        emoji = self.bot.get_emoji(emoji)
+
+        if not emoji:
+          emoji = self.bot.cookie
+
+        else:
+          emoji = str(emoji)
+
 
     if number is not None:
       async with aiosqlite.connect("data/db.db") as db:
@@ -288,7 +303,7 @@ class Cookie(commands.Cog):
             if u:
               counter += 1
               user = str(u).replace("`", "")
-              res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
+              res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {emoji}**"
 
     emb = discord.Embed(description = res, colour = colour)
     emb.set_author(name = "Global Leaderboard", icon_url = "https://cookiefighter.github.io/cdn/cookie_gif.gif")
@@ -299,8 +314,22 @@ class Cookie(commands.Cog):
   async def server(self, ctx):
     "Top Cookie users in the actual server"
 
-    opt = await cookies.guild_settings(ctx.guild.id)
-    colour = int(opt["colour"])
+    if not ctx.guild:
+      colour = self.bot.colour
+      emoji = self.bot.cookie
+
+    else:
+      opt = await cookies.guild_settings(ctx.guild.id)
+      colour = int(opt["colour"])
+      emoji = opt["emoji"]
+      if opt["emoji_default"] == False:
+        emoji = self.bot.get_emoji(emoji)
+
+        if not emoji:
+          emoji = self.bot.cookie
+
+        else:
+          emoji = str(emoji)
 
     async with ctx.typing():
       emb = discord.Embed(title=f"{self.bot.clock} | loading...",colour=colour)
@@ -337,7 +366,7 @@ class Cookie(commands.Cog):
             if u:
               counter += 1
               user = str(u).replace("`", "")
-              res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {self.bot.cookie}**"
+              res += f"\n**{counter}.** `{user}` - **{stats[str(data)]} {emoji}**"
 
     emb = discord.Embed(description = res, colour = colour)
     emb.set_author(name = ctx.guild.name, icon_url = str(ctx.guild.icon_url_as(static_format="png")))
@@ -348,17 +377,22 @@ class Cookie(commands.Cog):
   async def stats(self, ctx, user = None):
     "Check User stats"
 
-    opt = await cookies.guild_settings(ctx.guild.id)
-    colour = int(opt["colour"])
-    emoji = opt["emoji"]
-    if opt["emoji_default"] == False:
-      emoji = self.bot.get_emoji(emoji)
+    if not ctx.guild:
+      colour = self.bot.colour
+      emoji = self.bot.cookie
+    
+    else:
+      opt = await cookies.guild_settings(ctx.guild.id)
+      colour = int(opt["colour"])
+      emoji = opt["emoji"]
+      if opt["emoji_default"] == False:
+        emoji = self.bot.get_emoji(emoji)
 
-      if not emoji:
-        emoji = self.bot.cookie
+        if not emoji:
+          emoji = self.bot.cookie
 
-      else:
-        emoji = str(emoji)
+        else:
+          emoji = str(emoji)
 
     if not user:
       user = ctx.author
@@ -481,6 +515,7 @@ class Cookie(commands.Cog):
       await db.commit()
 
   @commands.command(aliases = ["p"])
+  @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.check(check_perms)
   async def party(self, ctx):
@@ -666,17 +701,22 @@ class Cookie(commands.Cog):
   async def send(self, ctx, user, cookies_: int):
     "Gift cookies to a user"
 
-    opt = await cookies.guild_settings(ctx.guild.id)
-    colour = int(opt["colour"])
-    emoji = opt["emoji"]
-    if opt["emoji_default"] == False:
-      emoji = self.bot.get_emoji(emoji)
+    if not ctx.guild:
+      colour = self.bot.colour
+      emoji = self.bot.cookie
 
-      if not emoji:
-        emoji = self.bot.cookie
+    else:
+      opt = await cookies.guild_settings(ctx.guild.id)
+      colour = int(opt["colour"])
+      emoji = opt["emoji"]
+      if opt["emoji_default"] == False:
+        emoji = self.bot.get_emoji(emoji)
 
-      else:
-        emoji = str(emoji)
+        if not emoji:
+          emoji = self.bot.cookie
+
+        else:
+          emoji = str(emoji)
 
     try:
       user = await self.bot.fetch_user(int(user))
@@ -761,8 +801,12 @@ class Cookie(commands.Cog):
   async def delete(self, ctx):
     "Delete all your cookies"
 
-    opt = await cookies.guild_settings(ctx.guild.id)
-    colour = int(opt["colour"])
+    if not ctx.guild:
+      colour = self.bot.colour
+
+    else:
+      opt = await cookies.guild_settings(ctx.guild.id)
+      colour = int(opt["colour"])
 
     def check(m):
       return m.author == ctx.author and m.channel == ctx.channel
