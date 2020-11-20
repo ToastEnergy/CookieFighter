@@ -50,7 +50,7 @@ class Cookie(commands.Cog):
 
     timeout = opt["timeout"]
     emoji = opt["emoji"]
-    if opt["e_d"] == False:
+    if opt["emoji_default"] == False:
       emoji = self.bot.get_emoji(emoji)
 
       if not emoji:
