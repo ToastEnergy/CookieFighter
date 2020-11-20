@@ -80,6 +80,9 @@ class Settings(commands.Cog):
                         await db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
+
+            if option == "colour": 
+                value = str(discord.Colour(int(value)))
                 
             emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
