@@ -71,11 +71,11 @@ class Settings(commands.Cog):
 
                     else:
                         if type(value) == str:
-                            await db.execute(f"update settings set {option}='{value}' where id='{ctx.guild.id}'")
+                            await db.execute(f"update settings set {option}='{value}' where id={ctx.guild.id}")
 
                         else:
                             await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
-                            
+
                         await db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
