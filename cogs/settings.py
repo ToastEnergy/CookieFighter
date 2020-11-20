@@ -45,57 +45,58 @@ class Settings(commands.Cog):
             return await ctx.send(embed=emb)
 
         else:
-            async with ctx.typing():
-                option = str(option).lower()
+            await ctx.trigger_typing()
+            
+            option = str(option).lower()
 
-                options = ["colour", "emoji", "timeout"]
-                if option not in options:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option", colour = int(guild_options["colour"]))
+            options = ["colour", "emoji", "timeout"]
+            if option not in options:
+                emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option", colour = int(guild_options["colour"]))
+                return await ctx.send(embed=emb)
+
+            if not value:
+                emb = discord.Embed(description=f"<a:fail:727212831782731796> | please specify a value!", colour = int(guild_options["colour"]))
+                return await ctx.send(embed=emb)
+
+            if option == "color":
+                option == "colour"
+
+            if option == "colour":
+                value = f"0x{value[1:]}"
+                value = int(value, 16)
+                # value = hex(value)
+
+            elif option == "emoji":
+                try:
+                    emoji = self.emoji_converter.convert(ctx, value)
+
+                except commands.errors.EmojiNotFound:
+                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid emoji", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
 
-                if not value:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | please specify a value!", colour = int(guild_options["colour"]))
+            elif option == "timout":
+                if type(value) not in [int, float]:
+                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid timout", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
 
-                if option == "color":
-                    option == "colour"
+            async with aiosqlite.connect("data/db.db") as db:
+                data = await db.execute(f"select * from settings where id={ctx.guild.id}")
+                data = await data.fetchall()
 
-                if option == "colour":
-                    value = f"0x{value[1:]}"
-                    value = int(value, 16)
-                    # value = hex(value)
+                options.remove(option)
 
-                elif option == "emoji":
-                    try:
-                        emoji = self.emoji_converter.convert(ctx, value)
+                if len(data) == 0:
+                    await db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES ('{ctx.guild.id}', '{value}', '0', '0')")
+                    await db.commit()
 
-                    except commands.errors.EmojiNotFound:
-                        emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid emoji", colour = int(guild_options["colour"]))
-                        return await ctx.send(embed=emb)
-
-                elif option == "timout":
-                    if type(value) not in [int, float]:
-                        emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid timout", colour = int(guild_options["colour"]))
-                        return await ctx.send(embed=emb)
-
-                async with aiosqlite.connect("data/db.db") as db:
-                    data = await db.execute(f"select * from settings where id={ctx.guild.id}")
-                    data = await data.fetchall()
-
-                    options.remove(option)
-
-                    if len(data) == 0:
-                        await db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES ('{ctx.guild.id}', '{value}', '0', '0')")
-                        await db.commit()
+                else:
+                    if option == "emoji":
+                        await db.execute(f"update settings set {option}='{value}' where id={ctx.guild.id}")
 
                     else:
-                        if option == "emoji":
-                            await db.execute(f"update settings set {option}='{value}' where id={ctx.guild.id}")
+                        await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
 
-                        else:
-                            await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
-
-                        await db.commit()
+                    await db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
 
