@@ -172,7 +172,7 @@ class Cookie(commands.Cog):
     await msg.add_reaction(emoji)
 
     def check(reaction, user):
-      return user.bot is False and str(reaction.emoji) in [self.bot.cookie, self.bot.oreo, self.bot.gocciola] and reaction.message.id == msg.id
+      return user.bot is False and str(reaction.emoji) == emoji and reaction.message.id == msg.id
 
     start = time.perf_counter()
     await asyncio.sleep(0.25)
