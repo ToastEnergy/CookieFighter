@@ -14,6 +14,7 @@ class Settings(commands.Cog):
         guild_options = await cookies.guild_settings(ctx.guild.id)
 
         if not option:
+            embed_colour = int(guild_options["colour"])
             guild_options["colour"] = str(discord.Colour(int(guild_options["colour"])))
 
             if guild_options["emoji_default"] == True:
@@ -37,7 +38,7 @@ class Settings(commands.Cog):
 {cookie} __colour__: `{guild_options['colour']}`
 {cookie} __emoji__: {guild_options['emoji']}
 {cookie} __timeout__: `{guild_options['timeout']}s`
-""", colour=self.bot.colour)
+""", colour=embed_colour)
             emb.set_author(name=f"{ctx.guild.name} settings",icon_url=str(ctx.guild.icon_url_as(static_format="png")))
 
             return await ctx.send(embed=emb)
@@ -80,7 +81,7 @@ class Settings(commands.Cog):
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
                 
-            emb = discord.Embed(title = "<a:check:726040431539912744> | one!", description = f"**{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
+            emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
 
 def setup(bot):
