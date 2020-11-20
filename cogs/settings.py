@@ -70,7 +70,7 @@ class Settings(commands.Cog):
                         await db.commit()
 
                     else:
-                        if type(value) == str:
+                        if option == "emoji":
                             await db.execute(f"update settings set {option}='{value}' where id={ctx.guild.id}")
 
                         else:
