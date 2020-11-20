@@ -21,6 +21,10 @@ class Settings(commands.Cog):
             if guild_options["emoji_default"] == True:
                 guild_options["emoji"] = f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
 
+            else:
+                emoji = self.bot.get_emoji(guild_options["emoji"]) if self.bot.get_emoji(guild_options["emoji"]) else f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
+                guild_options["emoji"] = str(emoji)
+
             prefix = await cookies.guild_prefix(ctx.guild.id)
 
             options = ["__colour__", "__emoji__", "__timeout__"]
@@ -46,7 +50,7 @@ class Settings(commands.Cog):
 
         else:
             await ctx.trigger_typing()
-            
+
             option = str(option).lower()
 
             options = ["colour", "emoji", "timeout"]
@@ -74,6 +78,8 @@ class Settings(commands.Cog):
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid emoji", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
 
+                value = emoji.id
+
             elif option == "timout":
                 if type(value) not in [int, float]:
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid timout", colour = int(guild_options["colour"]))
@@ -90,18 +96,16 @@ class Settings(commands.Cog):
                     await db.commit()
 
                 else:
-                    if option == "emoji":
-                        await db.execute(f"update settings set {option}='{value}' where id={ctx.guild.id}")
-
-                    else:
-                        await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
-
+                    await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
                     await db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
 
             if option == "colour": 
                 value = str(discord.Colour(int(value)))
+
+            elif option == "emoji": 
+                value = str(self.bot.get_emoji(guild_options["emoji"]))
                 
             emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
