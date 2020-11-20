@@ -70,7 +70,7 @@ class Settings(commands.Cog):
                         await db.commit()
 
                     else:
-                        await db.execute(f"update settings set colour={value} where id={ctx.guild.id}")
+                        await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
                         await db.commit()
                 
             emb = discord.Embed(title = "<a:check:726040431539912744> | done!", description = f"**{option}** for **{ctx.guild.name}** updated to **{value}**", colour = guild_options["colour"])
