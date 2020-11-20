@@ -59,8 +59,101 @@ class Cookie(commands.Cog):
       else:
         emoji = str(emoji)
 
-    #colour = int(opt["emoji"])
-    colour = self.bot.colour
+    colour = int(opt["colour"])
+
+    count = discord.Embed(title = "**3**", colour = colour)
+    count.set_footer(text = "First one to take the cookie wins 🍪!")
+
+    msg = await ctx.send(embed = count)
+    number = 2
+    await asyncio.sleep(1)
+    for a in range(2):
+      count.title = f"**{number}**"
+      await msg.edit(embed = count)
+      number -= 1
+      await asyncio.sleep(1)
+
+    emb = discord.Embed(description = f"First one to take the cookie wins {emoji}!", colour = colour)
+    await msg.edit(embed = emb)
+    await msg.add_reaction(emoji)
+
+    def check(reaction, user):
+      return user.bot is False and str(reaction.emoji) in [self.bot.cookie, self.bot.oreo, self.bot.gocciola] and reaction.message.id == msg.id
+
+    start = time.perf_counter()
+    await asyncio.sleep(0.25)
+    try:
+      msg0 = await self.bot.wait_for("reaction_add", check = check, timeout = timeout)
+
+    except asyncio.TimeoutError:
+      emb.description = "Nobody ate the cookie!"
+      try:
+        await msg.edit(embed = emb)
+        await msg.remove_reaction(emoji, ctx.guild.me)
+      except:
+        emb.description = "The original message got deleted, I can't end the game!"
+        await ctx.send(embed = emb)
+
+      return
+
+    end = time.perf_counter()
+    duration = (end - start) 
+    emb.set_author(name = "We have a winner!", icon_url = str(msg0[1].avatar_url_as(static_format = "png")))
+    emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!"
+    await msg.edit(embed = emb)
+
+    winner = str(msg0[1].id)
+
+    async with aiosqlite.connect("data/db.db") as db:
+      data = await db.execute(f"SELECT * from users where user = '{winner}'")
+      data = await data.fetchall()
+
+      if len(data) == 0:
+        await db.execute(f"INSERT into users (user, cookies) VALUES ('{winner}', 1)")
+
+      else:
+        final_data = int(data[0][1]) + 1
+        await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
+
+      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
+      await db.commit()
+
+    await asyncio.sleep(1.5)
+    try:
+      msg = await msg.channel.fetch_message(msg.id)
+      users = await msg.reactions[0].users().flatten()
+      others = "\n".join([a.mention for a in users if a.id != int(winner) and a.bot is False])
+
+      if len(others) >= 1:
+        emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!\n\nOther players:\n{others}"
+        await msg.edit(embed = emb)    
+      
+    except:
+      print(traceback.print_exc())
+
+  @commands.command(aliases = ["ct"], hidden = True)
+  @commands.is_owner()
+  @commands.guild_only()
+  @commands.max_concurrency(1, BucketType.channel)
+  @commands.cooldown(1, 5, BucketType.user)
+  @commands.check(check_perms)
+  async def cookie_test(self, ctx):
+    "Spawn a cookie in the chat, first one to take it wins!"
+
+    opt = await cookies.guild_settings(ctx.guild.id)
+
+    timeout = opt["timeout"]
+    emoji = opt["emoji"]
+    if opt["emoji_default"] == False:
+      emoji = self.bot.get_emoji(emoji)
+
+      if not emoji:
+        emoji = random.choice([self.bot.gocciola, self.bot.cookie, self.bot.oreo])
+
+      else:
+        emoji = str(emoji)
+
+    colour = int(opt["colour"])
 
     count = discord.Embed(title = "**3**", colour = colour)
     count.set_footer(text = "First one to take the cookie wins 🍪!")
