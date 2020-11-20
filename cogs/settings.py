@@ -90,9 +90,9 @@ class Settings(commands.Cog):
                     except:
                         emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid timeout", colour = int(guild_options["colour"]))
                         return await ctx.send(embed=emb)
-                    
+
                 if type(value) not in [int, float]:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | max timeout is **300s**!", colour = int(guild_options["colour"]))
+                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | max timeout is **300** seconds!", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
 
             async with aiosqlite.connect("data/db.db") as db:
@@ -116,6 +116,9 @@ class Settings(commands.Cog):
 
             elif option == "emoji": 
                 value = str(self.bot.get_emoji(guild_options["emoji"]))
+
+            elif option == "timeout":
+                value = f"{value} seconds"
                 
             emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
