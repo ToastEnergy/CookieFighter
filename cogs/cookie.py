@@ -59,7 +59,8 @@ class Cookie(commands.Cog):
       else:
         emoji = str(emoji)
 
-    colour = int(opt["emoji"])
+    #colour = int(opt["emoji"])
+    colour = self.bot.colour
 
     count = discord.Embed(title = "**3**", colour = colour)
     count.set_footer(text = "First one to take the cookie wins 🍪!")
