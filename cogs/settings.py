@@ -48,6 +48,11 @@ class Settings(commands.Cog):
             async with ctx.typing():
                 option = str(option).lower()
 
+                options = ["colour", "emoji", "timeout"]
+                if option not in options:
+                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option", colour = int(guild_options["colour"]))
+                    return await ctx.send(embed=emb)
+
                 if not value:
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | please specify a value!", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
@@ -72,11 +77,6 @@ class Settings(commands.Cog):
                     if type(value) not in [int, float]:
                         emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid timout", colour = int(guild_options["colour"]))
                         return await ctx.send(embed=emb)
-
-                options = ["colour", "emoji", "timeout"]
-                if option not in options:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option", colour = int(guild_options["colour"]))
-                    return await ctx.send(embed=emb)
 
                 async with aiosqlite.connect("data/db.db") as db:
                     data = await db.execute(f"select * from settings where id={ctx.guild.id}")
