@@ -1,10 +1,5 @@
-import discord
+import discord, cookies, os, aiosqlite, traceback, humanize
 from discord.ext import commands, tasks
-import aiohttp
-import os
-import aiosqlite
-import traceback
-import humanize
 
 class Events(commands.Cog):
     
@@ -68,35 +63,36 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        
+        if ctx.guild:
+            opt = await cookies.guild_settings(ctx.guild.id)
+            colour = int(opt["colour"])
+        
+        else: 
+            colour = self.bot.colour
+
         if isinstance(error, commands.CommandNotFound):
             return
 
         elif isinstance(error, commands.CheckFailure):
             return 
 
-        if ctx.command in [self.bot.get_command("cookie"), self.bot.get_command("milk"), self.bot.get_command("type")]:
-            if isinstance(error, commands.BadArgument):
-                emb = discord.Embed(description = f"<a:fail:727212831782731796> | To set a timeout you need to use a number, if want a decimal number, use this format: `10.4`.", colour = self.bot.colour)
-                return await ctx.send(embed = emb)
-            
-            else: pass
-
         elif ctx.command == self.bot.get_command("send"):
             if isinstance(error, commands.BadArgument):
-                emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `send @user 40`", colour = self.bot.colour)
+                emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `send @user 40`", colour = colour)
                 return await ctx.send(embed = emb)
             
             else: pass
 
         elif ctx.command == self.bot.get_command("leaderboard"):
             if isinstance(error, commands.BadArgument) or str(error) == 'Could not convert "number" into int or float.':
-                emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `leaderboard 69` or `leaderboard 4.20`", colour = self.bot.colour)
+                emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `leaderboard 69` or `leaderboard 4.20`", colour = colour)
                 return await ctx.send(embed = emb)
             
             else: pass
 
         elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
-            emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
+            emb = discord.Embed(description = f"```sh\n{error}\n```", colour = colour)
             return await ctx.send(embed = emb, delete_after = 3)
 
         elif isinstance(error, commands.MissingPermissions):
@@ -105,8 +101,11 @@ class Events(commands.Cog):
                     return await ctx.reinvoke()
                 else:
                     pass
+
+            emb = discord.Embed(description = "<a:fail:727212831782731796> | You don't have permissions to run this command!", colour = colour)
+            return await ctx.send(embed = emb)
         
-        emb = discord.Embed(description = f"```sh\n{error}\n```", colour = self.bot.colour)
+        emb = discord.Embed(description = f"```sh\n{error}\n```", colour = colour)
         await ctx.send(embed = emb)
 
     @commands.Cog.listener()
