@@ -72,7 +72,7 @@ class Settings(commands.Cog):
 
             elif option == "emoji":
                 try:
-                    emoji = self.emoji_converter.convert(ctx, value)
+                    emoji = await self.emoji_converter.convert(ctx, value)
 
                 except commands.errors.EmojiNotFound:
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid emoji", colour = int(guild_options["colour"]))
