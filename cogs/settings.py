@@ -6,8 +6,7 @@ class Settings(commands.Cog):
         self.bot = bot
         self.emoji_converter = commands.EmojiConverter()
 
-    @commands.group(aliases = ["setting"], invoke_without_command = True, hidden = True)
-    @commands.is_owner()
+    @commands.group(aliases = ["setting"], invoke_without_command = True)
     @commands.has_permissions(manage_messages = True)
     async def settings(self, ctx, option=None, value=None):
         "setup the bot for your guild"
