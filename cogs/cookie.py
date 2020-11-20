@@ -659,6 +659,15 @@ class Cookie(commands.Cog):
 
     opt = await cookies.guild_settings(ctx.guild.id)
     colour = int(opt["colour"])
+    emoji = opt["emoji"]
+    if opt["emoji_default"] == False:
+      emoji = self.bot.get_emoji(emoji)
+
+      if not emoji:
+        emoji = self.bot.cookie
+
+      else:
+        emoji = str(emoji)
 
     try:
       user = await self.bot.fetch_user(int(user))
@@ -687,7 +696,7 @@ class Cookie(commands.Cog):
 
     try:
 
-      emb = discord.Embed(description = f"Are you sure you want to gift **{cookies} {self.bot.cookie}** to **{str(user)}**? Reply with `yes` if you agree.", colour = colour)
+      emb = discord.Embed(description = f"Are you sure you want to gift **{cookies} {emoji}** to **{str(user)}**? Reply with `yes` if you agree.", colour = colour)
       await ctx.send(embed = emb)
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
@@ -703,7 +712,7 @@ class Cookie(commands.Cog):
       return await ctx.send(embed = emb)
 
     winner = user.id
-    emb = discord.Embed(description = f"Adding **{cookies} {self.bot.cookie}** to **{user.mention}**...", colour = colour)
+    emb = discord.Embed(description = f"Adding **{cookies} {emoji}** to **{user.mention}**...", colour = colour)
     msg = await ctx.send(embed = emb)
 
     async with aiosqlite.connect("data/db.db") as db:
@@ -735,7 +744,7 @@ class Cookie(commands.Cog):
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
         await db.commit()
 
-    emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {self.bot.cookie}** to **{str(user)}**!"
+    emb.description = f"<a:check:726040431539912744> | Gifted **{cookies} {emoji}** to **{str(user)}**!"
     await msg.edit(embed = emb)
 
   @commands.command()
