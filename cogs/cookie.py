@@ -1,14 +1,6 @@
-import discord
+import discord, cookies, os, traceback, asyncio, random, time, aiosqlite, dbl
 from discord.ext import commands, tasks
-import asyncio
 from discord.ext.commands.cooldowns import BucketType
-import os
-import traceback
-import random
-import time
-from datetime import datetime
-import aiosqlite
-import dbl
 from typing import Union
 
 async def check_perms(ctx):
@@ -51,15 +43,25 @@ class Cookie(commands.Cog):
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user)
   @commands.check(check_perms)
-  async def cookie(self, ctx, timeout: float = 120):
+  async def cookie(self, ctx):
+    "Spawn a cookie in the chat, first one to take it wins!"
 
-    "Spawn a cookie in the chat, first one to take it wins! You can also set a cusotom timeout in seconds (default is 120, max is 300)"
+    opt = await cookies.guild_settings(ctx.guild.id)
 
-    if timeout > 300: timeout = 300
+    timeout = opt["timeout"]
+    emoji = opt["emoji"]
+    if opt["e_d"] == False:
+      emoji = self.bot.get_emoji(emoji)
 
-    emoji = random.choice([self.bot.gocciola, self.bot.cookie, self.bot.oreo])
+      if not emoji:
+        emoji = random.choice([self.bot.gocciola, self.bot.cookie, self.bot.oreo])
 
-    count = discord.Embed(title = "**3**", colour = self.bot.colour)
+      else:
+        emoji = str(emoji)
+
+    colour = int(opt["emoji"])
+
+    count = discord.Embed(title = "**3**", colour = colour)
     count.set_footer(text = "First one to take the cookie wins 🍪!")
 
     msg = await ctx.send(embed = count)
@@ -71,7 +73,7 @@ class Cookie(commands.Cog):
       number -= 1
       await asyncio.sleep(1)
 
-    emb = discord.Embed(description = f"First one to take the cookie wins {emoji}!", colour = self.bot.colour)
+    emb = discord.Embed(description = f"First one to take the cookie wins {emoji}!", colour = colour)
     await msg.edit(embed = emb)
     await msg.add_reaction(emoji)
 
