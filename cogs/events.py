@@ -1,4 +1,4 @@
-import discord, cookies, os, aiosqlite, traceback, humanize
+import discord, cookies, os, aiosqlite, traceback, humanize, aiohttp
 from discord.ext import commands, tasks
 
 class Events(commands.Cog):
