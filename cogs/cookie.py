@@ -526,7 +526,7 @@ class Cookie(commands.Cog):
     colour = int(opt["colour"])
 
     if not check:
-      if ctx.author.id in [326736523494031360, 488398758812319745]:
+      if ctx.author.id in self.bot.owner_ids:
         pass
       else:
         emb = discord.Embed(title = "Please Vote!", description = f"• This command is for voters only!\n• Vote [here](https://top.gg/bot/{self.bot.user.id}/vote) and wait 1-2 minutes to use it.", url = f"https://top.gg/bot/{self.bot.user.id}/vote", colour = colour)
