@@ -46,7 +46,7 @@ class Events(commands.Cog):
                 if counter >= 10:
                     pass
                 else:
-                    u = self.bot.get_user(int(a))
+                    u = await self.bot.fetch_user(int(a))
                     if u:
                         counter += 1
                         m = guild.get_member(int(a))
