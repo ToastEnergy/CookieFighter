@@ -71,7 +71,7 @@ class Events(commands.Cog):
         else: 
             colour = self.bot.colour
 
-        if isinstance(error, commands.CommandNotFound):
+        if isinstance(error, commands.CommandNotFound) or isinstance(error, commands.CheckFailure):
             return
 
         elif ctx.command == self.bot.get_command("send"):
