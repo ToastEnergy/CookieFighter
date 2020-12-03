@@ -122,5 +122,40 @@ class Settings(commands.Cog):
             emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
 
+    @commands.group(aliases = ["setprefix"], invoke_without_command = True)
+    @commands.has_permissions(manage_roles = True)
+    async def prefix(self, ctx, *, prefix):
+        "Change server prefix"
+
+        opt = await cookies.guild_settings(ctx.guild.id)
+        colour = int(opt["colour"])
+
+        if len(prefix) > 36:
+                emb = discord.Embed(description = f"<a:fail:727212831782731796> | The prefix can't be longer than **36** characters!", colour = colour)
+                return await ctx.send(embed = emb)
+
+        async with aiosqlite.connect("data/db.db") as db:
+                await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
+                await db.execute(f"INSERT into prefixes (guild, prefix) VALUES ({ctx.guild.id}, '{prefix}')")
+                await db.commit()
+
+        emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix changed to **{prefix}**", colour = colour)
+        await ctx.send(embed = emb)
+
+    @prefix.command()
+    @commands.has_permissions(manage_roles = True)
+    async def reset(self, ctx):
+        "reset the prefix to the default one"
+
+        opt = await cookies.guild_settings(ctx.guild.id)
+        colour = int(opt["colour"])
+
+        async with aiosqlite.connect("data/db.db") as db:
+                await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
+                await db.commit()
+
+        emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix reset to **c/**", colour = colour)
+        await ctx.send(embed = emb)
+
 def setup(bot):
     bot.add_cog(Settings(bot))
