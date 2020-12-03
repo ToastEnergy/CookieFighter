@@ -12,6 +12,10 @@ async def check_perms(ctx):
       emb.description += "**• Use external emojis**\n"
       error = True
 
+    if not ctx.guild.me.permissions_in(ctx.channel).add_reactions:
+      emb.description += "**• Use external emojis**\n"
+      error = True
+
     if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
       emb.description += "**• Read message history**\n"
       error = True
