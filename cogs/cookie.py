@@ -432,7 +432,7 @@ class Cookie(commands.Cog):
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
   @commands.check(check_perms)
-  async def _type(self, ctx, timeout: float = 120):
+  async def _type(self, ctx):
     "First one to send the cookie emoji wins!"
 
     opt = await cookies.guild_settings(ctx.guild.id)
