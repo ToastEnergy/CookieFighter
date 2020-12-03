@@ -71,28 +71,32 @@ class Events(commands.Cog):
         else: 
             colour = self.bot.colour
 
-        if isinstance(error, commands.CommandNotFound) or isinstance(error, commands.CheckFailure):
+        if isinstance(error, commands.CommandNotFound):
             return
 
-        elif ctx.command == self.bot.get_command("send"):
+        if isinstance(error, commands.CheckFailure):
+            if ctx.command.cog.qualified_name == "Cookie":
+                return
+
+        if ctx.command == self.bot.get_command("send"):
             if isinstance(error, commands.BadArgument):
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `send @user 40`", colour = colour)
                 return await ctx.send(embed = emb)
             
             else: pass
 
-        elif ctx.command == self.bot.get_command("leaderboard"):
+        if ctx.command == self.bot.get_command("leaderboard"):
             if isinstance(error, commands.BadArgument) or str(error) == 'Could not convert "number" into int or float.':
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `leaderboard 69` or `leaderboard 4.20`", colour = colour)
                 return await ctx.send(embed = emb)
             
             else: pass
 
-        elif isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
+        if isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
             emb = discord.Embed(description = f"```sh\n{error}\n```", colour = colour)
             return await ctx.send(embed = emb, delete_after = 3)
 
-        elif isinstance(error, commands.MissingPermissions):
+        if isinstance(error, commands.MissingPermissions):
             if ctx.command in [self.bot.get_command("prefix"), self.bot.get_command("prefix reset"), self.bot.get_command("settings")]:
                 if ctx.author.id in self.bot.owner_ids:
                     return await ctx.reinvoke()
