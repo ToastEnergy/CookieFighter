@@ -25,30 +25,30 @@ def check_perms():
         embed = True
 
         if not ctx.guild.me.permissions_in(ctx.channel).use_external_emojis:
-        emb.description += "**• Use external emojis**\n"
-        error = True
+            emb.description += "**• Use external emojis**\n"
+            error = True
 
         if not ctx.guild.me.permissions_in(ctx.channel).add_reactions:
-        emb.description += "**• Use external emojis**\n"
-        error = True
+            emb.description += "**• Use external emojis**\n"
+            error = True
 
         if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
-        emb.description += "**• Read message history**\n"
-        error = True
+            emb.description += "**• Read message history**\n"
+            error = True
         
         if not ctx.guild.me.permissions_in(ctx.channel).embed_links:
-        emb.description += "**• Embed links**"
-        embed = False
-        error = True
+            emb.description += "**• Embed links**"
+            embed = False
+            error = True
 
         if error:
-        if embed:
-            await ctx.send(embed = emb)
-            return False
+            if embed:
+                await ctx.send(embed = emb)
+                return False
 
-        else:
-            await ctx.send(emb.description)
-            return False
+            else:
+                await ctx.send(emb.description)
+                return False
 
         return True
     return commands.check(predicate)
@@ -157,7 +157,7 @@ class DataBase:
 
             else:
                 final_data = int(data[0][1]) - int(cookies)
-                
+
                 if final_data < 0:
                     final_data = 0
 
