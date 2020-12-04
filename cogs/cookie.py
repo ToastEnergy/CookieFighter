@@ -607,7 +607,7 @@ class Cookie(commands.Cog):
 
             members.append(u)
 
-          e = discord.Embed(title="**Cookies Party Missions 🎉**", description="{} Participants:\n{}".format(len(PARTY_MEMBERS), '\n'.join([a.mention for a in members])), timestamp=datetime.utcnow(), colour = colour)
+          e = discord.Embed(title="**Cookies Party Missions 🎉**", description="{} Participants:\n{}".format(len(PARTY_MEMBERS), '\n'.join([a.mention for a in members])), timestamp=datetime.datetime.utcnow(), colour = colour)
           e.set_author(name=f"{user.name} Won in {duration:.2f} seconds!🎉", icon_url = str(user.avatar_url_as(static_format = "png")))
           e.set_footer(text='The party ends at')
           msg = await ctx.send(embed=e)
@@ -637,7 +637,7 @@ class Cookie(commands.Cog):
                   u = await self.bot.fetch_user(id)
 
                 members.append(u)
-              e = discord.Embed(title="**Cookies Party Missions 🎉**", description="{} Participants:\n{}".format(len(PARTY_MEMBERS), '\n'.join([a.mention for a in members])), timestamp=datetime.utcnow(), colour = colour)
+              e = discord.Embed(title="**Cookies Party Missions 🎉**", description="{} Participants:\n{}".format(len(PARTY_MEMBERS), '\n'.join([a.mention for a in members])), timestamp=datetime.datetime.utcnow(), colour = colour)
               e.set_author(name=f"{message.author.display_name} Won in {duration:.2f} seconds!🎉", icon_url=message.author.avatar_url)
               e.set_footer(text='The party ends at')
               msg = await ctx.send(embed=e)
