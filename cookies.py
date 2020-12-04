@@ -127,7 +127,7 @@ class Git:
         sync_process = functools.partial(self.sync_push, commit)
         await self.loop.run_in_executor(None, sync_process)
 
-class DataBase:
+class Database:
     def __init__(self):
         pass
 
@@ -164,5 +164,3 @@ class DataBase:
                 await db.execute(f"UPDATE users set cookies = {final_data} where user = {user}")
 
             await db.commit()
-
-    

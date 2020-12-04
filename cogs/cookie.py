@@ -8,6 +8,7 @@ class Cookie(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
     self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
+    self.database = cookies.Database()
 
   @commands.command(aliases = ["cookies", "c"])
   @commands.guild_only()
@@ -80,20 +81,8 @@ class Cookie(commands.Cog):
 
     winner = str(msg0[1].id)
 
-    async with aiosqlite.connect("data/db.db") as db:
-      data = await db.execute(f"SELECT * from users where user = '{winner}'")
-      data = await data.fetchall()
-
-      if len(data) == 0:
-        await db.execute(f"INSERT into users (user, cookies) VALUES ('{winner}', 1)")
-
-      else:
-        final_data = int(data[0][1]) + 1
-        await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
-
-      await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
-      await db.commit()
-
+    await self.database.add_cookies(winner, 1, ctx.message.id, duration)
+    
     await asyncio.sleep(1.5)
     try:
       msg = await msg.channel.fetch_message(msg.id)
