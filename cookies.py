@@ -18,35 +18,41 @@ import discord, os, functools, aiosqlite, random
 from discord.ext import commands
 from datetime import datetime
 
-def betterEmbed(**para):
-    EMBED_ATTRIBUTES = ('title', 'description', 'url', 'color', 'timestamp')
-    EMBED_SETS = ('image', 'thumbnail', 'footer_text', 'footer_icon_url', 'author_name', 'author_icon_url')
+def check_perms():
+    async def predicate(ctx):
+        error = False
+        emb = discord.Embed(description = f"I'm missing these permissions to run the command `{ctx.command}`:\n", colour = ctx.bot.colour)
+        embed = True
 
-    ATTRIBUTES_DICT = {argv: para[argv] for argv in para if argv in EMBED_ATTRIBUTES}
-    SETS_DICT = {argv: para[argv] for argv in para if argv in EMBED_SETS}
-    embed = discord.Embed(**ATTRIBUTES_DICT)   
-    if SETS_DICT:
-        for item, value in SETS_DICT.items():
-              if item == EMBED_SETS[0]:
-                    embed.set_image(url=value)
-              elif item == EMBED_SETS[1]:
-                    embed.set_thumbnail(url=value)
-              elif item == EMBED_SETS[2]:
-                    embed.set_footer(text=value)
-              elif item == EMBED_SETS[3]:
-                  if embed.footer.text:
-                      embed.footer.icon_url=value
-                  else:
-                      pass
-              elif item == EMBED_SETS[4]:
-                    embed.set_author(name=value)
-              elif item == EMBED_SETS[5]:
-                  if embed.author.name:
-                      embed.author.icon_url=value
-                  else:
-                      pass
+        if not ctx.guild.me.permissions_in(ctx.channel).use_external_emojis:
+        emb.description += "**• Use external emojis**\n"
+        error = True
 
-    return embed
+        if not ctx.guild.me.permissions_in(ctx.channel).add_reactions:
+        emb.description += "**• Use external emojis**\n"
+        error = True
+
+        if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
+        emb.description += "**• Read message history**\n"
+        error = True
+        
+        if not ctx.guild.me.permissions_in(ctx.channel).embed_links:
+        emb.description += "**• Embed links**"
+        embed = False
+        error = True
+
+        if error:
+        if embed:
+            await ctx.send(embed = emb)
+            return False
+
+        else:
+            await ctx.send(emb.description)
+            return False
+
+        return True
+    return commands.check(predicate)
+
 
 async def guild_prefix(guild_id):
     async with aiosqlite.connect("data/db.db") as db:
@@ -120,5 +126,43 @@ class Git:
     async def push(self, commit="auto push"):
         sync_process = functools.partial(self.sync_push, commit)
         await self.loop.run_in_executor(None, sync_process)
+
+class DataBase:
+    def __init__(self):
+        pass
+
+    async def add_cookies(self, user, cookies, message_id = None, duration = None):
+        async with aiosqlite.connect("data/db.db") as db:
+            data = await db.execute(f"SELECT * from users where user = '{user}'")
+            data = await data.fetchall()
+
+            if len(data) == 0:
+                await db.execute(f"INSERT into users (user, cookies) VALUES ('{user}', {cookies})")
+
+            else:
+                final_data = int(data[0][1]) + int(cookies)
+                await db.execute(f"UPDATE users set cookies = {final_data} where user = {user}")
+
+            if message_id:
+                await db.execute(f"INSERT into results (user, message, time) VALUES ('{user}', '{message_id}', '{duration:.4f}')")
+            await db.commit()
+
+    async def remove_cookies(self, user, cookies):
+        async with aiosqlite.connect("data/db.db") as db:
+            data = await db.execute(f"SELECT * from users where user = '{user}'")
+            data = await data.fetchall()
+
+            if len(data) == 0:
+                raise KeyError(user)
+
+            else:
+                final_data = int(data[0][1]) - int(cookies)
+                
+                if final_data < 0:
+                    final_data = 0
+
+                await db.execute(f"UPDATE users set cookies = {final_data} where user = {user}")
+
+            await db.commit()
 
     

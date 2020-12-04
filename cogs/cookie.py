@@ -1,40 +1,7 @@
 import discord, cookies, os, traceback, asyncio, random, time, aiosqlite, dbl, datetime
-from discord.ext import commands, tasks
+from discord.ext import commands, tasks, cookies
 from discord.ext.commands.cooldowns import BucketType
 from typing import Union
-
-async def check_perms(ctx):
-    error = False
-    emb = discord.Embed(description = f"I'm missing these permissions to run the command `{ctx.command}`:\n", colour = ctx.bot.colour)
-    embed = True
-
-    if not ctx.guild.me.permissions_in(ctx.channel).use_external_emojis:
-      emb.description += "**• Use external emojis**\n"
-      error = True
-
-    if not ctx.guild.me.permissions_in(ctx.channel).add_reactions:
-      emb.description += "**• Use external emojis**\n"
-      error = True
-
-    if not ctx.guild.me.permissions_in(ctx.channel).read_message_history:
-      emb.description += "**• Read message history**\n"
-      error = True
-    
-    if not ctx.guild.me.permissions_in(ctx.channel).embed_links:
-      emb.description += "**• Embed links**"
-      embed = False
-      error = True
-
-    if error:
-      if embed:
-        await ctx.send(embed = emb)
-        return False
-
-      else:
-        await ctx.send(emb.description)
-        return False
-
-    return True
 
 class Cookie(commands.Cog):
   
@@ -46,7 +13,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user)
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def cookie(self, ctx):
     "Spawn a cookie in the chat, first one to take it wins!"
 
@@ -144,7 +111,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def milk(self, ctx):
     "Spawn a milk in the chat, first one to take it wins!"
 
@@ -223,7 +190,7 @@ class Cookie(commands.Cog):
       print(traceback.print_exc())
 
   @commands.group(aliases = ["lb", "top"], invoke_without_command = True)
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def leaderboard(self, ctx, number: Union[int, float] = None):
     "Top Cookie users, if a number is specified it will return the closest results to that number."
 
@@ -319,7 +286,7 @@ class Cookie(commands.Cog):
     await ctx.send(embed = emb)
 
   @leaderboard.command(aliases = ["guild"])
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def server(self, ctx):
     "Top Cookie users in the actual server"
 
@@ -382,7 +349,7 @@ class Cookie(commands.Cog):
     await msg.edit(embed = emb, content = None)
 
   @commands.command(aliases = ["stat", "info", "bal", "balance"])
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def stats(self, ctx, user = None):
     "Check User stats"
 
@@ -440,7 +407,7 @@ class Cookie(commands.Cog):
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
   @commands.cooldown(1, 5, BucketType.user) 
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def _type(self, ctx):
     "First one to send the cookie emoji wins!"
 
@@ -526,7 +493,7 @@ class Cookie(commands.Cog):
   @commands.command(aliases = ["p"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
   
@@ -706,7 +673,7 @@ class Cookie(commands.Cog):
           await db.commit()
 
   @commands.command(aliases = ["gift"], usage = "<user> <cookies>")
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def send(self, ctx, user, cookies_: int):
     "Gift cookies to a user"
 
@@ -806,7 +773,7 @@ class Cookie(commands.Cog):
     await msg.edit(embed = emb)
 
   @commands.command()
-  @commands.check(check_perms)
+  @cookies.check_perms()
   async def delete(self, ctx):
     "Delete all your cookies"
 
