@@ -1,5 +1,5 @@
 import discord, cookies, os, traceback, asyncio, random, time, aiosqlite, dbl, datetime
-from discord.ext import commands, tasks, cookies
+from discord.ext import commands, tasks
 from discord.ext.commands.cooldowns import BucketType
 from typing import Union
 
