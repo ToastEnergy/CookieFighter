@@ -71,12 +71,8 @@ class Cookie(commands.Cog):
     end = time.perf_counter()
     duration = (end - start) 
     emb.set_author(name = "We have a winner!", icon_url = str(msg0[1].avatar_url_as(static_format = "png")))
-    event = random.choice(range(1, 6))
-    if int(event) == 4:
-      emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!\n\nTry winning **100** cookies with the christmas art contest! Join the [support server](https://discord.gg/vCUpW9E) for more info."
     
-    else:
-      emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!"
+    emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!"
     await msg.edit(embed = emb)
 
     winner = str(msg0[1].id)

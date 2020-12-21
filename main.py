@@ -41,6 +41,7 @@ bot.oreo = "<:oreo:761274120821276702>"
 bot.gocciola = "<:gocciola:747247300803297290>"
 bot.milk = "<:mc_milk:726522958847279174>"
 bot.clock = "<a:mc_clock:748835359991005215>"
+bot.christmas = "<:ChristmasCookie:790492019372982272>"
 bot.colour = 0xd8ad6a
 bot.launchtime = datetime.now()
 bot.remove_command("help")
