@@ -15,51 +15,14 @@ class Events(commands.Cog):
             headers = {"Authorization": str(os.environ.get("discordbotsgg"))}
             url1 = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"    
             headers1 = {"Authorization": str(os.environ.get("discordbotlist"))}
-            url2 = f"https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats"
-            headers2 = {"Authorization": str(os.environ.get("discordextremelist")), "Content-Type": "application/json"}
 
             async with aiohttp.ClientSession() as cs:
-                    await cs.post(url, headers = headers, data = {"guildCount": len(self.bot.guilds)})
-                    await cs.post(url1, headers = headers1, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
-                    await cs.post(url2, headers = headers2, data = {"guildCount": len(self.bot.guilds)})
+                await cs.post(url, headers = headers, data = {"guildCount": len(self.bot.guilds)})
+                await cs.post(url1, headers = headers1, data = {"guilds": len(self.bot.guilds), "users": len(self.bot.users), "voice_connections": 0})
             await cs.close()
 
-        except Exception as e:
-            print(e)
-
-        try:
-            guild = self.bot.get_guild(725860467964248075)
-            stats = {}
-
-            async with aiosqlite.connect("data/db.db") as db:
-                data = await db.execute("SELECT * from users")
-                data = await data.fetchall()
-
-                for a in data:
-                    stats[str(a[0])] = int(a[1])
-            
-            lb = sorted(stats, key=lambda x : stats[x], reverse=True)
-            role = guild.get_role(732621593112608809)
-
-            counter = 0
-            for a in lb:
-                if counter >= 10:
-                    pass
-                else:
-                    u = await self.bot.fetch_user(int(a))
-                    if u:
-                        counter += 1
-                        m = guild.get_member(int(a))
-                        if m:
-                            if role.id not in [a.id for a in m.roles]:
-                                await m.add_roles(role)
-
-            for a in role.members:
-                if int(a.id) not in [int(b) for b in lb]:
-                    await a.remove_roles(role)
-                    
-        except Exception as e:
-            print(e)
+        except:
+            pass
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):

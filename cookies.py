@@ -74,7 +74,7 @@ async def quickembed(ctx, text):
 
 async def guild_settings(guild_id):
     async with aiosqlite.connect("data/db.db") as db:
-        data = await db.execute(f"select * from settings where id = {guild_id}")
+        data = await db.execute(f"select * from settings where id = ?", (guild_id,))
         data = await data.fetchall()
 
     default = {"colour": 14200170, "timeout": 120, "emoji": "<:ChristmasCookie:790492019372982272>", "emoji_default": True}
@@ -94,13 +94,14 @@ async def guild_settings(guild_id):
             e_d = True
 
         else:
+            emoji = int(emoji)
             e_d = False
 
         if str(timeout) == "0.0": timeout = default["timeout"]
 
         options = {
             "colour": int(colour),
-            "emoji": int(emoji),
+            "emoji": emoji,
             "timeout": timeout,
             "emoji_default": e_d
         }
