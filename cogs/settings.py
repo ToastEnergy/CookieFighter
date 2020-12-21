@@ -18,7 +18,8 @@ class Settings(commands.Cog):
             guild_options["colour"] = str(discord.Colour(int(guild_options["colour"])))
 
             if guild_options["emoji_default"] == True:
-                guild_options["emoji"] = f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
+                #guild_options["emoji"] = f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
+                guild_options["emoji"] = self.bot.christmas
 
             else:
                 emoji = self.bot.get_emoji(guild_options["emoji"]) if self.bot.get_emoji(guild_options["emoji"]) else f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
