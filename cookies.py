@@ -77,8 +77,7 @@ async def guild_settings(guild_id):
         data = await db.execute(f"select * from settings where id = ?", (guild_id,))
         data = await data.fetchall()
 
-    default = {"colour": 14200170, "timeout": 120, "emoji": "<:ChristmasCookie:790492019372982272>", "emoji_default": True}
-    # random.choice(["<:mc_cookie:726184620164382741>", "<:gocciola:747247300803297290>", "<:oreo:761274120821276702>"])
+    default = {"colour": 14200170, "timeout": 120, "emoji": random.choice(["<:mc_cookie:726184620164382741>", "<:gocciola:747247300803297290>", "<:oreo:761274120821276702>"]), "emoji_default": True}
     if len(data) == 0:
         options = default
 
