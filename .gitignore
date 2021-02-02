@@ -1,0 +1,4 @@
+cogs/db.db
+.DS_Store
+__pycache__
+cogs/__pycache__
