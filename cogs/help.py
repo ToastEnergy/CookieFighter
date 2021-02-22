@@ -97,12 +97,6 @@ Command "{command}" not found
 [Support Server](https://discord.gg/vCUpW9E)
 Server Prefix: **{prefix}**
 
-**Christmas Art Contest!**
-hello artists! we have a challenge for you!
-draw a cookie emoji Christmas-Based for the bot!
-the winner will get a special role in our discord server, 100 cookies and his name on our future credit command! 
-join the support server and post your art in the art-contest channel!
-
 {res}"""
         emb.set_footer(text = f"Need more help? Use \"{prefix}help <command>\".", icon_url = str(ctx.author.avatar_url_as(static_format = "png")))
         await ctx.send(embed = emb)
