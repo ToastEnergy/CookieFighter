@@ -4,7 +4,7 @@ from discord.ext.commands.cooldowns import BucketType
 from typing import Union
 
 class Cookie(commands.Cog):
-  
+
   def __init__(self, bot):
     self.bot = bot
     self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
@@ -69,16 +69,16 @@ class Cookie(commands.Cog):
       return
 
     end = time.perf_counter()
-    duration = (end - start) 
+    duration = (end - start)
     emb.set_author(name = "We have a winner!", icon_url = str(msg0[1].avatar_url_as(static_format = "png")))
-    
+
     emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!"
     await msg.edit(embed = emb)
 
     winner = str(msg0[1].id)
 
     await self.database.add_cookies(winner, 1, ctx.message.id, duration)
-    
+
     await asyncio.sleep(1.5)
     try:
       msg = await msg.channel.fetch_message(msg.id)
@@ -87,15 +87,15 @@ class Cookie(commands.Cog):
 
       if len(others) >= 1:
         emb.description = f"{msg0[1].mention} won and ate the cookie {emoji} in `{duration:.2f}` seconds!\n\nOther players:\n{others}"
-        await msg.edit(embed = emb)    
-      
+        await msg.edit(embed = emb)
+
     except:
       print(traceback.print_exc())
 
   @commands.command(aliases = ["m"])
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
-  @commands.cooldown(1, 5, BucketType.user) 
+  @commands.cooldown(1, 5, BucketType.user)
   @cookies.check_perms()
   async def milk(self, ctx):
     "Spawn a milk in the chat, first one to take it wins!"
@@ -140,7 +140,7 @@ class Cookie(commands.Cog):
 
       return
     end = time.perf_counter()
-    duration = (end - start) 
+    duration = (end - start)
     emb.set_author(name = "We have a winner!", icon_url = str(msg0[1].avatar_url_as(static_format = "png")))
     emb.description = f"{msg0[1].mention} won and drunk the milk {self.bot.milk} in `{duration:.2f}` seconds!!"
     await msg.edit(embed = emb)
@@ -169,8 +169,8 @@ class Cookie(commands.Cog):
 
       if len(others) >= 1:
         emb.description = f"{msg0[1].mention} won and drunk the milk {self.bot.milk} in `{duration:.2f}` seconds!\n\nOther players:\n{others}"
-        await msg.edit(embed = emb)    
-      
+        await msg.edit(embed = emb)
+
     except:
       print(traceback.print_exc())
 
@@ -205,7 +205,7 @@ class Cookie(commands.Cog):
         data = await data.fetchall()
 
       lb = {}
-      
+
       for stat in sorted(data, key=lambda d: abs(number-d[2])):
         lb[stat[1]] = {"time": stat[2], "user": stat[0]}
 
@@ -217,9 +217,9 @@ class Cookie(commands.Cog):
 
         if counter >= 10:
           break
-        
+
         else:
-            u = self.bot.get_user(int(lb[data]["user"])) 
+            u = self.bot.get_user(int(lb[data]["user"]))
 
             if not u:
               try:
@@ -231,7 +231,7 @@ class Cookie(commands.Cog):
               counter += 1
               user = str(u).replace("`", "")
               res += f"\n**{counter}.** `{user}` - **{lb[data]['time']}s {self.bot.clock}**"
-        
+
     else:
       stats = {}
       async with aiosqlite.connect("data/db.db") as db:
@@ -240,7 +240,7 @@ class Cookie(commands.Cog):
 
         for value in data:
           stats[str(value[0])] = int(value[1])
-    
+
         lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
         res = ""
@@ -251,16 +251,16 @@ class Cookie(commands.Cog):
 
           if counter >= 10:
             break
-          
+
           else:
-            u = self.bot.get_user(int(data)) 
+            u = self.bot.get_user(int(data))
 
             if not u:
               try:
                 u = await self.bot.fetch_user(int(data))
               except:
                 u = None
-                
+
             if u:
               counter += 1
               user = str(u).replace("`", "")
@@ -294,7 +294,7 @@ class Cookie(commands.Cog):
 
     async with ctx.typing():
       emb = discord.Embed(title=f"{self.bot.clock} | loading...",colour=colour)
-      msg = await ctx.send("due to the new discord intents this will take a while", embed = emb) 
+      msg = await ctx.send("due to the new discord intents this will take a while", embed = emb)
 
       stats = {}
       async with aiosqlite.connect("data/db.db") as db:
@@ -303,7 +303,7 @@ class Cookie(commands.Cog):
 
         for value in data:
           stats[str(value[0])] = int(value[1])
-    
+
         lb = sorted(stats, key=lambda x : stats[x], reverse=True)
 
         res = ""
@@ -314,16 +314,16 @@ class Cookie(commands.Cog):
 
           if counter >= 10:
             break
-          
+
           else:
-            u = ctx.guild.get_member(int(data)) 
+            u = ctx.guild.get_member(int(data))
 
             if not u:
               try:
                 u = await ctx.guild.fetch_member(int(data))
               except:
                 u = None
-                
+
             if u:
               counter += 1
               user = str(u).replace("`", "")
@@ -341,7 +341,7 @@ class Cookie(commands.Cog):
     if not ctx.guild:
       colour = self.bot.colour
       emoji = self.bot.cookie
-    
+
     else:
       opt = await cookies.guild_settings(ctx.guild.id)
       colour = int(opt["colour"])
@@ -357,7 +357,7 @@ class Cookie(commands.Cog):
 
     if not user:
       user = ctx.author
-    
+
     else:
       try:
         user = await self.bot.fetch_user(int(user))
@@ -372,14 +372,14 @@ class Cookie(commands.Cog):
 
         else:
           return await ctx.send("user not found")
-          
+
     async with aiosqlite.connect("data/db.db") as db:
       data = await db.execute(f"SELECT * from users where user = {user.id}")
       data = await data.fetchall()
 
       if len(data) == 0:
         cookies_ = 0
-      
+
       else:
         cookies_ = int(data[0][1])
 
@@ -391,7 +391,7 @@ class Cookie(commands.Cog):
   @commands.command(name='type')
   @commands.guild_only()
   @commands.max_concurrency(1, BucketType.channel)
-  @commands.cooldown(1, 5, BucketType.user) 
+  @commands.cooldown(1, 5, BucketType.user)
   @cookies.check_perms()
   async def _type(self, ctx):
     "First one to send the cookie emoji wins!"
@@ -427,7 +427,7 @@ class Cookie(commands.Cog):
 
     def check(msg1):
       return not msg1.author.bot and msg1.channel.id == ctx.channel.id  and msg1.content == "🍪" or msg1.content == self.bot.cookie
-    
+
     start = time.perf_counter()
     await asyncio.sleep(0.25)
     try:
@@ -445,7 +445,7 @@ class Cookie(commands.Cog):
       return
 
     end = time.perf_counter()
-    duration = (end - start) 
+    duration = (end - start)
     emb.set_author(name = "We have a winner!", icon_url = str(msg0.author.avatar_url_as(static_format = "png")))
     emb.description = f"{msg0.author.mention} won and ate the cookie {self.bot.cookie} in `{duration:.2f}` seconds!"
 
@@ -471,7 +471,7 @@ class Cookie(commands.Cog):
       else:
         final_data = int(data[0][1]) + 1
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
-        
+
       await db.execute(f"INSERT into results (user, message, time) VALUES ('{winner}', '{ctx.message.id}', '{duration:.4f}')")
       await db.commit()
 
@@ -481,7 +481,7 @@ class Cookie(commands.Cog):
   @cookies.check_perms()
   async def party(self, ctx):
     "Make a Party with some friends and play a random game!"
-  
+
     check = await self.dblpy.get_user_vote(ctx.author.id)
     opt = await cookies.guild_settings(ctx.guild.id)
     colour = int(opt["colour"])
@@ -512,13 +512,13 @@ class Cookie(commands.Cog):
     @tasks.loop(seconds=2)
     async def partymembers_loop(_msg):
         if not PARTY_MEMBERS:
-            return 
+            return
 
         PARTY_MENTIONS = []
 
         for user in PARTY_MEMBERS:
           u = self.bot.get_user(user)
-          
+
           if not u:
             u = await self.bot.fetch_user(user)
 
@@ -578,7 +578,7 @@ class Cookie(commands.Cog):
 
           def r_check(reaction, user):
             return user.bot is False and str(reaction.emoji) == answer[1] and reaction.message.id == msg.id and user.id in PARTY_MEMBERS
-          
+
           try:
             start = time.perf_counter()
             await asyncio.sleep(0.25)
@@ -701,6 +701,10 @@ class Cookie(commands.Cog):
       emb = discord.Embed(description = "mh.. why would give yourself something you already have?", colour=colour)
       return await ctx.send(embed = emb)
 
+     if cookies_ <= 0:
+         emb = discord.Embed(description = "<a:fail:727212831782731796> | pls send me a number that is higher than `0`!", colour=colour)
+         return await ctx.send(embed = emb)
+
     def check(m):
       return m.author == ctx.author and m.channel == ctx.channel
 
@@ -711,9 +715,9 @@ class Cookie(commands.Cog):
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
       if msg.content.lower() == "yes":
-        pass 
+        pass
 
-      else:  
+      else:
         emb = discord.Embed(description = "<a:fail:727212831782731796> | Aborted", colour = colour)
         return await ctx.send(embed = emb)
 
@@ -748,7 +752,7 @@ class Cookie(commands.Cog):
       if len(data) == 0:
         await db.execute(f"isnert into users (user, cookies) VALUES ({winner}, {cookies_})")
         await db.commit()
-      
+
       else:
         final_data = int(data[0][1]) + cookies_
         await db.execute(f"UPDATE users set cookies = {final_data} where user = {winner}")
@@ -779,9 +783,9 @@ class Cookie(commands.Cog):
       msg = await self.bot.wait_for("message", check = check, timeout = 30)
 
       if msg.content.lower() == "yes":
-        pass 
+        pass
 
-      else:  
+      else:
         emb = discord.Embed(description = "<a:fail:727212831782731796> | Aborted", colour = colour)
         return await ctx.send(embed = emb)
 
@@ -790,7 +794,7 @@ class Cookie(commands.Cog):
       return await ctx.send(embed = emb)
 
     winner = str(ctx.author.id)
-  
+
     async with aiosqlite.connect("data/db.db") as db:
           await db.execute(f"UPDATE users set cookies = 0 where user = {winner}")
           await db.commit()
