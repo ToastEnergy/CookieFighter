@@ -701,9 +701,9 @@ class Cookie(commands.Cog):
       emb = discord.Embed(description = "mh.. why would give yourself something you already have?", colour=colour)
       return await ctx.send(embed = emb)
 
-     if cookies_ <= 0:
-         emb = discord.Embed(description = "<a:fail:727212831782731796> | pls send me a number that is higher than `0`!", colour=colour)
-         return await ctx.send(embed = emb)
+    if cookies_ <= 0:
+      emb = discord.Embed(description = "<a:fail:727212831782731796> | pls send me a number that is higher than `0`!", colour=colour)
+      return await ctx.send(embed = emb)
 
     def check(m):
       return m.author == ctx.author and m.channel == ctx.channel
