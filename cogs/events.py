@@ -2,7 +2,7 @@ import discord, cookies, os, aiosqlite, traceback, humanize, aiohttp
 from discord.ext import commands, tasks
 
 class Events(commands.Cog):
-    
+
     def __init__(self, bot):
         self.bot = bot
         self.update_stats.start()
@@ -12,9 +12,9 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         try:
             url = f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats"
-            headers = {"Authorization": str(os.environ.get("discordbotsgg"))}
-            url1 = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"    
-            headers1 = {"Authorization": str(os.environ.get("discordbotlist"))}
+            headers = {"Authorization": str(config.discordbotsgg)}
+            url1 = f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats"
+            headers1 = {"Authorization": str(config.discordbotlist)}
 
             async with aiohttp.ClientSession() as cs:
                 await cs.post(url, headers = headers, data = {"guildCount": len(self.bot.guilds)})
@@ -26,12 +26,12 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        
+
         if ctx.guild:
             opt = await cookies.guild_settings(ctx.guild.id)
             colour = int(opt["colour"])
-        
-        else: 
+
+        else:
             colour = self.bot.colour
 
         if isinstance(error, commands.CommandNotFound):
@@ -45,14 +45,14 @@ class Events(commands.Cog):
             if isinstance(error, commands.BadArgument):
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `send @user 40`", colour = colour)
                 return await ctx.send(embed = emb)
-            
+
             else: pass
 
         if ctx.command == self.bot.get_command("leaderboard"):
             if isinstance(error, commands.BadArgument) or str(error) == 'Could not convert "number" into int or float.':
                 emb = discord.Embed(description = f"<a:fail:727212831782731796> | Please use this format: `leaderboard 69` or `leaderboard 4.20`", colour = colour)
                 return await ctx.send(embed = emb)
-            
+
             else: pass
 
         if isinstance(error, commands.MaxConcurrencyReached) or isinstance(error, commands.CommandOnCooldown):
@@ -68,7 +68,7 @@ class Events(commands.Cog):
 
             emb = discord.Embed(description = "<a:fail:727212831782731796> | You don't have permissions to run this command!", colour = colour)
             return await ctx.send(embed = emb)
-        
+
         emb = discord.Embed(description = f"```sh\n{error}\n```", colour = colour)
         await ctx.send(embed = emb)
 
@@ -85,7 +85,7 @@ class Events(commands.Cog):
         emb.set_thumbnail(url = guild.icon_url)
         if guild.banner:
             emb.set_image(url = guild.banner_url)
-        
+
         await ch.send(embed = emb)
         await ch.edit(topic = f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} users")
 
@@ -102,7 +102,7 @@ class Events(commands.Cog):
         emb.set_thumbnail(url = guild.icon_url)
         if guild.banner:
             emb.set_image(url = guild.banner_url)
-        
+
         await ch.send(embed = emb)
         await ch.edit(topic = f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} users")
 
@@ -115,7 +115,7 @@ class Events(commands.Cog):
 
             ch = self.bot.get_channel(725909095017873492)
             await ch.edit(topic = f"Hello new people!\n{member.guild.member_count} members")
-    
+
     @commands.Cog.listener()
     async def on_member_removed(self, member):
         if member.guild.id == 725860467964248075:
@@ -133,7 +133,7 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.guild_id != 725860467964248075:
-            return 
+            return
         if payload.message_id == 734861410567192628:
             if payload.emoji.name == "📰":
                 guild = self.bot.get_guild(payload.guild_id)
@@ -152,13 +152,13 @@ class Events(commands.Cog):
 
                 if not m:
                     m = await guild.fetch_member(payload.user_id)
-                    
+
                 await m.add_roles(r)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         if payload.guild_id != 725860467964248075:
-            return 
+            return
         if payload.message_id == 734861410567192628:
             if payload.emoji.name == "📰":
                 guild = self.bot.get_guild(payload.guild_id)
@@ -184,7 +184,7 @@ class Events(commands.Cog):
 
         else:
             mention = message.guild.me.mention
-        
+
         if message.content == str(mention) and message.author != self.bot.user:
             async with aiosqlite.connect("data/db.db") as db:
                 data = await db.execute(f"select * from prefixes where guild = {message.guild.id}")

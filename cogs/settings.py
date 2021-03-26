@@ -31,7 +31,7 @@ class Settings(commands.Cog):
             a = f"\n{cookie} " # cuz \n raise an error with f-strings
 
             emb = discord.Embed(description=f"""**Available Settings**
-            
+
 {cookie} {a.join(options)}
 
 **use** `{prefix}settings [setting name] [option]` to set-up the bot
@@ -95,30 +95,30 @@ class Settings(commands.Cog):
                     return await ctx.send(embed=emb)
 
             async with aiosqlite.connect("data/db.db") as db:
-                data = await db.execute(f"select * from settings where id={ctx.guild.id}")
+                data = await db.execute(f"select * from settings where id=?", (ctx.guild.id,))
                 data = await data.fetchall()
 
                 options.remove(option)
 
                 if len(data) == 0:
-                    await db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES ('{ctx.guild.id}', '{value}', '0', '0')")
+                    await db.execute(f"insert into settings (id, ?, ?, ?) VALUES (?, ?, ?, ?)", (option, options[0], options[1], ctx.guild.id, value, 0, 0))
                     await db.commit()
 
                 else:
-                    await db.execute(f"update settings set {option}={value} where id={ctx.guild.id}")
+                    await db.execute(f"update settings set ?=? where id=?", (option, value, ctx.guild.id))
                     await db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
 
-            if option == "colour": 
+            if option == "colour":
                 value = str(discord.Colour(int(value)))
 
-            elif option == "emoji": 
+            elif option == "emoji":
                 value = str(self.bot.get_emoji(guild_options["emoji"]))
 
             elif option == "timeout":
                 value = f"{value} seconds"
-                
+
             emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
             await ctx.send(embed = emb)
 
@@ -135,8 +135,8 @@ class Settings(commands.Cog):
                 return await ctx.send(embed = emb)
 
         async with aiosqlite.connect("data/db.db") as db:
-                await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
-                await db.execute(f"INSERT into prefixes (guild, prefix) VALUES ({ctx.guild.id}, '{prefix}')")
+                await db.execute(f"delete from prefixes where guild = ?", (ctx.guild.id,))
+                await db.execute(f"INSERT into prefixes (guild, prefix) VALUES (?, ?)", (ctx.guild.id, prefix))
                 await db.commit()
 
         emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix changed to **{prefix}**", colour = colour)
@@ -151,7 +151,7 @@ class Settings(commands.Cog):
         colour = int(opt["colour"])
 
         async with aiosqlite.connect("data/db.db") as db:
-                await db.execute(f"delete from prefixes where guild = {ctx.guild.id}")
+                await db.execute(f"delete from prefixes where guild = ?", (ctx.guild.id,))
                 await db.commit()
 
         emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix reset to **c/**", colour = colour)

@@ -1,13 +1,7 @@
-import discord
-from discord.ext import commands 
-import os
+import discord, os, config, asyncio, sqlite3, aiosqlite
+from discord.ext import commands
 from dotenv import load_dotenv
 from datetime import datetime
-import asyncio
-import sqlite3
-import aiosqlite
-
-load_dotenv(dotenv_path=".env")
 
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
@@ -17,7 +11,7 @@ def get_prefix(bot, message):
 
   if message.guild is None:
     prefix = commands.when_mentioned_or("c/ ", "c/")(bot, message)
-  
+
   else:
     with sqlite3.connect("data/db.db") as db:
         data = db.execute(f"SELECT * from prefixes where guild = {message.guild.id}")
@@ -72,5 +66,5 @@ for a in os.listdir("./cogs"):
     if a.endswith(".py"):
         bot.load_extension(f"cogs.{a[:-3]}")
 
-token = os.environ.get("token")
+token = config.token
 bot.run(token)
