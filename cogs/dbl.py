@@ -1,6 +1,5 @@
 import dbl, discord, os, config
 from discord.ext import commands
-from dotenv import load_dotenv
 
 class TopGG(commands.Cog):
     """Handles interactions with the top.gg API"""
