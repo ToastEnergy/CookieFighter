@@ -94,18 +94,18 @@ class Settings(commands.Cog):
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | max timeout is **300** seconds!", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
 
-            data = await bot.db.execute(f"select * from settings where id=?", (ctx.guild.id,))
+            data = await self.bot.db.execute(f"select * from settings where id=?", (ctx.guild.id,))
             data = await data.fetchall()
 
             options.remove(option)
 
             if len(data) == 0:
-                await bot.db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES (?, ?, ?, ?)", (ctx.guild.id, value, 0, 0))
-                await bot.db.commit()
+                await self.bot.db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES (?, ?, ?, ?)", (ctx.guild.id, value, 0, 0))
+                await self.bot.db.commit()
 
             else:
-                await bot.db.execute(f"update settings set {option}=? where id=?", (value, ctx.guild.id))
-                await bot.db.commit()
+                await self.bot.db.execute(f"update settings set {option}=? where id=?", (value, ctx.guild.id))
+                await self.bot.db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
 
