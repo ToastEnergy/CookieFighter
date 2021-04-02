@@ -94,19 +94,18 @@ class Settings(commands.Cog):
                     emb = discord.Embed(description=f"<a:fail:727212831782731796> | max timeout is **300** seconds!", colour = int(guild_options["colour"]))
                     return await ctx.send(embed=emb)
 
-            async with aiosqlite.connect("data/db.db") as db:
-                data = await db.execute(f"select * from settings where id=?", (ctx.guild.id,))
-                data = await data.fetchall()
+            data = await bot.db.execute(f"select * from settings where id=?", (ctx.guild.id,))
+            data = await data.fetchall()
 
-                options.remove(option)
+            options.remove(option)
 
-                if len(data) == 0:
-                    await db.execute(f"insert into settings (id, ?, ?, ?) VALUES (?, ?, ?, ?)", (option, options[0], options[1], ctx.guild.id, value, 0, 0))
-                    await db.commit()
+            if len(data) == 0:
+                await bot.db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES (?, ?, ?, ?)", (ctx.guild.id, value, 0, 0))
+                await bot.db.commit()
 
-                else:
-                    await db.execute(f"update settings set ?=? where id=?", (option, value, ctx.guild.id))
-                    await db.commit()
+            else:
+                await bot.db.execute(f"update settings set {option}=? where id=?", (value, ctx.guild.id))
+                await bot.db.commit()
 
             guild_options = await cookies.guild_settings(ctx.guild.id)
 
