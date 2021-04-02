@@ -1,4 +1,4 @@
-import discord, cookies, os, traceback, asyncio, random, time, aiosqlite, dbl, datetime
+import discord, cookies, os, traceback, asyncio, random, time, aiosqlite, dbl, datetime, config
 from discord.ext import commands, tasks
 from discord.ext.commands.cooldowns import BucketType
 from typing import Union
@@ -7,7 +7,7 @@ class Cookie(commands.Cog):
 
   def __init__(self, bot):
     self.bot = bot
-    self.dblpy = dbl.DBLClient(self.bot, str(os.environ.get("topgg")))
+    self.dblpy = dbl.DBLClient(self.bot, config.topgg)
     self.database = cookies.Database()
 
   @commands.command(aliases = ["cookies", "c"])
