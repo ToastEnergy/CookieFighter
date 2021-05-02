@@ -1,6 +1,10 @@
 import discord, config, aiosqlite, utils, os
 from discord.ext import commands
 
+os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
+os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
+os.environ["JISHAKU_HIDE"] = "True"
+
 bot = commands.Bot(command_prefix=config.bot.default_prefix, description=config.bot.description)
 bot.load_extension("jishaku")
 
