@@ -22,7 +22,8 @@ def get_prefix(bot, message):
 def get_settings(ctx, data):
     if not data["guilds"].get(ctx.guild.id):
         data["guilds"][ctx.guild.id] = {"users": {}, "settings": {"colour": 14200170, "timeout": 120, "emoji": random.choice(config.emojis.default), "emoji_default": True}, "durations": []}
-    data["guilds"][ctx.guild.id]["settings"]["emoji"] = random.choice(config.emojis.default)
+    if data["guilds"][ctx.guild.id]["settings"]["emoji_default"]:
+        data["guilds"][ctx.guild.id]["settings"]["emoji"] = random.choice(config.emojis.default)
     return data["guilds"][ctx.guild.id]["settings"]
 
 async def check_db(db):
