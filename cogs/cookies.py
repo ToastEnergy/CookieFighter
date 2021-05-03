@@ -28,6 +28,7 @@ class Cookies(commands.Cog):
             reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=settings["timeout"])
         except asyncio.TimeoutError:
             emb.description = ":clock: | Timeout!"
+            await msg.clear_reactions()
             return await msg.edit(embed=emb)
 
         end = time.perf_counter()
