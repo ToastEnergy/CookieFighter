@@ -1,3 +1,4 @@
 discord.py
 aiosqlite
 jishaku
+discord-py-slash-command
