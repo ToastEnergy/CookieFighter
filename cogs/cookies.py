@@ -53,7 +53,7 @@ class Cookies(commands.Cog):
         def check(reaction, user):
             return str(reaction.emoji) == settings["emoji"] and not user.bot
 
-        emb = discord.Embed(description = f"First to catch the cookie {settings['emoji']} wins!", colour=settings['colour'])
+        emb = discord.Embed(description = f"First to **catch** the cookie {settings['emoji']} wins!", colour=settings['colour'])
         await msg.edit(embed=emb)
         start = time.perf_counter()
         await msg.add_reaction(settings["emoji"])
@@ -72,6 +72,68 @@ class Cookies(commands.Cog):
         emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
         await utils.check_other_users(user, msg, emb)
+
+    @cog_ext.cog_slash(name="type", description="Send the cookie!")
+    async def type_slash(self, ctx: SlashContext):
+        "Send the cookie!"
+
+        settings = utils.get_settings(ctx, self.bot.db_cache)
+        emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
+        emb.set_footer(text="First one to send a cookie wins 🍪!")
+        msg = await ctx.send(embed=emb)
+        await utils.countdown(msg, emb)
+
+        def check(m):
+            return m.content in [config.bot.default_cookie, settings["emoji"]] and m.channel.id == ctx.channel.id and not m.author.bot
+
+        emb = discord.Embed(description = f"First to **send** a cookie {config.bot.default_cookie} wins!", colour=settings['colour'])
+        await msg.edit(embed=emb)
+        start = time.perf_counter()
+
+        try:
+            m = await self.bot.wait_for("message", check=check, timeout=settings["timeout"])
+        except asyncio.TimeoutError:
+            emb.description = ":clock: | Timeout!"
+            await msg.clear_reactions()
+            return await msg.edit(embed=emb)
+
+        end = time.perf_counter()
+        duration = end - start
+
+        await utils.add_cookies(self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
+        emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
+        await msg.edit(embed=emb)
+
+    @commands.command(name="type", aliases=["t"])
+    async def type_(self, ctx):
+        "Send the cookie!"
+
+        settings = utils.get_settings(ctx, self.bot.db_cache)
+        emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
+        emb.set_footer(text="First one to send a cookie wins 🍪!")
+        msg = await ctx.reply(embed=emb, mention_author=False)
+        await utils.countdown(msg, emb)
+
+        def check(m):
+            return m.content in [config.bot.default_cookie, settings["emoji"]] and m.channel.id == ctx.channel.id and not m.author.bot
+
+        emb = discord.Embed(description = f"First to **send** a cookie {config.bot.default_cookie} wins!", colour=settings['colour'])
+        await msg.edit(embed=emb)
+        start = time.perf_counter()
+
+        try:
+            m = await self.bot.wait_for("message", check=check, timeout=settings["timeout"])
+        except asyncio.TimeoutError:
+            emb.description = ":clock: | Timeout!"
+            await msg.clear_reactions()
+            return await msg.edit(embed=emb)
+
+        end = time.perf_counter()
+        duration = end - start
+
+        await utils.add_cookies(self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
+        emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
+        await msg.edit(embed=emb)
 
     @cog_ext.cog_slash(name="leaderboard", description="Who's the best?")
     async def leaderboard_slash(self, ctx: SlashContext):
@@ -113,7 +175,7 @@ class Cookies(commands.Cog):
             if not u:
                 u = await self.bot.fetch_user(x)
             emb.description += f"**{count}.** `{str(u)}` - **{users[x]}** {settings['emoji']}\n"
-        await ctx.send(embed=emb)
+        await ctx.reply(embed=emb, mention_author=False)
 
 def setup(bot):
     bot.add_cog(Cookies(bot))
