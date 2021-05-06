@@ -34,7 +34,7 @@ class Cookies(commands.Cog):
         end = time.perf_counter()
         duration = end - start
 
-        await utils.add_cookies(self.bot.db, self.bot.db_cache, ctx.guild.id, user.id, 1, duration)
+        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, user.id, 1, duration)
         emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
         await utils.check_other_users(user, msg, emb)
@@ -68,7 +68,7 @@ class Cookies(commands.Cog):
         end = time.perf_counter()
         duration = end - start
 
-        await utils.add_cookies(self.bot.db, self.bot.db_cache, ctx.guild.id, user.id, 1, duration)
+        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, user.id, 1, duration)
         emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
         await utils.check_other_users(user, msg, emb)
@@ -84,9 +84,9 @@ class Cookies(commands.Cog):
         await utils.countdown(msg, emb)
 
         def check(m):
-            return m.content in [config.bot.default_cookie, settings["emoji"]] and m.channel.id == ctx.channel.id and not m.author.bot
+            return m.content in [config.emojis.default_cookie, settings["emoji"]] and m.channel.id == ctx.channel.id and not m.author.bot
 
-        emb = discord.Embed(description = f"First to **send** a cookie {config.bot.default_cookie} wins!", colour=settings['colour'])
+        emb = discord.Embed(description = f"First to **send** a cookie {config.emojis.default_cookie} wins!", colour=settings['colour'])
         await msg.edit(embed=emb)
         start = time.perf_counter()
 
@@ -100,7 +100,7 @@ class Cookies(commands.Cog):
         end = time.perf_counter()
         duration = end - start
 
-        await utils.add_cookies(self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
+        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
         emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
 
@@ -131,7 +131,7 @@ class Cookies(commands.Cog):
         end = time.perf_counter()
         duration = end - start
 
-        await utils.add_cookies(self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
+        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
         emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
 

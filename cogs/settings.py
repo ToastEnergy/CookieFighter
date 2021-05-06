@@ -30,7 +30,7 @@ class Settings(commands.Cog):
         self.bot.db_cache["guilds"][ctx.guild.id]["settings"]["emoji"] = str(emoji)
         self.bot.db_cache["guilds"][ctx.guild.id]["settings"]["emoji_default"] = False
 
-        await utils.update_data(self.bot.db, self.bot.db_cache)
+        await utils.update_data(self.bot.cursor, self.bot.db, self.bot.db_cache)
 
         emb = discord.Embed(description = f"Emoji changed to {str(emoji)}", colour=settings["colour"])
         await ctx.reply(embed=emb, mention_author=False)
@@ -47,7 +47,7 @@ class Settings(commands.Cog):
         settings = utils.get_settings(ctx, self.bot.db_cache)
         self.bot.db_cache["guilds"][ctx.guild.id]["settings"]["colour"] = colour
 
-        await utils.update_data(self.bot.db, self.bot.db_cache)
+        await utils.update_data(self.bot.cursor, self.bot.db, self.bot.db_cache)
 
         emb = discord.Embed(description = f"Colour changed to `{init_colour}`", colour=colour)
         await ctx.reply(embed=emb, mention_author=False)
@@ -60,7 +60,7 @@ class Settings(commands.Cog):
         settings = utils.get_settings(ctx, self.bot.db_cache)
         self.bot.db_cache["guilds"][ctx.guild.id]["settings"]["timeout"] = timeout
 
-        await utils.update_data(self.bot.db, self.bot.db_cache)
+        await utils.update_data(self.bot.cursor, self.bot.db, self.bot.db_cache)
 
         emb = discord.Embed(description = f"Timeout changed to `{timeout}` seconds", colour=settings["colour"])
         await ctx.reply(embed=emb, mention_author=False)

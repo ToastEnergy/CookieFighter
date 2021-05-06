@@ -1,4 +1,4 @@
-import discord, config, aiosqlite, utils, os
+import discord, config, aiomysql, utils, os
 from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_option
@@ -14,11 +14,17 @@ bot.load_extension("jishaku")
 
 @bot.event
 async def on_ready():
-    bot.db = await aiosqlite.connect("data/db.db")
-    await utils.check_db(bot.db)
-    bot.db_cache = await utils.get_data(bot.db)
+    bot.db = await aiomysql.connect(
+      host=config.db.host,
+      user=config.db.user,
+      password=config.db.password,
+      db=config.db.db
+    )
+    bot.cursor = await bot.db.cursor()
+    await utils.check_db(bot.cursor, bot.db)
+    bot.db_cache = await utils.get_data(bot.cursor)
     print("ready as", bot.user)
-    
+
 for file in os.listdir("./cogs"):
     if file.endswith(".py"):
         bot.load_extension(f"cogs.{file[:-3]}")
