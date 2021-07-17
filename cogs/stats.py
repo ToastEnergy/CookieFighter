@@ -37,12 +37,11 @@ class Stats(commands.Cog):
         except: await ctx.send(embed=emb)
 
     @cog_ext.cog_slash(name="cookies", description="Get how many cookies a member has", options=[create_option(name="member", description="Member you want to get info about", option_type=6,required=False)])
-    async def cookies_slash(self, ctx: SlashContext, member):
+    async def cookies_slash(self, ctx: SlashContext, member=None):
         "Get how many cookies a member has"
 
-        print(member)
-        await ctx.send(member)
-        # await self.cookies(ctx)
+        member = member or ctx.author
+        await self.cookies(ctx, member)
 
     @commands.command(aliases=["info", "stats", "stat"])
     async def cookies(self, ctx, member: discord.Member=None):
