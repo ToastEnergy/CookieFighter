@@ -23,6 +23,13 @@ class Stats(commands.Cog):
 
         emb = discord.Embed(description="", colour=settings["colour"])
         emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
+
+        if not users:
+            emb.description = "*no one's here*"
+            try: await ctx.reply(embed=emb, mention_author=False)
+            except: await ctx.send(embed=emb)
+            return
+            
         count = 0
         for x in lb:
             count += 1
