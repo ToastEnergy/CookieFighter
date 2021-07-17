@@ -19,7 +19,6 @@ class Stats(commands.Cog):
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         users = await utils.get_users(self.bot.db, ctx.guild.id)
-        lb = sorted(users, key=lambda x : users[x], reverse=True)
 
         emb = discord.Embed(description="", colour=settings["colour"])
         emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
@@ -29,7 +28,8 @@ class Stats(commands.Cog):
             try: await ctx.reply(embed=emb, mention_author=False)
             except: await ctx.send(embed=emb)
             return
-            
+
+        lb = sorted(users, key=lambda x : users[x], reverse=True)
         count = 0
         for x in lb:
             count += 1
