@@ -10,24 +10,17 @@ class Misc(commands.Cog):
     async def ping_slash(self, ctx: SlashContext):
         "Check bot latency and response"
 
-        settings = utils.get_settings(ctx, self.bot.db_cache)
-
-        start = time.perf_counter()
-        msg = await ctx.send("Pinging...")
-        end = time.perf_counter()
-        duration = (end - start) * 1000
-        pong = round(self.bot.latency * 1000)
-        emb = discord.Embed(description = f"**{config.bot.loading} Response:** `{duration:.2f}ms`\n**🏓 Latency:** `{pong}ms`", colour = settings["colour"])
-        await msg.edit(content=None, embed = emb)
+        await self.ping(ctx)
 
     @commands.command()
     async def ping(self, ctx):
         "Check bot latency and response"
 
-        settings = utils.get_settings(ctx, self.bot.db_cache)
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
 
         start = time.perf_counter()
-        msg = await ctx.reply("Pinging...", mention_author=False)
+        try: msg = await ctx.reply("Pinging...", mention_author=False)
+        except: msg = await ctx.send("Pinging...")
         end = time.perf_counter()
         duration = (end - start) * 1000
         pong = round(self.bot.latency * 1000)

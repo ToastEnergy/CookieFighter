@@ -10,44 +10,18 @@ class Cookies(commands.Cog):
     async def cookie_slash(self, ctx: SlashContext):
         "Catch the cookie!"
 
-        settings = utils.get_settings(ctx, self.bot.db_cache)
-        emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
-        emb.set_footer(text="First one to take the cookie wins 🍪!")
-        msg = await ctx.send(embeds=[emb])
-        await utils.countdown(msg, emb)
-
-        def check(reaction, user):
-            return str(reaction.emoji) == settings["emoji"] and not user.bot
-
-        emb = discord.Embed(description = f"First to catch the cookie {settings['emoji']} wins!", colour=settings['colour'])
-        await msg.edit(embed=emb)
-        start = time.perf_counter()
-        await msg.add_reaction(settings["emoji"])
-
-        try:
-            reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=settings["timeout"])
-        except asyncio.TimeoutError:
-            emb.description = ":clock: | Timeout!"
-            await msg.clear_reactions()
-            return await msg.edit(embed=emb)
-
-        end = time.perf_counter()
-        duration = end - start
-
-        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, user.id, 1, duration)
-        emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
-        await msg.edit(embed=emb)
-        await utils.check_other_users(user, msg, emb)
+        await self.cookie(ctx)
 
     @commands.command(aliases=["c"])
     @commands.guild_only()
     async def cookie(self, ctx):
         "Catch the cookie!"
 
-        settings = utils.get_settings(ctx, self.bot.db_cache)
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
         emb.set_footer(text="First one to take the cookie wins 🍪!")
-        msg = await ctx.reply(embed=emb, mention_author=False)
+        try: msg = await ctx.reply(embed=emb, mention_author=False)
+        except:  msg = await ctx.send(embed=emb)
         await utils.countdown(msg, emb)
 
         def check(reaction, user):
@@ -68,7 +42,7 @@ class Cookies(commands.Cog):
         end = time.perf_counter()
         duration = end - start
 
-        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, user.id, 1, duration)
+        await utils.add_cookie(self.bot.db, user.id, ctx.guild.id, duration, "cookie")
         emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
         await utils.check_other_users(user, msg, emb)
@@ -77,10 +51,17 @@ class Cookies(commands.Cog):
     async def type_slash(self, ctx: SlashContext):
         "Send the cookie!"
 
-        settings = utils.get_settings(ctx, self.bot.db_cache)
+        await self.type_(ctx)
+
+    @commands.command(name="type", aliases=["t"])
+    async def type_(self, ctx):
+        "Send the cookie!"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
         emb.set_footer(text="First one to send a cookie wins 🍪!")
-        msg = await ctx.send(embed=emb)
+        try: msg = await ctx.reply(embed=emb, mention_author=False)
+        except: msg = await ctx.send(embed=emb)
         await utils.countdown(msg, emb)
 
         def check(m):
@@ -100,82 +81,9 @@ class Cookies(commands.Cog):
         end = time.perf_counter()
         duration = end - start
 
-        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
+        await utils.add_cookie(self.bot.db, m.author.id, ctx.guild.id, duration, "type")
         emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
-
-    @commands.command(name="type", aliases=["t"])
-    async def type_(self, ctx):
-        "Send the cookie!"
-
-        settings = utils.get_settings(ctx, self.bot.db_cache)
-        emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
-        emb.set_footer(text="First one to send a cookie wins 🍪!")
-        msg = await ctx.reply(embed=emb, mention_author=False)
-        await utils.countdown(msg, emb)
-
-        def check(m):
-            return m.content in [config.bot.default_cookie, settings["emoji"]] and m.channel.id == ctx.channel.id and not m.author.bot
-
-        emb = discord.Embed(description = f"First to **send** a cookie {config.bot.default_cookie} wins!", colour=settings['colour'])
-        await msg.edit(embed=emb)
-        start = time.perf_counter()
-
-        try:
-            m = await self.bot.wait_for("message", check=check, timeout=settings["timeout"])
-        except asyncio.TimeoutError:
-            emb.description = ":clock: | Timeout!"
-            await msg.clear_reactions()
-            return await msg.edit(embed=emb)
-
-        end = time.perf_counter()
-        duration = end - start
-
-        await utils.add_cookies(self.bot.cursor, self.bot.db, self.bot.db_cache, ctx.guild.id, m.author.id, 1, duration)
-        emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
-        await msg.edit(embed=emb)
-
-    @cog_ext.cog_slash(name="leaderboard", description="Who's the best?")
-    async def leaderboard_slash(self, ctx: SlashContext):
-        "Who's the best?"
-
-        settings = utils.get_settings(ctx, self.bot.db_cache)
-        users = self.bot.db_cache["guilds"][ctx.guild.id]["users"]
-        lb = sorted(users, key=lambda x : users[x], reverse=True)
-
-        emb = discord.Embed(description="", colour=settings["colour"])
-        emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
-        count = 0
-        for x in lb:
-            count += 1
-            if count > 10:
-                break
-            u = self.bot.get_user(x)
-            if not u:
-                u = await self.bot.fetch_user(x)
-            emb.description += f"**{count}.** `{str(u)}` - **{users[x]}** {settings['emoji']}\n"
-        await ctx.send(embed=emb)
-
-    @commands.command(aliases=["lb"])
-    async def leaderboard(self, ctx):
-        "Who's the best?"
-
-        settings = utils.get_settings(ctx, self.bot.db_cache)
-        users = self.bot.db_cache["guilds"][ctx.guild.id]["users"]
-        lb = sorted(users, key=lambda x : users[x], reverse=True)
-
-        emb = discord.Embed(description="", colour=settings["colour"])
-        emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
-        count = 0
-        for x in lb:
-            count += 1
-            if count > 10:
-                break
-            u = self.bot.get_user(x)
-            if not u:
-                u = await self.bot.fetch_user(x)
-            emb.description += f"**{count}.** `{str(u)}` - **{users[x]}** {settings['emoji']}\n"
-        await ctx.reply(embed=emb, mention_author=False)
 
 def setup(bot):
     bot.add_cog(Cookies(bot))

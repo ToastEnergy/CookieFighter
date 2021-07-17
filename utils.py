@@ -1,27 +1,18 @@
 import config, ast, random, asyncio
 
-def get_settings(ctx, data):
-    if not data["guilds"].get(ctx.guild.id):
-        data["guilds"][ctx.guild.id] = {"users": {}, "settings": {"colour": 14200170, "timeout": 120, "emoji": random.choice(config.emojis.default), "emoji_default": True}, "durations": []}
-    if data["guilds"][ctx.guild.id]["settings"]["emoji_default"]:
-        data["guilds"][ctx.guild.id]["settings"]["emoji"] = random.choice(config.emojis.default)
-    return data["guilds"][ctx.guild.id]["settings"]
-
-async def check_db(cursor, db):
-    await cursor.execute("create table if not exists CookieFighter (data text)")
-    if not (await get_data(cursor)):
-        await cursor.execute("insert into CookieFighter (data) VALUES (%s)", (str({"guilds": {}}),))
-    await db.commit()
-
-async def get_data(cursor):
-    await cursor.execute("select data from CookieFighter")
-    data = await cursor.fetchone()
+async def get_settings(db, guild):
+    data = await (await db.execute("SELECT prefix, colour, timeout, emoji FROM settings WHERE guild=?", (guild,))).fetchone()
     if not data:
-        return None
-    return ast.literal_eval(data[0])
+        await db.execute("INSERT INTO settings (guild, prefix, colour, timeout) VALUES (?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout))
+        await db.commit()
+        return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default)}
 
-async def update_data(cursor, db, data):
-    await cursor.execute("update CookieFighter set data=%s", (str(data),))
+    emoji = data[3] or random.choice(config.emojis.default)
+    return {"prefix": data[0], "colour": data[1], "timeout": data[2], "emoji": emoji}
+
+async def check_db(db):
+    await db.execute("CREATE TABLE IF NOT EXISTS entries (user id, guild id, duration id, type text)")
+    await db.execute("CREATE TABLE IF NOT EXISTS settings (guild id, prefix text, colour id, timeout id, emoji text)")
     await db.commit()
 
 async def countdown(message, embed):
@@ -33,14 +24,14 @@ async def countdown(message, embed):
             await message.edit(content=None, embed=embed)
         await asyncio.sleep(1)
 
-async def add_cookies(cursor, db, data: dict, guild_id: int, user_id: int, cookies: int, duration):
-    user = data["guilds"][guild_id]["users"].get(user_id)
-    if not user:
-        data["guilds"][guild_id]["users"][user_id] = cookies
-    else:
-        data["guilds"][guild_id]["users"][user_id] += cookies
-    data["guilds"][guild_id]["durations"].append({"user": user_id, "duration": f"{duration:.4f}"})
-    await update_data(cursor, db, data)
+async def add_cookie(db, user, guild, duration=None, type=None):
+    await db.execute("INSERT INTO entries (user, guild, duration, type) VALUES (?, ?, ?, ?)", (user, guild, duration, type))
+    await db.commit()
+
+async def add_cookies(db, user, guild, cookies):
+    for x in range(cookies):
+        await db.execute("INSERT INTO entries (user, guild) VALUES (?, ?)", (user, guild))
+    await db.commit()
 
 async def check_other_users(user, message, embed):
     msg = await message.channel.fetch_message(message.id) # fetch it again to get new users
@@ -50,3 +41,16 @@ async def check_other_users(user, message, embed):
     if len(others) >= 1:
         emb.description += f"Other players:\n{others}"
         await msg.edit(embed = emb)
+
+async def get_users(db, guild):
+    users = dict()
+    entries = await (await db.execute("SELECT user FROM entries WHERE guild=?", (guild,))).fetchall()
+
+    for entry in entries:
+        try: users[entry[0]] += 1
+        except KeyError: users[entry[0]] = 1
+
+    return users if len(users) > 0 else None
+
+async def get_cookies(db, user, guild):
+    return (await (await db.execute("SELECT COUNT(*) FROM entries WHERE user=? AND guild=?", (user, guild))).fetchone())[0]
