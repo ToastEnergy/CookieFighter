@@ -1,4 +1,4 @@
-import discord, utils
+import discord, utils, config
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 
@@ -8,8 +8,9 @@ class Settings(commands.Cog):
 
     @cog_ext.cog_slash(name="settings", description="Check server settings")
     async def settings_slash(self, ctx: SlashContext):
-        settings = utils.get_settings(ctx, self.bot.db_cache)
-        emb = discord.Embed(description=f"• **Emoji:** {settings['emoji']}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`", colour=settings["colour"])
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        emoji = emoji if emoji not in config.emojis.default else " / ".join(config.emojis.default)
+        emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`", colour=settings["colour"])
         await ctx.send(embed=emb)
 
     @commands.group(invoke_without_command=True)
