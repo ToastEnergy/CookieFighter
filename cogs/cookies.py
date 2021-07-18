@@ -46,6 +46,8 @@ class Cookies(commands.Cog):
         emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
         await utils.check_other_users(user, msg, emb)
+        try: await msg.clear_reactions()
+        except: pass
 
     @cog_ext.cog_slash(name="type", description="Send the cookie!")
     async def type_slash(self, ctx: SlashContext):
