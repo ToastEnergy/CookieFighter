@@ -9,7 +9,7 @@ class Settings(commands.Cog):
     @cog_ext.cog_slash(name="settings", description="Check server settings")
     async def settings_slash(self, ctx: SlashContext):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        emoji = emoji if emoji not in config.emojis.default else " / ".join(config.emojis.default)
+        emoji = settings["emoji"] if settings["emoji"] not in config.emojis.default else " / ".join(config.emojis.default)
         emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`", colour=settings["colour"])
         await ctx.send(embed=emb)
 
