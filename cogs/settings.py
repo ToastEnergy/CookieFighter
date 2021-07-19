@@ -1,6 +1,7 @@
 import discord, utils, config, asyncio
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option, create_choice
 
 class Settings(commands.Cog):
     def __init__(self, bot):
@@ -22,11 +23,46 @@ class Settings(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
+    @cog_ext.cog_slash(name="editsettings", description="Edit server settings", options=[create_option(
+            name="option",
+            description="The setting you want to edit",
+            option_type=3,
+            required=True,
+            choices=[
+                  create_choice(
+                    name="Emoji",
+                    value="emoji"
+                  ),
+                  create_choice(
+                    name="Colour",
+                    value="colour"
+                  ),
+                  create_choice(
+                    name="Timeout",
+                    value="timeout"
+                  ), create_choice(
+                    name="Prefix",
+                    value="prefix"
+                  )
+                ]
+        ), create_option(
+            name="value",
+            description="The new value",
+            option_type=3,
+            required=True
+        )])
+    async def settings_slash(self, ctx: SlashContext, option, value):
+        "Edit server settings"
+
+        await self.editsettings(ctx, option, value)
+
     @commands.command(aliases=["editsetting"])
     @commands.has_permissions(manage_messages=True)
     @commands.guild_only()
     async def editsettings(self, ctx, option, value):
         "Edit server settings"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
 
         option = option.lower().replace("color", "colour")
 
@@ -37,6 +73,11 @@ class Settings(commands.Cog):
             return
 
         if option == "colour":
+            if not value.startswith("#"):
+                emb = discord.Embed(title="Invalid color!", description="Please specify a **HEX Color** like `#ffe930`, you can pick one from [here](https://htmlcolorcodes.com/).", colour=discord.Colour.red())
+                try: await ctx.reply(embed=emb, mention_author=False)
+                except: await ctx.send(embed=emb)
+                return
             value = f"0x{value[1:]}"
             value = int(value, 16)
 
@@ -56,7 +97,19 @@ class Settings(commands.Cog):
 
             value = round(value)
 
-        await utils.get_settings(self.bot.db, ctx.guild.id) # generate column if none
+        elif option == "emoji":
+            emb = discord.Embed(description=f"{config.emojis.loading} |  This message will be used to test the emoji", colour=settings["colour"])
+            try: msg = await ctx.reply(embed=emb, mention_author=False)
+            except: msg = await ctx.send(embed=emb)
+
+            try: await msg.add_reaction(value)
+            except:
+                emb.colour = discord.Colour.red()
+                emb.description = f"{config.emojis.fail} | Invalid emoji!"
+                return await msg.edit(embed=emb)
+
+            await msg.delete()
+
         await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
         await self.bot.db.commit()
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)

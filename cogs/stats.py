@@ -1,7 +1,7 @@
 import discord, config, utils, asyncio, time
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option, create_choice
+from discord_slash.utils.manage_commands import create_option
 
 class Stats(commands.Cog):
     def __init__(self, bot):
