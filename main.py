@@ -7,8 +7,25 @@ os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 os.environ["JISHAKU_HIDE"] = "True"
 
+async def get_prefix(bot, message):
+
+  if message.guild is None:
+    prefix = commands.when_mentioned_or(f"{config.bot.prefix} ", config.bot.prefix)(bot, message)
+
+  else:
+    data = await (await bot.db.execute("SELECT prefix FROM settings WHERE guild=?", (message.guild.id,))).fetchone()
+
+    if data:
+      new_prefix = str(data[0])
+      prefix = commands.when_mentioned_or(f"{new_prefix} ", new_prefix)(bot, message)
+
+    else:
+      prefix = commands.when_mentioned_or(f"{config.bot.prefix} ", config.bot.prefix)(bot, message)
+
+  return prefix
+
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(config.bot.prefix), description=config.bot.description, intents=intents, case_insensitive=True)
+bot = commands.Bot(command_prefix=get_prefix, description=config.bot.description, intents=intents, case_insensitive=True)
 slash = SlashCommand(bot, sync_commands=True, override_type=True)
 bot.load_extension("jishaku")
 
