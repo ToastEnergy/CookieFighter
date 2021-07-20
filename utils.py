@@ -13,6 +13,7 @@ async def get_settings(db, guild):
 async def check_db(db):
     await db.execute("CREATE TABLE IF NOT EXISTS entries (user id, guild id, duration id, type text)")
     await db.execute("CREATE TABLE IF NOT EXISTS settings (guild id, prefix text, colour id, timeout id, emoji text)")
+    await db.execute("CREATE TABLE IF NOT EXISTS shop (guild id, role id, cookies id)")
     await db.commit()
 
 async def countdown(message, embed):
@@ -54,3 +55,19 @@ async def get_users(db, guild):
 
 async def get_cookies(db, user, guild):
     return (await (await db.execute("SELECT COUNT(*) FROM entries WHERE user=? AND guild=?", (user, guild))).fetchone())[0]
+
+async def get_roles(db, guild):
+    data = await (await db.execute("SELECT role, cookies FROM shop WHERE guild=?", (guild.id,))).fetchall()
+
+    if not data:
+        return None
+
+    roles = dict()
+    for raw in data:
+        role = guild.get_role(raw[0])
+        if role:
+            roles[role] = raw[1]
+
+    roles_list = sorted(roles, key=lambda role : roles[role])
+
+    return {r: roles[r] for r in roles_list}
