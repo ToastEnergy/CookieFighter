@@ -108,7 +108,12 @@ class Settings(commands.Cog):
                 emb.description = f"{config.emojis.fail} | Invalid emoji!"
                 return await msg.edit(embed=emb)
 
-            await msg.delete()
+            await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
+            await self.bot.db.commit()
+            settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+
+            emb = discord.Embed(description=f"{config.emojis.check} | `{option}` updated to {value if option == 'emoji' else f'`{value}`'}", colour=settings["colour"])
+            return await msg.edit(embed=emb)
 
         await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
         await self.bot.db.commit()
