@@ -1,4 +1,4 @@
-import config, ast, random, asyncio
+import config, random, asyncio
 
 async def get_settings(db, guild):
     data = await (await db.execute("SELECT prefix, colour, timeout, emoji FROM settings WHERE guild=?", (guild,))).fetchone()
@@ -11,9 +11,11 @@ async def get_settings(db, guild):
     return {"prefix": data[0], "colour": data[1], "timeout": data[2], "emoji": emoji}
 
 async def check_db(db):
+    await db.execute("CREATE TABLE IF NOT EXISTS users (user id, guild id, cookies id)")
     await db.execute("CREATE TABLE IF NOT EXISTS entries (user id, guild id, duration id, type text)")
     await db.execute("CREATE TABLE IF NOT EXISTS settings (guild id, prefix text, colour id, timeout id, emoji text)")
     await db.execute("CREATE TABLE IF NOT EXISTS shop (guild id, role id, cookies id)")
+    await db.execute("CREATE TABLE IF NOT EXISTS inventory (user id, guild id, role id)")
     await db.commit()
 
 async def countdown(message, embed):
@@ -25,13 +27,28 @@ async def countdown(message, embed):
             await message.edit(content=None, embed=embed)
         await asyncio.sleep(1)
 
+async def check_user(db, user, guild):
+    data = await (await db.execute("SELECT cookies FROM users WHERE user=? AND guild=?", (user, guild))).fetchone()
+    return False if not data else True
+
 async def add_cookie(db, user, guild, duration=None, type=None):
+
+    if await check_user(db, user, guild):
+        await db.execute("UPDATE users SET cookies=cookies+? WHERE user=? AND guild=?", (1, user, guild))
+    else:
+        await db.execute("INSERT INTO users (user, guild, cookies) VALUES (?, ?, ?)", (user, guild, 1))
     await db.execute("INSERT INTO entries (user, guild, duration, type) VALUES (?, ?, ?, ?)", (user, guild, duration, type))
     await db.commit()
 
 async def add_cookies(db, user, guild, cookies):
-    for x in range(cookies):
-        await db.execute("INSERT INTO entries (user, guild) VALUES (?, ?)", (user, guild))
+    if await check_user(db, user, guild):
+        await db.execute("UPDATE users SET cookies=cookies+? WHERE user=? AND guild=?", (cookies, user, guild))
+    else:
+        await db.execute("INSERT INTO users (user, guild, cookies) VALUES (?, ?, ?)", (user, guild, cookies))
+    await db.commit()
+
+async def remove_cookies(db, user, guild, cookies):
+    await db.execute("UPDATE users SET cookies=cookies-? WHERE user=? AND guild=?", (cookies, user, guild))
     await db.commit()
 
 async def check_other_users(user, message, embed):
@@ -45,16 +62,16 @@ async def check_other_users(user, message, embed):
 
 async def get_users(db, guild):
     users = dict()
-    entries = await (await db.execute("SELECT user FROM entries WHERE guild=?", (guild,))).fetchall()
+    entries = await (await db.execute("SELECT user, cookies FROM users WHERE guild=?", (guild,))).fetchall()
 
     for entry in entries:
-        try: users[entry[0]] += 1
-        except KeyError: users[entry[0]] = 1
+        users[int(entry[0])] = int(entry[1])
 
     return users if len(users) > 0 else None
 
 async def get_cookies(db, user, guild):
-    return (await (await db.execute("SELECT COUNT(*) FROM entries WHERE user=? AND guild=?", (user, guild))).fetchone())[0]
+    data = await (await db.execute("SELECT cookies FROM users WHERE user=? AND guild=?", (user, guild))).fetchone()
+    return 0 if not data else data[0]
 
 async def get_roles(db, guild):
     data = await (await db.execute("SELECT role, cookies FROM shop WHERE guild=?", (guild.id,))).fetchall()
@@ -71,3 +88,11 @@ async def get_roles(db, guild):
     roles_list = sorted(roles, key=lambda role : roles[role])
 
     return {r: roles[r] for r in roles_list}
+
+async def update_inventory(db, user, guild, role):
+    await db.execute("INSERT INTO inventory (user, guild, role) VALUES (?, ?, ?)", (user, guild, role))
+    await db.commit()
+
+async def get_inventory(db, user, guild):
+    data = await (await db.execute("SELECT role FROM inventory WHERE user=? AND guild=?", (user, guild))).fetchall()
+    return None if not data else [d[0] for d in data]
