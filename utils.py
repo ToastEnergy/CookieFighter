@@ -96,3 +96,14 @@ async def update_inventory(db, user, guild, role):
 async def get_inventory(db, user, guild):
     data = await (await db.execute("SELECT role FROM inventory WHERE user=? AND guild=?", (user, guild))).fetchall()
     return None if not data else [d[0] for d in data]
+
+async def add_to_shop(db, guild, role, cookies):
+    roles = await get_roles(db, guild)
+    if roles and role in [r.id for r in roles]:
+        await db.execute("UPDATE shop SET cookies=? WHERE role=? AND guild=?", (cookies, role, guild.id))
+    else:
+        await db.execute("INSERT INTO SHOP (guild, role, cookies) VALUES (?, ?, ?)", (guild.id, role, cookies))
+    await db.commit()
+
+async def remove_from_shop(db, guild, role):
+    await db.execute("DELETE FROM shop WHERE role=? AND guild=?", (role, guild))
