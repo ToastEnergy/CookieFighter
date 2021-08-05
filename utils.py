@@ -54,11 +54,11 @@ async def remove_cookies(db, user, guild, cookies):
 async def check_other_users(user, message, embed):
     msg = await message.channel.fetch_message(message.id) # fetch it again to get new users
     users = await msg.reactions[0].users().flatten()
-    others = "\n".join([str(u) for u in users if u.id != user.id and not u.bot])
+    others = "\n".join([f"**{str(u)}**" for u in users if u.id != user.id and not u.bot])
 
     if len(others) >= 1:
-        emb.description += f"Other players:\n{others}"
-        await msg.edit(embed = emb)
+        embed.description += f"\n__Other players:__\n\n>>> {others}"
+        await msg.edit(embed=embed)
 
 async def get_users(db, guild):
     users = dict()

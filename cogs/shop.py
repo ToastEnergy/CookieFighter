@@ -117,6 +117,7 @@ class Shop(commands.Cog):
             except: await ctx.send(embed=emb)
             return
 
+        await utils.remove_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
         await utils.update_inventory(self.bot.db, ctx.author.id, ctx.guild.id, role.id)
         emb = discord.Embed(description=f"{config.emojis.check} | You have successfully bought the role {role.mention}", colour=settings["colour"])
 
