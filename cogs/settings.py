@@ -56,10 +56,10 @@ class Settings(commands.Cog):
 
         await self.editsettings(ctx, option, value)
 
-    @commands.command(aliases=["editsetting"])
+    @commands.command(name="edit-settings", aliases=["editsetting", "edit-setting", "editsettings"])
     @commands.has_permissions(manage_messages=True)
     @commands.guild_only()
-    async def editsettings(self, ctx, option, value):
+    async def edit_settings(self, ctx, option, value):
         "Edit server settings"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
@@ -108,6 +108,7 @@ class Settings(commands.Cog):
                 emb.description = f"{config.emojis.fail} | Invalid emoji!"
                 return await msg.edit(embed=emb)
 
+            await msg.remove_reaction(value, ctx.guild.me)
             await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
             await self.bot.db.commit()
             settings = await utils.get_settings(self.bot.db, ctx.guild.id)
@@ -126,10 +127,10 @@ class Settings(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
-    @commands.command(aliases=["reset"])
+    @commands.command(name="reset-settings", aliases=["resetsettings", "resetsetting", "reset-setting"])
     @commands.has_permissions(manage_messages=True)
     @commands.guild_only()
-    async def resetsettings(self, ctx):
+    async def reset_settings(self, ctx):
         "Reset server settings"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)

@@ -1,4 +1,14 @@
-import config, random, asyncio
+import discord, config, random, asyncio, datetime
+
+async def error(ctx, message):
+    emb = discord.Embed(description=f"{config.emojis.fail} | {message}", colour=discord.Colour.red())
+    try: await ctx.reply(embed=emb, mention_author=False)
+    except: await ctx.send(embed=emb)
+
+async def success(ctx, message, colour=None):
+    emb = discord.Embed(description=f"{config.emojis.check} | {message}", colour=colour or discord.Colour.green())
+    try: await ctx.reply(embed=emb, mention_author=False)
+    except: await ctx.send(embed=emb)
 
 async def get_settings(db, guild):
     data = await (await db.execute("SELECT prefix, colour, timeout, emoji FROM settings WHERE guild=?", (guild,))).fetchone()
@@ -16,6 +26,9 @@ async def check_db(db):
     await db.execute("CREATE TABLE IF NOT EXISTS settings (guild id, prefix text, colour id, timeout id, emoji text)")
     await db.execute("CREATE TABLE IF NOT EXISTS shop (guild id, role id, cookies id)")
     await db.execute("CREATE TABLE IF NOT EXISTS inventory (user id, guild id, role id)")
+    await db.execute("CREATE TABLE IF NOT EXISTS spawn (guild id, enabled id, spawn_perc id)")
+    await db.execute("CREATE TABLE IF NOT EXISTS spawn_channels (channel id)")
+    await db.execute("CREATE TABLE IF NOT EXISTS spawn_messages (guild id, channel id, message id, time text, emoji text)")
     await db.commit()
 
 async def countdown(message, embed):
@@ -93,6 +106,10 @@ async def update_inventory(db, user, guild, role):
     await db.execute("INSERT INTO inventory (user, guild, role) VALUES (?, ?, ?)", (user, guild, role))
     await db.commit()
 
+async def remove_from_inventory(db, user, guild, role):
+    await db.execute("DELETE FROM inventory WHERE user=? AND guild=? AND role=?", (user, guild, role))
+    await db.commit()
+
 async def get_inventory(db, user, guild):
     data = await (await db.execute("SELECT role FROM inventory WHERE user=? AND guild=?", (user, guild))).fetchall()
     return None if not data else [d[0] for d in data]
@@ -107,3 +124,80 @@ async def add_to_shop(db, guild, role, cookies):
 
 async def remove_from_shop(db, guild, role):
     await db.execute("DELETE FROM shop WHERE role=? AND guild=?", (role, guild))
+
+async def reset_leaderboard(db, guild):
+    await db.execute("DELETE FROM users WHERE guild=?", (guild,))
+    await db.execute("DELETE FROM entries WHERE guild=?", (guild,))
+    await db.commit()
+
+async def get_spawn_status(db, guild):
+    data = await (await db.execute("SELECT enabled FROM spawn WHERE guild=?", (guild,))).fetchone()
+    return 'disabled' if not data or int(data[0]) == 0 else 'enabled'
+
+async def enable_spawn(db, guild):
+    data = await (await db.execute("SELECT enabled FROM spawn WHERE guild=?", (guild,))).fetchone()
+    if not data:
+        await db.execute("INSERT INTO spawn (guild,enabled,spawn_perc) VALUES (?,1,?)", (guild,config.bot.default_spawn_rate))
+    else:
+        await db.execute("UPDATE spawn SET enabled=1 WHERE guild=?", (guild,))
+    await db.commit()
+
+async def disable_spawn(db, guild):
+    data = await (await db.execute("SELECT enabled FROM spawn WHERE guild=?", (guild,))).fetchone()
+    if not data:
+        await db.execute("INSERT INTO spawn (guild,enabled,spawn_perc) VALUES (?,0,?)", (guild,config.bot.default_spawn_rate))
+    else:
+        await db.execute("UPDATE spawn SET enabled=0 WHERE guild=?", (guild,))
+    await db.commit()
+
+async def calc_spawn(db, guild):
+    data = await (await db.execute("SELECT spawn_perc FROM spawn WHERE guild=?", (guild,))).fetchone()
+    perc = int(data[0])
+    prob = list()
+    [prob.append(False) for x in range(100-perc)]
+    [prob.append(True) for x in range(perc)]
+    return random.choice(prob)
+
+async def add_timer(db, guild, channel, message, date, emoji):
+    await db.execute("INSERT INTO spawn_messages (guild,channel,message,time,emoji) VALUES (?,?,?,?,?)", (guild, channel, message, date.strftime("%x %X"),emoji))
+    await db.commit()
+
+async def remove_timer(db, message):
+    await db.execute("DELETE FROM spawn_messages WHERE message=?", (message,))
+    await db.commit()
+
+class SpawnMessage:
+    def __init__(self, guild, channel, message, date, emoji):
+        self.guild = guild
+        self.channel = channel
+        self.message = message
+        self.date = date
+        self.emoji = emoji
+
+async def get_spawn_messages(db):
+    data = await (await db.execute("SELECT * FROM spawn_messages")).fetchall()
+    return [SpawnMessage(int(d[0]), int(d[1]), int(d[2]), datetime.datetime.strptime(d[3], "%x %X"), d[4]) for d in data]
+
+async def check_message_spawn(db, message):
+    data = await (await db.execute("SELECT message FROM spawn_messages WHERE message=?", (message,))).fetchone()
+    return False if not data else True
+
+async def edit_spawn_rate(db, guild, rate):
+    data = await (await db.execute("SELECT enabled FROM spawn WHERE guild=?", (guild,))).fetchone()
+    if not data:
+        await db.execute("INSERT INTO spawn (guild,enabled,spawn_perc) VALUES (?,0,?)", (guild,rate))
+    else:
+        await db.execute("UPDATE spawn SET spawn_perc=? WHERE guild=?", (rate,guild))
+    await db.commit()
+
+async def add_ignored_channel(db, channel):
+    await db.execute("INSERT INTO spawn_channels (channel) VALUES (?)", (channel,))
+    await db.commit()
+
+async def remove_ignored_channel(db, channel):
+    await db.execute("DELETE FROM spawn_channels WHERE channel=?", (channel,))
+    await db.commit()
+
+async def is_ignored(db, channel):
+    data = await (await db.execute("SELECT channel FROM spawn_channels WHERE channel=?", (channel,))).fetchone()
+    return False if not data else True

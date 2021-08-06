@@ -69,9 +69,9 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
-    @commands.command(aliases=["remove-item"])
+    @commands.command(name="remove-item", aliases=["removeitem"])
     @commands.has_permissions(manage_guild=True)
-    async def removeitem(self, ctx, role_id):
+    async def remove_item(self, ctx, role_id):
         "Add an item to the shop"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
@@ -93,8 +93,8 @@ class Shop(commands.Cog):
     async def buy(self, ctx, role_id):
         "Buy something from the shop"
 
-        roles = await utils.get_roles(self.bot.db, ctx.guild)
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        roles = await utils.get_roles(self.bot.db, ctx.guild)
 
         if not roles:
             return await self.empty_shop(ctx, settings)
@@ -133,6 +133,35 @@ class Shop(commands.Cog):
         await utils.update_inventory(self.bot.db, ctx.author.id, ctx.guild.id, role.id)
         emb = discord.Embed(description=f"{config.emojis.check} | You have successfully bought the role {role.mention}", colour=settings["colour"])
 
+        try: await ctx.reply(embed=emb, mention_author=False)
+        except: await ctx.send(embed=emb)
+
+    @commands.command()
+    async def sell(self, ctx, role_id):
+        "Sell an item (it must be in the shop)"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+
+        try: role_id = int(role_id)
+        except: return await self.invalid_role_id(ctx)
+
+        roles = await utils.get_roles(self.bot.db, ctx.guild)
+
+        try: role = list(roles.keys())[role_id-1]
+        except: return await self.invalid_role_id(ctx)
+
+        inv = await utils.get_inventory(self.bot.db, ctx.author.id, ctx.guild.id)
+        if not inv or role.id not in inv:
+            emb = discord.Embed(description=f"{config.emojis.fail} | That role isn't in your inventory!", colour=discord.Colour.red())
+            try: await ctx.reply(embed=emb, mention_author=False)
+            except: await ctx.send(embed=emb)
+            return
+
+        cookies = roles[role]
+        await utils.remove_from_inventory(self.bot.db, ctx.author.id, ctx.guild.id, role.id)
+        await utils.add_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
+
+        emb = discord.Embed(description=f"{config.emojis.check} | You have successfully sold the role {role.mention}", colour=settings['colour'])
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
