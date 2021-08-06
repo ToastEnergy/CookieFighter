@@ -204,3 +204,6 @@ async def is_ignored(db, channel):
 async def send_embed(ctx, embed):
     try: await ctx.reply(embed=embed, mention_author=False)
     except: await ctx.send(embed=embed)
+
+def invite_url(id):
+    return discord.utils.oauth_url(id, scopes=('bot','applications.commands'), permissions=discord.Permissions(permissions=280640))

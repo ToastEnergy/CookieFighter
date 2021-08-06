@@ -36,9 +36,9 @@ class Misc(commands.Cog):
     @commands.command()
     async def invite(self, ctx):
         "Invite the bot to your server"
-        
+
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        url = discord.utils.oauth_url(self.bot.user.id, scopes=('bot','applications.commands'), permissions=discord.Permissions(permissions=280640))
+        url = utils.invite_url(self.bot.user.id)
         emb = discord.Embed(description=f"[Invite me]({url})", colour=settings["colour"])
         await utils.send_embed(ctx, emb)
 

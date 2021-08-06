@@ -44,9 +44,9 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
-    @commands.command(aliases=["add-item"])
+    @commands.command(name="add-item", aliases=["additem"])
     @commands.has_permissions(manage_guild=True)
-    async def additem(self, ctx, role: discord.Role, cookies):
+    async def add_item(self, ctx, role: discord.Role, cookies):
         "Add an item to the shop"
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
 

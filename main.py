@@ -33,9 +33,8 @@ bot.load_extension("jishaku")
 async def on_ready():
     bot.db = await aiosqlite.connect("db.db")
     await utils.check_db(bot.db)
-
     bot.command_prefix=get_prefix
-
+    bot.remove_command("help")
     for file in os.listdir("./cogs"):
         if file.endswith(".py"):
             bot.load_extension(f"cogs.{file[:-3]}")
