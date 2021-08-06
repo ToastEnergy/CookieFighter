@@ -49,6 +49,49 @@ class Cookies(commands.Cog):
         try: await msg.clear_reactions()
         except: pass
 
+    @cog_ext.cog_slash(name="milk", description="Drink the milk!")
+    async def milk_slash(self, ctx: SlashContext):
+        "Drink the milk!"
+
+        await self.milk(ctx)
+
+    @commands.command(aliases=["m"])
+    @commands.guild_only()
+    async def milk(self, ctx):
+        "Drink the milk!"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        emb = discord.Embed(description=f"```\n{config.bot.countdown[0]}\n```", colour=settings["colour"])
+        emb.set_footer(text="First one to drink the milk wins 🥛!")
+        try: msg = await ctx.reply(embed=emb, mention_author=False)
+        except:  msg = await ctx.send(embed=emb)
+        await utils.countdown(msg, emb)
+
+        def check(reaction, user):
+            return str(reaction.emoji) == "🥛" and not user.bot
+
+        emb = discord.Embed(description = f"First to **drink** the milk 🥛 wins!", colour=settings['colour'])
+        await msg.edit(embed=emb)
+        start = time.perf_counter()
+        await msg.add_reaction("🥛")
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=settings["timeout"])
+        except asyncio.TimeoutError:
+            emb.description = ":clock: | Timeout!"
+            await msg.clear_reactions()
+            return await msg.edit(embed=emb)
+
+        end = time.perf_counter()
+        duration = end - start
+
+        await utils.add_cookie(self.bot.db, user.id, ctx.guild.id, duration, "milk")
+        emb.description = f"**{str(user)}** won in `{duration:.2f}` seconds!"
+        await msg.edit(embed=emb)
+        await utils.check_other_users(user, msg, emb)
+        try: await msg.clear_reactions()
+        except: pass
+
     @cog_ext.cog_slash(name="type", description="Send the cookie!")
     async def type_slash(self, ctx: SlashContext):
         "Send the cookie!"

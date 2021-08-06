@@ -11,19 +11,20 @@ async def success(ctx, message, colour=None):
     except: await ctx.send(embed=emb)
 
 async def get_settings(db, guild):
-    data = await (await db.execute("SELECT prefix, colour, timeout, emoji FROM settings WHERE guild=?", (guild,))).fetchone()
+    data = await (await db.execute("SELECT prefix, colour, timeout, emoji, spawn, spawnrate FROM settings WHERE guild=?", (guild,))).fetchone()
     if not data:
-        await db.execute("INSERT INTO settings (guild, prefix, colour, timeout) VALUES (?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout))
+        await db.execute("INSERT INTO settings (guild, prefix, colour, timeout, spawn, spawnrate) VALUES (?, ?, ?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout, config.bot.spawn, config.bot.spawnrate))
         await db.commit()
-        return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default)}
+        return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default), "spawn": config.bot.spawn, "spawnrate": config.bot.spawnrate}
 
     emoji = data[3] or random.choice(config.emojis.default)
-    return {"prefix": data[0], "colour": data[1], "timeout": data[2], "emoji": emoji}
+    spawn = True if int(data[4]) == 1 else False
+    return {"prefix": data[0], "colour": data[1], "timeout": data[2], "emoji": emoji, "spawn": spawn, "spawnrate": data[5]}
 
 async def check_db(db):
     await db.execute("CREATE TABLE IF NOT EXISTS users (user id, guild id, cookies id)")
     await db.execute("CREATE TABLE IF NOT EXISTS entries (user id, guild id, duration id, type text)")
-    await db.execute("CREATE TABLE IF NOT EXISTS settings (guild id, prefix text, colour id, timeout id, emoji text)")
+    await db.execute("CREATE TABLE IF NOT EXISTS settings (guild id, prefix text, colour id, timeout id, emoji text, spawn id, spawnrate id)")
     await db.execute("CREATE TABLE IF NOT EXISTS shop (guild id, role id, cookies id)")
     await db.execute("CREATE TABLE IF NOT EXISTS inventory (user id, guild id, role id)")
     await db.execute("CREATE TABLE IF NOT EXISTS spawn (guild id, enabled id, spawn_perc id)")
@@ -131,7 +132,7 @@ async def reset_leaderboard(db, guild):
     await db.commit()
 
 async def get_spawn_status(db, guild):
-    data = await (await db.execute("SELECT enabled FROM spawn WHERE guild=?", (guild,))).fetchone()
+    data = await (await db.execute("SELECT spawn FROM settings WHERE guild=?", (guild,))).fetchone()
     return 'disabled' if not data or int(data[0]) == 0 else 'enabled'
 
 async def enable_spawn(db, guild):
@@ -150,9 +151,7 @@ async def disable_spawn(db, guild):
         await db.execute("UPDATE spawn SET enabled=0 WHERE guild=?", (guild,))
     await db.commit()
 
-async def calc_spawn(db, guild):
-    data = await (await db.execute("SELECT spawn_perc FROM spawn WHERE guild=?", (guild,))).fetchone()
-    perc = int(data[0])
+async def calc_spawn(perc):
     prob = list()
     [prob.append(False) for x in range(100-perc)]
     [prob.append(True) for x in range(perc)]
@@ -201,3 +200,7 @@ async def remove_ignored_channel(db, channel):
 async def is_ignored(db, channel):
     data = await (await db.execute("SELECT channel FROM spawn_channels WHERE channel=?", (channel,))).fetchone()
     return False if not data else True
+
+async def send_embed(ctx, embed):
+    try: await ctx.reply(embed=embed, mention_author=False)
+    except: await ctx.send(embed=embed)

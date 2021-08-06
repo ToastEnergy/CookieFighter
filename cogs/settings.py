@@ -18,7 +18,7 @@ class Settings(commands.Cog):
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         emoji = settings["emoji"] if settings["emoji"] not in config.emojis.default else " / ".join(config.emojis.default)
-        emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`", colour=settings["colour"])
+        emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`\n• **Spawn:** `{'enabled' if settings['spawn'] else 'disabled'}`\n• **Spawn Rate:** `{settings['spawnrate']}%`", colour=settings["colour"])
         emb.set_author(name=f"{ctx.guild.name} settings", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
@@ -43,6 +43,14 @@ class Settings(commands.Cog):
                   ), create_choice(
                     name="Prefix",
                     value="prefix"
+                  ),
+                  create_choice(
+                    name="Spawn",
+                    value="spawn"
+                  ),
+                  create_choice(
+                    name="Spawn Rate",
+                    value="spawnrate"
                   )
                 ]
         ), create_option(
@@ -63,11 +71,10 @@ class Settings(commands.Cog):
         "Edit server settings"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        option = option.lower().replace("color", "colour").replace("spawn-rate", "spawnrate", )
 
-        option = option.lower().replace("color", "colour")
-
-        if option not in ["colour", "emoji", "timeout", "prefix"]:
-            emb = discord.Embed(title="Invalid option!", description="Choose from `colour` `emoji` `timeout` `prefix`", colour=discord.Colour.red())
+        if option not in ["colour", "emoji", "timeout", "prefix", "spawn", "spawnrate"]:
+            emb = discord.Embed(title="Invalid option!", description="Choose from `colour` `emoji` `timeout` `prefix` `spawn` `spawnrate`", colour=discord.Colour.red())
             try: await ctx.reply(embed=emb, mention_author=False)
             except: await ctx.send(embed=emb)
             return
@@ -116,12 +123,35 @@ class Settings(commands.Cog):
             emb = discord.Embed(description=f"{config.emojis.check} | `{option}` updated to {value if option == 'emoji' else f'`{value}`'}", colour=settings["colour"])
             return await msg.edit(embed=emb)
 
+        elif option == "spawn":
+            if value.lower() in ["true", "yes", "enable", "enabled", "1"]:
+                value = 1
+            elif value.lower() in ["false", "no", "disable", "disabled", "0"]:
+                value = 0
+            else:
+                return await utils.error(ctx, "Please specify `enabled` or `disabled`")
+
+        elif option == "spawnrate":
+            if "%" in value:
+                if value[:-1].isdigit():
+                    value = int(value[:-1])
+            elif value.isdigit():
+                value = int(value)
+                if value not in range(1, 61):
+                    return await utils.error(ctx, "Please specify a percentage between `1%` and `60%`")
+            else:
+                return await utils.error(ctx, "Please specify a percentage between `1%` and `60%`")
+
         await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
         await self.bot.db.commit()
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
 
         if option == "colour":
             value = str(discord.Colour(value))
+        elif option == "spawn":
+            value = 'enabled' if value == 1 else 'disabled'
+        elif option == 'spawnrate':
+            value = str(value) + "%"
 
         emb = discord.Embed(description=f"{config.emojis.check} | `{option}` updated to {value if option == 'emoji' else f'`{value}`'}", colour=settings["colour"])
         try: await ctx.reply(embed=emb, mention_author=False)

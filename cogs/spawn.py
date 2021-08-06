@@ -16,7 +16,11 @@ class Spawn(commands.Cog):
                 settings = await utils.get_settings(self.bot.db, msg.guild)
                 guild = self.bot.get_guild(msg.guild)
                 channel = guild.get_channel(msg.channel)
-                message = await channel.fetch_message(msg.message)
+
+                try:
+                    message = await channel.fetch_message(msg.message)
+                except discord.errors.NotFound:
+                    return
 
                 await message.remove_reaction(msg.emoji, guild.me)
                 await utils.remove_timer(self.bot.db, msg.message)
@@ -52,60 +56,13 @@ class Spawn(commands.Cog):
         if not message.guild or message.author.bot:
             return
 
-        if await utils.get_spawn_status(self.bot.db, message.guild.id) == "enabled":
+        settings = await utils.get_settings(self.bot.db, message.guild.id)
+        if settings['spawn']:
             if await utils.is_ignored(self.bot.db, message.channel.id):
                 return
-            if await utils.calc_spawn(self.bot.db, message.guild.id):
-                settings = await utils.get_settings(self.bot.db, message.guild.id)
+            if await utils.calc_spawn(settings['spawnrate']):
                 await message.add_reaction(settings["emoji"])
                 await utils.add_timer(self.bot.db, message.guild.id, message.channel.id, message.id, datetime.datetime.utcnow() + datetime.timedelta(seconds=settings["timeout"]), settings["emoji"])
-
-    @commands.command(name="enable-spawn", aliases=["enablespawn"])
-    @commands.has_permissions(manage_guild=True)
-    async def enable_spawn(self, ctx):
-        "Enable the spawn of cookies in your server"
-
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-
-        spawn_enabled = await utils.get_spawn_status(self.bot.db, ctx.guild.id) == "enabled"
-        if spawn_enabled:
-            return await utils.error(ctx, "Spawning cookies for this server are already enabled")
-
-        await utils.enable_spawn(self.bot.db, ctx.guild.id)
-        await utils.success(ctx, "Spawning cookies enabled for this server", settings["colour"])
-
-    @commands.command(name="disable-spawn", aliases=["disablespawn"])
-    @commands.has_permissions(manage_guild=True)
-    async def disable_spawn(self, ctx):
-        "Disable spawning cookies in your server"
-
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-
-        spawn_enabled = await utils.get_spawn_status(self.bot.db, ctx.guild.id)
-        if spawn_enabled == "enabled":
-            return await utils.error(ctx, "Spawning cookies for this server are already disabled")
-
-        await utils.disable_spawn(self.bot.db, ctx.guild.id)
-        await utils.success(ctx, "Spawning cookies disabled for this server", settings["colour"])
-
-    @commands.command(name="spawn-rate", aliases=["spawnrate"])
-    @commands.has_permissions(manage_guild=True)
-    async def spawn_rate(self, ctx, perc):
-        "Edit the spawn rate"
-
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        if "%" in perc:
-            if perc[:-1].isdigit():
-                perc = int(perc[:-1])
-        elif perc.isdigit():
-            perc = int(perc)
-            if perc not in range(1, 61):
-                return await utils.error(ctx, "Please specify a percentage between `1%` and `60%`")
-        else:
-            return await utils.error(ctx, "Please specify a percentage between `1%` and `60%`")
-
-        await utils.edit_spawn_rate(self.bot.db, ctx.guild.id, perc)
-        await utils.success(ctx, f"Spawn rate updated to `{perc}%`")
 
     @commands.command(name="ignore-channel", aliases=["ignorechannel", "ignore-spawn", "ignorespawn"])
     @commands.has_permissions(manage_guild=True)
