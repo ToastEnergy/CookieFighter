@@ -11,6 +11,9 @@ class bot:
     loading = "<a:loading:777504033925234718>"
     colour = 14200170
     timeout = 120
+    spawn = 0
+    spawnrate = 5
+    support_server = "https://discord.gg/nvSwvPXgkn"
     countdown = [
 """
        ██████╗
@@ -36,7 +39,12 @@ class bot:
          ██║
          ╚═╝
 """
-    ]
+    ],
+    banner = """
+╔═╗╔═╗╔═╗╦╔═╦╔═╗  ╔═╗╦╔═╗╦ ╦╔╦╗╔═╗╦═╗
+║  ║ ║║ ║╠╩╗║║╣   ╠╣ ║║ ╦╠═╣ ║ ║╣ ╠╦╝
+╚═╝╚═╝╚═╝╩ ╩╩╚═╝  ╚  ╩╚═╝╩ ╩ ╩ ╚═╝╩╚═
+"""
 
 class emojis:
     default = ["<:mc_cookie:726184620164382741>", "<:gocciola:747247300803297290>", "<:oreo:761274120821276702>"]
