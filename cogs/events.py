@@ -7,97 +7,107 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        errors = list()
         if isinstance(error, commands.ConversionError):
-            pass
+            errors.append("Something went wrong converting an item")
         elif isinstance(error, commands.CheckFailure):
             if isinstance(error, commands.PrivateMessageOnly):
-                pass
+                errors.append("This commands works only in DMs")
             elif isinstance(error, commands.NoPrivateMessage):
-                pass
+                errors.append("This commands works only in servers")
             elif isinstance(error, commands.CheckAnyFailure):
-                pass
+                errors.append("This commands doesn't work with the current context")
             elif isinstance(error, commands.NotOwner):
-                pass
+                errors.append("This command is for the developers")
             elif isinstance(error, commands.MissingPermissions):
-                pass
+                if len(error.missing_perms) == 1:
+                    errors.append(f"You are missing the `{error.missing_perms[0]}` permission")
+                else:
+                    errors.append(f"You are missing {' '.join([f'`{perm}`' for perm in error.missing_perms])} permissions")
             elif isinstance(error, commands.BotMissingPermissions):
-                pass
+                if len(error.missing_perms) == 1:
+                    errors.append(f"I'm missing the `{error.missing_perms[0]}` permission")
+                else:
+                    errors.append(f"I'm missing {' '.join([f'`{perm}`' for perm in error.missing_perms])} permissions")
             elif isinstance(error, commands.MissingRole):
-                pass
+                errors.append(f"You're missing the `{error.missing_role}` role")
             elif isinstance(error, commands.BotMissingRole):
-                pass
+                errors.append(f"I'm missing the `{error.missing_role}` role")
             elif isinstance(error, commands.MissingAnyRole):
-                pass
+                if len(error.missing_roles) == 1:
+                    errors.append(f"You're missing the `{error.missing_roles[0]}` role")
+                else:
+                    errors.append(f"You're missing {' '.join([f'`{perm}`' for perm in error.missing_roles])} roles")
             elif isinstance(error, commands.BotMissingAnyRole):
-                pass
+                if len(error.missing_roles) == 1:
+                    errors.append(f"I'm missing the `{error.missing_roles[0]}` role")
+                else:
+                    errors.append(f"I'm missing {' '.join([f'`{perm}`' for perm in error.missing_roles])} roles")
             elif isinstance(error, commands.NSFWChannelRequired):
-                pass
+                errors.append("This command works only on NSFW channels")
         elif isinstance(error, commands.CommandNotFound):
             pass
         elif isinstance(error, commands.DisabledCommand):
-            pass
+            erros.append("This command is currently disabled")
         elif isinstance(error, commands.CommandInvokeError):
             pass
         elif isinstance(error, commands.UserInputError):
             if isinstance(error, commands.MissingRequiredArgument):
-                pass
+                errors.append(f"Please specify `{error.param.name}`")
             elif isinstance(error, commands.ArgumentParsingError):
                 if isinstance(error, commands.UnexpectedQuoteError):
-                    pass
+                    errors.append(error)
                 elif isinstance(error, commands.InvalidEndOfQuotedStringError):
-                    pass
+                    errors.append(error)
                 elif isinstance(error, commands.ExpectedClosingQuoteError):
-                    pass
+                    errors.append(error)
             elif isinstance(error, commands.BadArgument):
                 if isinstance(error, commands.MessageNotFound):
-                    pass
+                    errors.append("Couldn't find that message")
                 elif isinstance(error, commands.MemberNotFound):
-                    await utils.error(ctx, f"Couldn't find member `{error.argument}`")
+                    errors.append(f"Couldn't find member `{error.argument}`")
                 elif isinstance(error, commands.GuildNotFound):
-                    pass
+                    errors.append(f"Couldn't find guild `{error.argument}`")
                 elif isinstance(error, commands.UserNotFound):
-                    pass
+                    errors.append(f"Couldn't find user `{error.argument}`")
                 elif isinstance(error, commands.ChannelNotFound):
-                    pass
+                    errors.append(f"Couldn't find channel `{error.argument}`")
                 elif isinstance(error, commands.ChannelNotReadable):
-                    pass
+                    errors.append(f"I don't have enough permissions to read {error.argument.mention}")
                 elif isinstance(error, commands.BadColourArgument):
-                    pass
+                    errors.append(f"{error.argument} isn't a invalid colour")
                 elif isinstance(error, commands.RoleNotFound):
-                    pass
+                    errors.append(f"Couldn't find role `{error.argument}`")
                 elif isinstance(error, commands.BadInviteArgument):
-                    pass
+                    errors.append("Invalid invite")
                 elif isinstance(error, commands.EmojiNotFound):
-                    pass
+                    errors.append(f"Couldn't find emoji **{error.argument}**")
                 elif isinstance(error, commands.PartialEmojiConversionFailure):
-                    pass
+                    errors.append(f"{error.argument} is an invalid emoji")
                 elif isinstance(error, commands.BadBoolArgument):
-                    pass
+                    errors.append(f"Couldn't convert `{error.argument}` to `True` or `False`")
             elif isinstance(error, commands.TooManyArguments):
-                pass
+                errors.append("You passed too many arguments")
         elif isinstance(error, commands.CommandOnCooldown):
-            pass
+            retry_after = utils.get_time(round(error.retry_after))
+            errors.append(f"You can use this command in {retry_after}")
         elif isinstance(error, commands.MaxConcurrencyReached):
-            pass
-        elif isinstance(error, commands.errors.CommandOnCooldown):
-            pass
-        elif isinstance(error, commands.MaxConcurrencyReached):
-            pass
-        elif isinstance(error, commands.errors.ChannelNotFound):
-            pass
+            errors.append("This command is being used too many times")
         elif isinstance(error, commands.ExtensionError):
             if isinstance(error, commands.ExtensionAlreadyLoaded):
-                pass
+                errors.append("Extension is already loaded")
             elif isinstance(error, commands.ExtensionNotLoaded):
-                pass
+                errors.append("Extension not loaded")
             elif isinstance(error, commands.NoEntryPointError):
-                pass
+                errors.append("Missing `setup` function")
             elif isinstance(error, commands.ExtensionFailed):
-                pass
+                errors.append("Extension has loaded")
             elif isinstance(error, commands.ExtensionNotFound):
-                pass
+                errors.append("Extension not found")
         elif isinstance(error, commands.CommandRegistrationError):
-            pass
+            errors.append(f"There are 2 commands with the same name (`{error.name}`)!")
+
+        await utils.error(ctx, "\n".join(errors))
 
 def setup(bot):
     bot.add_cog(Events(bot))
