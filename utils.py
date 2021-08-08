@@ -201,9 +201,10 @@ async def is_ignored(db, channel):
     data = await (await db.execute("SELECT channel FROM spawn_channels WHERE channel=?", (channel,))).fetchone()
     return False if not data else True
 
-async def send_embed(ctx, embed):
-    try: await ctx.reply(embed=embed, mention_author=False)
-    except: await ctx.send(embed=embed)
+async def send_embed(ctx, embed, components=None):
+    try: msg = await ctx.reply(embed=embed, mention_author=False, components=components)
+    except: msg = await ctx.send(embed=embed, components=components)
+    return msg
 
 def invite_url(id):
     return discord.utils.oauth_url(id, scopes=('bot','applications.commands'), permissions=discord.Permissions(permissions=280640))

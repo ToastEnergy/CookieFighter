@@ -2,26 +2,22 @@ import discord, config, aiosqlite, utils, os
 from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_option
+import discord_components as dc
 
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 os.environ["JISHAKU_HIDE"] = "True"
 
 async def get_prefix(bot, message):
-
   if message.guild is None:
     prefix = commands.when_mentioned_or(f"{config.bot.prefix} ", config.bot.prefix)(bot, message)
-
   else:
     data = await (await bot.db.execute("SELECT prefix FROM settings WHERE guild=?", (message.guild.id,))).fetchone()
-
     if data:
       new_prefix = str(data[0])
       prefix = commands.when_mentioned_or(f"{new_prefix} ", new_prefix)(bot, message)
-
     else:
       prefix = commands.when_mentioned_or(f"{config.bot.prefix} ", config.bot.prefix)(bot, message)
-
   return prefix
 
 intents = discord.Intents.default()
@@ -31,6 +27,7 @@ bot.load_extension("jishaku")
 
 @bot.event
 async def on_ready():
+    dc.DiscordComponents(bot)
     bot.db = await aiosqlite.connect("db.db")
     await utils.check_db(bot.db)
     bot.command_prefix=get_prefix
