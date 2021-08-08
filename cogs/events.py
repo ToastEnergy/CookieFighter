@@ -107,6 +107,9 @@ class Events(commands.Cog):
         elif isinstance(error, commands.CommandRegistrationError):
             errors.append(f"There are 2 commands with the same name (`{error.name}`)!")
 
+        if len(errors) == 0:
+            errors.append(str(error))
+
         await utils.error(ctx, "\n".join(errors))
 
 def setup(bot):

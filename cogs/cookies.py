@@ -1,4 +1,4 @@
-import discord, config, utils, asyncio, time
+import discord, config, utils, asyncio, time, random
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 
@@ -129,6 +129,34 @@ class Cookies(commands.Cog):
         await utils.add_cookie(self.bot.db, m.author.id, ctx.guild.id, duration, "type")
         emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
+
+    @commands.command(aliases=["coin", "flip"])
+    async def bet(self, ctx, cookies):
+        "Bet come cookies!"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        av_cookies = await utils.get_cookies(self.bot.db, ctx.author.id, ctx.guild.id)
+
+        if not cookies.isdigit():
+            return await utils.error(ctx, "Please specify a number")
+
+        cookies = int(cookies)
+
+        if cookies <= 0:
+            return await utils.error(ctx, "Please specify a number higher than `0`")
+
+        if av_cookies < cookies:
+            return await utils.error(ctx, f"You don't have `{cookies}` {'cookie' if cookies == 1 else 'cookies'}")
+
+        won = random.choice([True, False])
+        if won:
+            await utils.add_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
+            emb = discord.Embed(title="You won!", description=f"I added you `{cookies}` {'cookie' if cookies == 1 else 'cookies'}", colour=settings["colour"])
+        else:
+            await utils.remove_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
+            emb = discord.Embed(title="You lost!", description=f"I removed you `{cookies}` {'cookie' if cookies == 1 else 'cookies'}", colour=settings["colour"])
+
+        await utils.send_embed(ctx, emb)
 
 def setup(bot):
     bot.add_cog(Cookies(bot))
