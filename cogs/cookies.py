@@ -178,7 +178,7 @@ class Cookies(commands.Cog):
                 members.append(i.user)
                 new_emb = discord.Embed(title=emb.title, colour=emb.colour)
                 new_emb.add_field(name="• **__How does this work__**", value="> I'll chose a random emoji, you have to be fast to find the emoji and send it before the others", inline=False)
-                new_emb.add_field(name="• **__Joined Members__**", value=f"> • {f'{slashn}• '.join([f'**{str(m)}**' for m in members])}", inline=False)
+                new_emb.add_field(name="• **__Joined Members__**", value=f"> • {f'{slashn}> • '.join([f'**{str(m)}**' for m in members])}", inline=False)
                 new_emb.set_footer(text="Party will start in 10 seconds")
                 self.bot.loop.create_task(msg.edit(embed=new_emb, content=None, components=components))
                 self.bot.loop.create_task(i.respond(embed=discord.Embed(description=f"{config.emojis.check} | You joined the party", colour=settings['colour'])))
@@ -189,11 +189,15 @@ class Cookies(commands.Cog):
 
         if len(members) == 0:
             emb = discord.Embed(description="*No one joined the party*", colour=settings['colour'])
-            return await msg.edit(embed=emb)
+            return await msg.edit(embed=emb, components=[])
+
+        elif len(members) == 1:
+            emb = discord.Embed(description="The party can't start with `1` member", colour=settings['colour'])
+            return await msg.edit(embed=emb, components=[])
 
         emoji = random.choice(config.emojis.discord)
         emb = discord.Embed(title=emb.title, description=f"First one to send the emoji {emoji} wins", colour=emb.colour)
-        await msg.edit(content=None, embed=emb, components=None)
+        await msg.edit(content=None, embed=emb, components=[])
 
         def check_message(m):
             return m.author.id in [m_.id for m_ in members] and m.content.lower() == emoji
@@ -202,14 +206,15 @@ class Cookies(commands.Cog):
         try: message = await self.bot.wait_for("message", check=check_message, timeout=settings['timeout'])
         except asyncio.TimeoutError:
             error = discord.Embed(description=":clock: | Timeout!", colour=settings['colour'])
-            return await msg.edit(embed=emb, content=None)
+            return await msg.edit(embed=emb, content=None, components=[])
 
         end = time.perf_counter()
         duration = end - start
 
+        await message.add_reaction(config.emojis.tada)
         await utils.add_cookie(self.bot.db, message.author.id, ctx.guild.id, duration, 'party')
         emb.description = f"**{str(message.author)}** won in `{duration:.2f}` seconds!"
-        await msg.edit(embed=emb)
+        await msg.edit(content=None, embed=emb, components=[])
 
 def setup(bot):
     bot.add_cog(Cookies(bot))
