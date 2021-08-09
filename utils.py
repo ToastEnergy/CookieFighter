@@ -206,5 +206,8 @@ async def send_embed(ctx, embed, components=None):
     except: msg = await ctx.send(embed=embed, components=components)
     return msg
 
+def get_emoji(bot, emoji):
+    return discord.utils.get(bot.emojis, id=int(emoji.split(":")[2][:-1]))
+
 def invite_url(id):
     return discord.utils.oauth_url(id, scopes=('bot','applications.commands'), permissions=discord.Permissions(permissions=280640))

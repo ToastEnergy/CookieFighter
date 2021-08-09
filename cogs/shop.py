@@ -1,6 +1,7 @@
 import discord, utils, time, config
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 class Shop(commands.Cog):
     def __init__(self, bot):
@@ -44,6 +45,26 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
+    @cog_ext.cog_slash(name="add-item", description="Add an item to the shop", options=[
+        create_option(
+            name="role",
+            required=True,
+            type=8,
+            description="The role to add to the shop"
+        ),
+        create_option(
+            name="cookies",
+            value=4,
+            required=True,
+            description="Number of cookies required to buy the role"
+        )
+    ])
+    @commands.has_permissions(manage_guild=True)
+    async def add_item_slash(self, ctx: SlashContext, role, cookies):
+        "Add an item to the shop"
+
+        await self.add_item(ctx, role, cookies)
+
     @commands.command(name="add-item", aliases=["additem"])
     @commands.has_permissions(manage_guild=True)
     async def add_item(self, ctx, role: discord.Role, cookies):
@@ -69,6 +90,20 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
+    @cog_ext.cog_slash(name="remove-item", description="Remove an item from the shop", options=[
+        create_option(
+            name="role_id",
+            required=True,
+            type=4,
+            description="The id of the role to remove from the shop"
+        )
+    ])
+    @commands.has_permissions(manage_guild=True)
+    async def remove_item_slash(self, ctx: SlashContext, role_id):
+        "Remove an item from the shop"
+
+        await self.remove_item(ctx, role_id)
+
     @commands.command(name="remove-item", aliases=["removeitem"])
     @commands.has_permissions(manage_guild=True)
     async def remove_item(self, ctx, role_id):
@@ -88,6 +123,19 @@ class Shop(commands.Cog):
         emb = discord.Embed(description=f"{config.emojis.check} | Item removed from the shop", colour=settings["colour"])
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
+
+    @cog_ext.cog_slash(name="buy", description="Buy an item from the shop", options=[
+        create_option(
+            name="role_id",
+            required=True,
+            type=4,
+            description="The id of the role to buy"
+        )
+    ])
+    async def buy_slash(self, ctx: SlashContext, role_id):
+        "Buy an item from the shop"
+
+        await self.buy(ctx, role_id)
 
     @commands.command()
     async def buy(self, ctx, role_id):
@@ -165,9 +213,13 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
+    @cog_ext.cog_slash(name="inventory", description="Check the inventory of a member", options=[create_option(name="member", description="The member to check the inventory of", type=6, required=False)])
+    async def inventory_slash(self, ctx: SlashContext, member=None):
+        await self.inventory(ctx, member)
+
     @commands.command(aliases=["inv"])
     async def inventory(self, ctx, *, member: discord.Member=None):
-        "Check the inventory of someone"
+        "Check the inventory of a member"
 
         member = member or ctx.author
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)

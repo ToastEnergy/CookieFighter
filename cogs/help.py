@@ -1,12 +1,27 @@
 import discord, utils, config
 from discord.ext import commands
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @cog_ext.cog_slash(name="help", description="Get some help", options=[
+        create_option(
+            name="command",
+            description="Need help for a single command?",
+            option_type=3,
+            required=False
+        )
+    ])
+    async def gift_slash(self, ctx: SlashContext, member, cookies):
+        "Get some help"
+
+        await self.help(ctx, command=None)
+
     @commands.command(hidden = True)
-    async def help(self, ctx, *, command = None):
+    async def help(self, ctx, *, command=None):
         "Get some help"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)

@@ -1,6 +1,7 @@
 import discord, utils, time, config
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+import discord_components as dc
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -39,8 +40,8 @@ class Misc(commands.Cog):
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         url = utils.invite_url(self.bot.user.id)
-        emb = discord.Embed(description=f"[Invite me]({url})", colour=settings["colour"])
-        await utils.send_embed(ctx, emb)
+        emb = discord.Embed(description="Thanks for inviting me!", colour=settings["colour"])
+        await utils.send_embed(ctx, emb, components=[dc.Button(label="Click me", style=dc.ButtonStyle.URL, url=url, emoji=utils.get_emoji(self.bot, config.emojis.zigzag))])
 
 def setup(bot):
     bot.add_cog(Misc(bot))

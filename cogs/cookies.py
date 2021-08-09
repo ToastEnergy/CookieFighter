@@ -1,6 +1,7 @@
 import discord, config, utils, asyncio, time, random
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
 import discord_components as dc
 
 class Cookies(commands.Cog):
@@ -131,6 +132,17 @@ class Cookies(commands.Cog):
         emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
 
+    @cog_ext.cog_slash(name="bet", description="Bet come cookies!", options=[create_option(
+            name="cookies",
+            description="Number of cookies to bet",
+            option_type=4,
+            required=True
+        )])
+    async def bet_slash(self, ctx: SlashContext, cookies):
+        "Bet come cookies!"
+
+        await self.bet(ctx, cookies)
+
     @commands.command(aliases=["coin", "flip"])
     async def bet(self, ctx, cookies):
         "Bet come cookies!"
@@ -159,6 +171,12 @@ class Cookies(commands.Cog):
 
         await utils.send_embed(ctx, emb)
 
+    @cog_ext.cog_slash(name="party", description="Who's ready to party?")
+    async def party_slash(self, ctx: SlashContext):
+        "Who's ready to party?"
+
+        await self.party(ctx)
+
     @commands.command()
     async def party(self, ctx):
         "Who's ready to party?"
@@ -168,7 +186,7 @@ class Cookies(commands.Cog):
         emb.add_field(name="• **__How does this work__**", value="> I'll chose a random emoji, you have to be fast to find the emoji and send it before the others", inline=False)
         emb.add_field(name="• **__Joined Members__**", value="> *No one joined yet, use the button below to join*", inline=False)
         emb.set_footer(text="Party will start in 10 seconds")
-        components = [dc.Button(label="Join", style=dc.ButtonStyle.blue, emoji=discord.utils.get(self.bot.emojis, id=int(config.emojis.check.split(":")[2][:-1])))]
+        components = [dc.Button(label="Join", style=dc.ButtonStyle.blue, emoji=utils.get_emoji(self.bot, config.emojis.check))]
         msg = await utils.send_embed(ctx, emb, components=components)
         members = list( )
         slashn = "\n"
@@ -215,6 +233,50 @@ class Cookies(commands.Cog):
         await utils.add_cookie(self.bot.db, message.author.id, ctx.guild.id, duration, 'party')
         emb.description = f"**{str(message.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(content=None, embed=emb, components=[])
+
+    @cog_ext.cog_slash(name="gift", description="Gift some cookies to a member", options=[
+        create_option(
+            name="member",
+            description="Member to send cookies",
+            option_type=6,
+            required=True
+        ), create_option(
+            name="cookies",
+            description="Number of cookies to gift",
+            option_type=4,
+            required=True
+        )
+    ])
+    async def gift_slash(self, ctx: SlashContext, member, cookies):
+        "Gift some cookies to a member"
+
+        await self.gift(ctx, member, cookies)
+
+    @commands.command(aliases=["send"])
+    async def gift(self, ctx, member: discord.Member, cookies):
+        "Gift some cookies to a member"
+
+        if member.bot:
+            return await utils.error(ctx, "You can't send cookies to a bot")
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        av_cookies = await utils.get_cookies(self.bot.db, ctx.author.id, ctx.guild.id)
+
+        if not cookies.isdigit():
+            return await utils.error(ctx, "Please specify a number")
+
+        cookies = int(cookies)
+
+        if cookies <= 0:
+            return await utils.error(ctx, "Please specify a number higher than `0`")
+
+        if av_cookies < cookies:
+            return await utils.error(ctx, f"You don't have `{cookies}` {'cookie' if cookies == 1 else 'cookies'}")
+
+        await utils.remove_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
+        await utils.add_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
+
+        await utils.success(ctx, f"Transfered `{cookies}` {'cookie' if cookies == 1 else 'cookies'} from {ctx.author.mention} to {member.mention}")
 
 def setup(bot):
     bot.add_cog(Cookies(bot))

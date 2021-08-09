@@ -7,9 +7,6 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         self.bot = bot
         self._last_result = None
 
-    async def cog_check(self, ctx):
-        return await self.bot.is_owner(ctx.author)
-
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
 
@@ -19,6 +16,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         return content.strip('` \n')
 
     @commands.command()
+    @commands.is_owner()
     async def eval(self, ctx, *, body: str):
         "Evaluates a code"
 
@@ -80,6 +78,38 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.send(embed = emb)
 
         await db.commit()
+        await ctx.message.add_reaction(config.emojis.check)
+
+    @commands.command(name="add-cookies", aliases=["addcookies"])
+    @commands.is_owner()
+    async def add_cookies(self, ctx, member: discord.Member, cookies):
+        "Add cookies to a member"
+
+        if not cookies.isdigit():
+            return await utils.error(ctx, 'not a number')
+
+        cookies = int(cookies)
+
+        if cookies <= 0:
+            return await utils.error(ctx, 'not a number higher than `0`')
+
+        await utils.add_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
+        await ctx.message.add_reaction(config.emojis.check)
+
+    @commands.command(name="remove-cookies", aliases=["removecookies"])
+    @commands.is_owner()
+    async def remove_cookies(self, ctx, member: discord.Member, cookies):
+        "Remove cookies from a member"
+
+        if not cookies.isdigit():
+            return await utils.error(ctx, 'not a number')
+
+        cookies = int(cookies)
+
+        if cookies <= 0:
+            return await utils.error(ctx, 'not a number higher than `0`')
+
+        await utils.remove_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
         await ctx.message.add_reaction(config.emojis.check)
 
 def setup(bot):
