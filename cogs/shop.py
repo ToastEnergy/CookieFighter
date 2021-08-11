@@ -49,12 +49,12 @@ class Shop(commands.Cog):
         create_option(
             name="role",
             required=True,
-            type=8,
+            option_type=8,
             description="The role to add to the shop"
         ),
         create_option(
             name="cookies",
-            value=4,
+            option_type=4,
             required=True,
             description="Number of cookies required to buy the role"
         )
@@ -94,7 +94,7 @@ class Shop(commands.Cog):
         create_option(
             name="role_id",
             required=True,
-            type=4,
+            option_type=4,
             description="The id of the role to remove from the shop"
         )
     ])
@@ -128,7 +128,7 @@ class Shop(commands.Cog):
         create_option(
             name="role_id",
             required=True,
-            type=4,
+            option_type=4,
             description="The id of the role to buy"
         )
     ])
@@ -213,7 +213,7 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
-    @cog_ext.cog_slash(name="inventory", description="Check the inventory of a member", options=[create_option(name="member", description="The member to check the inventory of", type=6, required=False)])
+    @cog_ext.cog_slash(name="inventory", description="Check the inventory of a member", options=[create_option(name="member", description="The member to check the inventory of", option_type=6, required=False)])
     async def inventory_slash(self, ctx: SlashContext, member=None):
         await self.inventory(ctx, member)
 
