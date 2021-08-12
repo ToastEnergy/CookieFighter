@@ -1,12 +1,17 @@
 import discord, asyncio, utils, config, datetime
 from discord.ext import commands, tasks
 from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 class Spawn(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.spawn_loop.start()
         self.settings = dict()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await asyncio.sleep(0.1)
+        self.spawn_loop.start()
 
     @tasks.loop(seconds=10)
     async def spawn_loop(self):
@@ -64,6 +69,19 @@ class Spawn(commands.Cog):
                 await message.add_reaction(settings["emoji"])
                 await utils.add_timer(self.bot.db, message.guild.id, message.channel.id, message.id, datetime.datetime.utcnow() + datetime.timedelta(seconds=settings["timeout"]), settings["emoji"])
 
+    @cog_ext.cog_slash(name="ignore-channel", description="Block cookies from spawning in a channel", options=[
+        create_option(
+            name="channel",
+            required=True,
+            option_type=7,
+            description="The channel to lock"
+        )
+    ])
+    async def ignore_channel_slash(self, ctx: SlashContext, channel):
+        "Block cookies from spawning in a channel"
+
+        await self.ignore_channel(ctx, channel=channel)
+
     @commands.command(name="ignore-channel", aliases=["ignorechannel", "ignore-spawn", "ignorespawn"])
     @commands.has_permissions(manage_guild=True)
     async def ignore_channel(self, ctx, *, channel: discord.TextChannel):
@@ -77,10 +95,23 @@ class Spawn(commands.Cog):
         await utils.add_ignored_channel(self.bot.db, channel.id)
         await utils.success(ctx, f"Cookies won't spawn in {channel.mention}")
 
+    @cog_ext.cog_slash(name="allow-channel", description="Allow cookies to spawn in a channel", options=[
+        create_option(
+            name="channel",
+            required=True,
+            option_type=7,
+            description="The channel to unlock"
+        )
+    ])
+    async def allow_channel_slash(self, ctx: SlashContext, channel):
+        "Allow cookies ot spawn in a channel"
+
+        await self.ignore_channel(ctx, channel=channel)
+
     @commands.command(name="allow-channel", aliases=["allowchannel", "allow-spawn", "allowspawn"])
     @commands.has_permissions(manage_guild=True)
     async def allow_channel(self, ctx, *, channel: discord.TextChannel):
-        "Allow cookies ot spawn in a channel"
+        "Allow cookies to spawn in a channel"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
 

@@ -2,6 +2,8 @@ import discord, utils, time, config
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 import discord_components as dc
+import discord_slash.utils.manage_components as components
+from discord_slash.model import ButtonStyle
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -26,7 +28,7 @@ class Misc(commands.Cog):
         duration = (end - start) * 1000
         pong = round(self.bot.latency * 1000)
         emb = discord.Embed(description = f"**{config.bot.loading} Response:** `{duration:.2f}ms`\n**🏓 Latency:** `{pong}ms`", colour = settings["colour"])
-        await msg.edit(content=None, embed = emb)
+        await msg.edit(content="", embed=emb)
 
     @cog_ext.cog_slash(name="invite", description="Invite the bot to your server")
     async def invite_slash(self, ctx: SlashContext):

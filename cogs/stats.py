@@ -59,9 +59,15 @@ class Stats(commands.Cog):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         cookies = await utils.get_cookies(self.bot.db, member.id, ctx.guild.id)
         emb = discord.Embed(description=f"**{cookies}** Cookies {settings['emoji']}", colour=settings['colour'])
-        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png")))
+        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png", size=1024)))
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
+
+    @cog_ext.cog_slash(name="reset-leaderboard", description="Reset the leaderboard, everyone in the server will lose their cookies")
+    async def reset_leaderboard_slash(self, ctx: SlashContext):
+        "Reset the leaderboard, everyone in the server will lose their cookies"
+
+        await self.reset_leaderboard(ctx)
 
     @commands.command(name="reset-leaderboard", aliases=["resetleaderboard"])
     @commands.has_permissions(manage_guild=True)

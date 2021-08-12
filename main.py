@@ -24,6 +24,7 @@ intents = discord.Intents.default()
 bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=intents, case_insensitive=True)
 slash = SlashCommand(bot, sync_commands=True, override_type=True)
 bot.load_extension("jishaku")
+bot.remove_command("help")
 
 @bot.event
 async def on_ready():
@@ -31,11 +32,10 @@ async def on_ready():
     bot.db = await aiosqlite.connect("db.db")
     await utils.check_db(bot.db)
     bot.command_prefix=get_prefix
-    bot.remove_command("help")
-    for file in os.listdir("./cogs"):
-        if file.endswith(".py"):
-            bot.load_extension(f"cogs.{file[:-3]}")
-
     print("ready as", bot.user)
+
+for file in os.listdir("./cogs"):
+    if file.endswith(".py"):
+        bot.load_extension(f"cogs.{file[:-3]}")
 
 bot.run(config.tokens.bot)

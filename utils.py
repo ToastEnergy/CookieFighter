@@ -10,7 +10,10 @@ async def success(ctx, message, colour=None):
     try: await ctx.reply(embed=emb, mention_author=False)
     except: await ctx.send(embed=emb)
 
-async def get_settings(db, guild):
+async def get_settings(db, guild=None):
+    if not guild:
+        return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default), "spawn": config.bot.spawn, "spawnrate": config.bot.spawnrate}
+        
     data = await (await db.execute("SELECT prefix, colour, timeout, emoji, spawn, spawnrate FROM settings WHERE guild=?", (guild,))).fetchone()
     if not data:
         await db.execute("INSERT INTO settings (guild, prefix, colour, timeout, spawn, spawnrate) VALUES (?, ?, ?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout, config.bot.spawn, config.bot.spawnrate))

@@ -1,4 +1,4 @@
-discord.py
+https://github.com/Rapptz/discord.py
 aiosqlite
 jishaku
 discord-py-slash-command

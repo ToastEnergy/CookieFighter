@@ -184,6 +184,19 @@ class Shop(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
+    @cog_ext.cog_slash(name="sell", description="Sell an item (it must be in the shop)", options=[
+        create_option(
+            name="role_id",
+            required=True,
+            option_type=4,
+            description="The id of the role to sell"
+        )
+    ])
+    async def sell_slash(self, ctx: SlashContext, role_id):
+        "Sell an item (it must be in the shop)"
+
+        await self.sell(ctx, role_id)
+
     @commands.command()
     async def sell(self, ctx, role_id):
         "Sell an item (it must be in the shop)"
@@ -215,7 +228,7 @@ class Shop(commands.Cog):
 
     @cog_ext.cog_slash(name="inventory", description="Check the inventory of a member", options=[create_option(name="member", description="The member to check the inventory of", option_type=6, required=False)])
     async def inventory_slash(self, ctx: SlashContext, member=None):
-        await self.inventory(ctx, member)
+        await self.inventory(ctx, member=member)
 
     @commands.command(aliases=["inv"])
     async def inventory(self, ctx, *, member: discord.Member=None):
@@ -226,7 +239,7 @@ class Shop(commands.Cog):
         inv = await utils.get_inventory(self.bot.db, member.id, ctx.guild.id)
 
         emb = discord.Embed(colour=settings["colour"])
-        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png")))
+        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png", size=1024)))
 
         if not inv:
             emb.description = "*Nothing to see here...*"
