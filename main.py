@@ -29,7 +29,7 @@ async def on_ready():
     bot.db = await aiosqlite.connect("db.db")
     await utils.check_db(bot.db)
     bot.command_prefix=get_prefix
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{config.bot.prefix}help"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{config.bot.prefix}help"), status=discord.Status.idle)
     print("ready as", bot.user)
 
 for file in os.listdir("./cogs"):
