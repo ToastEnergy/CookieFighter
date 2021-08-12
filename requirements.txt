@@ -1,0 +1,5 @@
+https://github.com/Rapptz/discord.py
+aiosqlite
+jishaku
+discord-py-slash-command
+discord-components

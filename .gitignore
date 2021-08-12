@@ -3,3 +3,6 @@ data/
 __pycache__
 cogs/__pycache__
 oof.py
+config.py
+db.db
+db.db-journal

@@ -1,160 +1,152 @@
-import discord, aiosqlite, cookies, random
+import discord, utils, config, asyncio
 from discord.ext import commands
 
 class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.emoji_converter = commands.EmojiConverter()
 
-    @commands.group(aliases = ["setting"], invoke_without_command = True)
-    @commands.has_permissions(manage_messages = True)
-    async def settings(self, ctx, option=None, value=None):
-        "setup the bot for your guild"
+    @commands.command()
+    @commands.guild_only()
+    async def settings(self, ctx):
+        "Check server settings"
 
-        guild_options = await cookies.guild_settings(ctx.guild.id)
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        emoji = settings["emoji"] if settings["emoji"] not in config.emojis.default else " / ".join(config.emojis.default)
+        emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`\n• **Spawn:** `{'enabled' if settings['spawn'] else 'disabled'}`\n• **Spawn Rate:** `{settings['spawnrate']}%`", colour=settings["colour"])
+        emb.set_author(name=f"{ctx.guild.name} settings", icon_url=str(ctx.guild.icon.replace(static_format="png")))
+        try: await ctx.reply(embed=emb, mention_author=False)
+        except: await ctx.send(embed=emb)
 
-        if not option:
-            embed_colour = int(guild_options["colour"])
-            guild_options["colour"] = str(discord.Colour(int(guild_options["colour"])))
+    @commands.command(name="edit-settings", aliases=["editsetting", "edit-setting", "editsettings"])
+    @commands.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    async def edit_settings(self, ctx, option, value):
+        "Edit server settings"
 
-            if guild_options["emoji_default"] == True:
-                guild_options["emoji"] = f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        option = option.lower().replace("color", "colour").replace("spawn-rate", "spawnrate", )
 
+        if option not in ["colour", "emoji", "timeout", "prefix", "spawn", "spawnrate"]:
+            emb = discord.Embed(title="Invalid option!", description="Choose from `colour` `emoji` `timeout` `prefix` `spawn` `spawnrate`", colour=discord.Colour.red())
+            try: await ctx.reply(embed=emb, mention_author=False)
+            except: await ctx.send(embed=emb)
+            return
+
+        if option == "colour":
+            if not value.startswith("#"):
+                emb = discord.Embed(title="Invalid color!", description="Please specify a **HEX Color** like `#ffe930`, you can pick one from [here](https://htmlcolorcodes.com/).", colour=discord.Colour.red())
+                try: await ctx.reply(embed=emb, mention_author=False)
+                except: await ctx.send(embed=emb)
+                return
+            value = f"0x{value[1:]}"
+            value = int(value, 16)
+
+        elif option == "timeout":
+            try: value = int(value)
+            except:
+                emb = discord.Embed(title="Invalid Timeout!", description="Please specify the amount of seconds.", colour=discord.Colour.red())
+                try: await ctx.reply(embed=emb, mention_author=False)
+                except: await ctx.send(embed=emb)
+                return
+
+            if value > 300 or value < 1:
+                emb = discord.Embed(title="Invalid Timeout!", description="Timeout must be between `1` and `300`", colour=discord.Colour.red())
+                try: await ctx.reply(embed=emb, mention_author=False)
+                except: await ctx.send(embed=emb)
+                return
+
+            value = round(value)
+
+        elif option == "emoji":
+            emb = discord.Embed(description=f"{config.emojis.loading} |  This message will be used to test the emoji", colour=settings["colour"])
+            try: msg = await ctx.reply(embed=emb, mention_author=False)
+            except: msg = await ctx.send(embed=emb)
+
+            try: await msg.add_reaction(value)
+            except:
+                emb.colour = discord.Colour.red()
+                emb.description = f"{config.emojis.fail} | Invalid emoji!"
+                return await msg.edit(embed=emb)
+
+            await msg.remove_reaction(value, ctx.guild.me)
+            await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
+            await self.bot.db.commit()
+            settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+
+            emb = discord.Embed(description=f"{config.emojis.check} | `{option}` updated to {value if option == 'emoji' else f'`{value}`'}", colour=settings["colour"])
+            return await msg.edit(embed=emb)
+
+        elif option == "spawn":
+            if value.lower() in ["true", "yes", "enable", "enabled", "1"]:
+                value = 1
+            elif value.lower() in ["false", "no", "disable", "disabled", "0"]:
+                value = 0
             else:
-                emoji = self.bot.get_emoji(guild_options["emoji"]) if self.bot.get_emoji(guild_options["emoji"]) else f"{self.bot.cookie} / {self.bot.oreo} / {self.bot.gocciola}"
-                guild_options["emoji"] = str(emoji)
+                return await utils.error(ctx, "Please specify `enabled` or `disabled`")
 
-            prefix = await cookies.guild_prefix(ctx.guild.id)
-
-            options = ["__colour__", "__emoji__", "__timeout__"]
-            cookie = random.choice([self.bot.cookie, self.bot.gocciola, self.bot.oreo])
-            a = f"\n{cookie} " # cuz \n raise an error with f-strings
-
-            emb = discord.Embed(description=f"""**Available Settings**
-
-{cookie} {a.join(options)}
-
-**use** `{prefix}settings [setting name] [option]` to set-up the bot
-**example**: `{prefix}settings colour #ffffff`
-
-**Current Settings**
-
-{cookie} __colour__: `{guild_options['colour']}`
-{cookie} __emoji__: {guild_options['emoji']}
-{cookie} __timeout__: `{guild_options['timeout']}s`
-""", colour=embed_colour)
-            emb.set_author(name=f"{ctx.guild.name} settings",icon_url=str(ctx.guild.icon_url_as(static_format="png")))
-
-            return await ctx.send(embed=emb)
-
-        else:
-            await ctx.trigger_typing()
-
-            option = str(option).lower()
-
-            options = ["colour", "emoji", "timeout"]
-            if option not in options:
-                emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{option}** is not a valid option", colour = int(guild_options["colour"]))
-                return await ctx.send(embed=emb)
-
-            if not value:
-                emb = discord.Embed(description=f"<a:fail:727212831782731796> | please specify a value!", colour = int(guild_options["colour"]))
-                return await ctx.send(embed=emb)
-
-            if option == "color":
-                option == "colour"
-
-            if option == "colour":
-                value = f"0x{value[1:]}"
-                value = int(value, 16)
-                # value = hex(value)
-
-            elif option == "emoji":
-                try:
-                    emoji = await self.emoji_converter.convert(ctx, value)
-
-                except commands.errors.EmojiNotFound:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid emoji", colour = int(guild_options["colour"]))
-                    return await ctx.send(embed=emb)
-
-                value = emoji.id
-
-            elif option == "timeout":
-                try:
-                    value = int(value)
-
-                except:
-                    try:
-                        value = float(value)
-                    except:
-                        emb = discord.Embed(description=f"<a:fail:727212831782731796> | **{value}** is not a valid timeout", colour = int(guild_options["colour"]))
-                        return await ctx.send(embed=emb)
-
-                if type(value) not in [int, float]:
-                    emb = discord.Embed(description=f"<a:fail:727212831782731796> | max timeout is **300** seconds!", colour = int(guild_options["colour"]))
-                    return await ctx.send(embed=emb)
-
-            data = await self.bot.db.execute(f"select * from settings where id=?", (ctx.guild.id,))
-            data = await data.fetchall()
-
-            options.remove(option)
-
-            if len(data) == 0:
-                await self.bot.db.execute(f"insert into settings (id, {option}, {options[0]}, {options[1]}) VALUES (?, ?, ?, ?)", (ctx.guild.id, value, 0, 0))
-                await self.bot.db.commit()
-
+        elif option == "spawnrate":
+            if "%" in value:
+                if value[:-1].isdigit():
+                    value = int(value[:-1])
+            elif value.isdigit():
+                value = int(value)
+                if value not in range(1, 61):
+                    return await utils.error(ctx, "Please specify a percentage between `1%` and `60%`")
             else:
-                await self.bot.db.execute(f"update settings set {option}=? where id=?", (value, ctx.guild.id))
-                await self.bot.db.commit()
+                return await utils.error(ctx, "Please specify a percentage between `1%` and `60%`")
 
-            guild_options = await cookies.guild_settings(ctx.guild.id)
+        await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
+        await self.bot.db.commit()
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
 
-            if option == "colour":
-                value = str(discord.Colour(int(value)))
+        if option == "colour":
+            value = str(discord.Colour(value))
+        elif option == "spawn":
+            value = 'enabled' if value == 1 else 'disabled'
+        elif option == 'spawnrate':
+            value = str(value) + "%"
 
-            elif option == "emoji":
-                value = str(self.bot.get_emoji(guild_options["emoji"]))
+        emb = discord.Embed(description=f"{config.emojis.check} | `{option}` updated to {value if option == 'emoji' else f'`{value}`'}", colour=settings["colour"])
+        try: await ctx.reply(embed=emb, mention_author=False)
+        except: await ctx.send(embed=emb)
 
-            elif option == "timeout":
-                value = f"{value} seconds"
+    @commands.command(name="reset-settings", aliases=["resetsettings", "resetsetting", "reset-setting"])
+    @commands.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    async def reset_settings(self, ctx):
+        "Reset server settings"
 
-            emb = discord.Embed(description = f"<a:check:726040431539912744> | **{option}** for **{ctx.guild.name}** updated to **{value}**", colour = discord.Colour(int(guild_options["colour"])))
-            await ctx.send(embed = emb)
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        emb = discord.Embed(description="You are going to reset guild settings, are you sure?", colour=settings['colour'])
+        try: msg = await ctx.reply(embed=emb, mention_author=False)
+        except: msg = await ctx.send(embed=emb)
 
-    @commands.group(aliases = ["setprefix"], invoke_without_command = True)
-    @commands.has_permissions(manage_roles = True)
-    async def prefix(self, ctx, *, prefix):
-        "Change server prefix"
+        [await msg.add_reaction(r) for r in [config.emojis.check, config.emojis.fail]]
 
-        opt = await cookies.guild_settings(ctx.guild.id)
-        colour = int(opt["colour"])
+        def check(reaction, user):
+            return str(reaction.emoji) in [config.emojis.check, config.emojis.fail] and user.id == ctx.author.id
 
-        if len(prefix) > 36:
-                emb = discord.Embed(description = f"<a:fail:727212831782731796> | The prefix can't be longer than **36** characters!", colour = colour)
-                return await ctx.send(embed = emb)
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=120)
+        except asyncio.TimeoutError:
+            emb = discord.Embed(description=f"{config.emojis.fail} | Timeout!", colour=discord.Colour.red())
+            try: msg = await ctx.reply(embed=emb, mention_author=False)
+            except: msg = await ctx.send(embed=emb)
+            return
 
-        async with aiosqlite.connect("data/db.db") as db:
-                await db.execute(f"delete from prefixes where guild = ?", (ctx.guild.id,))
-                await db.execute(f"INSERT into prefixes (guild, prefix) VALUES (?, ?)", (ctx.guild.id, prefix))
-                await db.commit()
+        if str(reaction.emoji) == config.emojis.fail:
+            emb = discord.Embed(description="Ok, I won't reset anything.", colour=settings['colour'])
+            try: msg = await ctx.reply(embed=emb, mention_author=False)
+            except: msg = await ctx.send(embed=emb)
+            return
 
-        emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix changed to **{prefix}**", colour = colour)
-        await ctx.send(embed = emb)
+        await self.bot.db.execute("DELETE FROM settings WHERE guild=?", (ctx.guild.id,))
+        await self.bot.db.commit()
 
-    @prefix.command()
-    @commands.has_permissions(manage_roles = True)
-    async def reset(self, ctx):
-        "reset the prefix to the default one"
-
-        opt = await cookies.guild_settings(ctx.guild.id)
-        colour = int(opt["colour"])
-
-        async with aiosqlite.connect("data/db.db") as db:
-                await db.execute(f"delete from prefixes where guild = ?", (ctx.guild.id,))
-                await db.commit()
-
-        emb = discord.Embed(description = f"<a:check:726040431539912744> | Prefix reset to **c/**", colour = colour)
-        await ctx.send(embed = emb)
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        emb = discord.Embed(description="Done, everything has been reset.", colour=settings['colour'])
+        try: msg = await ctx.reply(embed=emb, mention_author=False)
+        except: msg = await ctx.send(embed=emb)
 
 def setup(bot):
     bot.add_cog(Settings(bot))

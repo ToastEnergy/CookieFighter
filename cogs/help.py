@@ -1,32 +1,25 @@
-import discord
+import discord, utils, config
 from discord.ext import commands
-import aiosqlite
 
 class Help(commands.Cog):
-    
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(hidden = True)
-    async def help(self, ctx, *, command = None):
+    async def help(self, ctx, *, command=None):
         "Get some help"
 
-        async with aiosqlite.connect("data/db.db") as db:
-            data = await db.execute(f"select * from prefixes where guild = {ctx.guild.id}")
-            data = await data.fetchall()
-
-        if len(data) == 0:
-            prefix = "c/"
-
+        if ctx.guild:
+            settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         else:
-            prefix = data[0][1]
-
-        emb = discord.Embed(colour = self.bot.colour)
-        emb.set_author(name = self.bot.user.name, icon_url = str(self.bot.user.avatar_url_as(static_format = "png")))
-        emb.set_footer(text = ctx.author, icon_url = str(ctx.author.avatar_url_as(static_format = "png")))
-        error = discord.Embed(description = f"""```sh
+            settings = await utils.get_settings(self.bot.db)
+        prefix = settings['prefix']
+        emb = discord.Embed(colour=settings['colour'])
+        emb.set_author(name=self.bot.user.name, icon_url=str(self.bot.user.avatar_url_as(static_format="png", size=1024)))
+        emb.set_footer(text=ctx.author, icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        error = discord.Embed(description=f"""```sh
 Command "{command}" not found
-```""", colour = self.bot.colour)
+```""", colour=settings['colour'])
 
         if command:
             command = self.bot.get_command(command)
@@ -39,7 +32,7 @@ Command "{command}" not found
             if command.parent:
                 name = command.parent.name + " " + command.name
                 res += f"\n**Parent**: __`{command.parent}`__"
-            
+
             else:
                 name = command.name
 
@@ -61,8 +54,8 @@ Command "{command}" not found
                 pass
 
             emb.description = res
-            return await ctx.send(embed = emb)
-        
+            return await utils.send_embed(ctx, embed=emb)
+
         res = ""
         for a in self.bot.cogs:
             if str(a) != "Jishaku":
@@ -86,20 +79,18 @@ Command "{command}" not found
                                             res_ += f"> `{prefix}{c.parent} {c.name}`\n"
                             except:
                                 pass
-                                    
+
                     res += f"{res_}\n"
 
         emb.description = f"""```
-╔═╗╔═╗╔═╗╦╔═╦╔═╗  ╔═╗╦╔═╗╦ ╦╔╦╗╔═╗╦═╗
-║  ║ ║║ ║╠╩╗║║╣   ╠╣ ║║ ╦╠═╣ ║ ║╣ ╠╦╝
-╚═╝╚═╝╚═╝╩ ╩╩╚═╝  ╚  ╩╚═╝╩ ╩ ╩ ╚═╝╩╚═```
-[Invite me]({discord.utils.oauth_url(self.bot.user.id, permissions = discord.Permissions(permissions = 84032))})
-[Support Server](https://discord.gg/vCUpW9E)
+{config.bot.banner}```
+[Invite me]({utils.invite_url(self.bot.user.id)})
+[Support Server]({config.bot.support_server})
 Server Prefix: **{prefix}**
 
 {res}"""
-        emb.set_footer(text = f"Need more help? Use \"{prefix}help <command>\".", icon_url = str(ctx.author.avatar_url_as(static_format = "png")))
-        await ctx.send(embed = emb)
+        emb.set_footer(text=f"Need more help? Use \"{prefix}help <command>\".", icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        await utils.send_embed(ctx, embed=emb)
 
 def setup(bot):
     bot.add_cog(Help(bot))
