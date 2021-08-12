@@ -1,17 +1,9 @@
 import discord, config, utils, asyncio, time
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option
 
 class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @cog_ext.cog_slash(name="leaderboard", description="Who's the best?")
-    async def leaderboard_slash(self, ctx: SlashContext):
-        "Who's the best?"
-
-        await self.leaderboard(ctx)
 
     @commands.command(aliases=["lb"])
     async def leaderboard(self, ctx):
@@ -21,7 +13,7 @@ class Stats(commands.Cog):
         users = await utils.get_users(self.bot.db, ctx.guild.id)
 
         emb = discord.Embed(description="", colour=settings["colour"])
-        emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
+        emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png", size=1024)))
 
         if not users:
             emb.description = "*no one's here*"
@@ -43,13 +35,6 @@ class Stats(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
-    @cog_ext.cog_slash(name="cookies", description="Get how many cookies a member has", options=[create_option(name="member", description="Member you want to get info about", option_type=6,required=False)])
-    async def cookies_slash(self, ctx: SlashContext, member=None):
-        "Get how many cookies a member has"
-
-        member = member or ctx.author
-        await self.cookies(ctx, member)
-
     @commands.command(aliases=["info", "stats", "stat", "bal", "balance"])
     async def cookies(self, ctx, member: discord.Member=None):
         "Get how many cookies a member has"
@@ -59,15 +44,8 @@ class Stats(commands.Cog):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         cookies = await utils.get_cookies(self.bot.db, member.id, ctx.guild.id)
         emb = discord.Embed(description=f"**{cookies}** Cookies {settings['emoji']}", colour=settings['colour'])
-        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png", size=1024)))
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
-
-    @cog_ext.cog_slash(name="reset-leaderboard", description="Reset the leaderboard, everyone in the server will lose their cookies")
-    async def reset_leaderboard_slash(self, ctx: SlashContext):
-        "Reset the leaderboard, everyone in the server will lose their cookies"
-
-        await self.reset_leaderboard(ctx)
+        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png", size=1024)))
+        await ctx.reply(embed=emb, mention_author=False)
 
     @commands.command(name="reset-leaderboard", aliases=["resetleaderboard"])
     @commands.has_permissions(manage_guild=True)

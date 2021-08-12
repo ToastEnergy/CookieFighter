@@ -13,7 +13,7 @@ async def success(ctx, message, colour=None):
 async def get_settings(db, guild=None):
     if not guild:
         return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default), "spawn": config.bot.spawn, "spawnrate": config.bot.spawnrate}
-        
+
     data = await (await db.execute("SELECT prefix, colour, timeout, emoji, spawn, spawnrate FROM settings WHERE guild=?", (guild,))).fetchone()
     if not data:
         await db.execute("INSERT INTO settings (guild, prefix, colour, timeout, spawn, spawnrate) VALUES (?, ?, ?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout, config.bot.spawn, config.bot.spawnrate))
@@ -204,8 +204,8 @@ async def is_ignored(db, channel):
     data = await (await db.execute("SELECT channel FROM spawn_channels WHERE channel=?", (channel,))).fetchone()
     return False if not data else True
 
-async def send_embed(ctx, embed, components=None):
-    try: msg = await ctx.reply(embed=embed, mention_author=False, components=components)
+async def send_embed(ctx, embed):
+    try: msg = await ctx.reply(embed=embed, mention_author=False)
     except: msg = await ctx.send(embed=embed, components=components)
     return msg
 
@@ -213,4 +213,4 @@ def get_emoji(bot, emoji):
     return discord.utils.get(bot.emojis, id=int(emoji.split(":")[2][:-1]))
 
 def invite_url(id):
-    return discord.utils.oauth_url(id, scopes=('bot','applications.commands'), permissions=discord.Permissions(permissions=280640))
+    return discord.utils.oauth_url(id, scopes=('bot',), permissions=discord.Permissions(permissions=280640))

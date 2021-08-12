@@ -14,6 +14,8 @@ class bot:
     spawn = 0
     spawnrate = 5
     support_server = "https://discord.gg/nvSwvPXgkn"
+    logs = 1234
+    errors = 1234
     countdown = [
 """
        ██████╗

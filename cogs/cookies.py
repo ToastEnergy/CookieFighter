@@ -1,18 +1,10 @@
 import discord, config, utils, asyncio, time, random
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option
 import discord_components as dc
 
 class Cookies(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @cog_ext.cog_slash(name="cookie", description="Catch the cookie!")
-    async def cookie_slash(self, ctx: SlashContext):
-        "Catch the cookie!"
-
-        await self.cookie(ctx)
 
     @commands.command(aliases=["c"])
     @commands.guild_only()
@@ -51,12 +43,6 @@ class Cookies(commands.Cog):
         try: await msg.clear_reactions()
         except: pass
 
-    @cog_ext.cog_slash(name="milk", description="Drink the milk!")
-    async def milk_slash(self, ctx: SlashContext):
-        "Drink the milk!"
-
-        await self.milk(ctx)
-
     @commands.command(aliases=["m"])
     @commands.guild_only()
     async def milk(self, ctx):
@@ -94,12 +80,6 @@ class Cookies(commands.Cog):
         try: await msg.clear_reactions()
         except: pass
 
-    @cog_ext.cog_slash(name="type", description="Send the cookie!")
-    async def type_slash(self, ctx: SlashContext):
-        "Send the cookie!"
-
-        await self.type_(ctx)
-
     @commands.command(name="type", aliases=["t"])
     async def type_(self, ctx):
         "Send the cookie!"
@@ -132,17 +112,6 @@ class Cookies(commands.Cog):
         emb.description = f"**{str(m.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(embed=emb)
 
-    @cog_ext.cog_slash(name="bet", description="Bet come cookies!", options=[create_option(
-            name="cookies",
-            description="Number of cookies to bet",
-            option_type=4,
-            required=True
-        )])
-    async def bet_slash(self, ctx: SlashContext, cookies):
-        "Bet come cookies!"
-
-        await self.bet(ctx, cookies)
-
     @commands.command(aliases=["coin", "flip"])
     async def bet(self, ctx, cookies):
         "Bet come cookies!"
@@ -169,13 +138,7 @@ class Cookies(commands.Cog):
             await utils.remove_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
             emb = discord.Embed(title="You lost!", description=f"I removed you `{cookies}` {'cookie' if cookies == 1 else 'cookies'}", colour=settings["colour"])
 
-        await utils.send_embed(ctx, emb)
-
-    @cog_ext.cog_slash(name="party", description="Who's ready to party?")
-    async def party_slash(self, ctx: SlashContext):
-        "Who's ready to party?"
-
-        await self.party(ctx)
+        await ctx.reply(embed=emb, mention_author=False)
 
     @commands.command()
     async def party(self, ctx):
@@ -187,8 +150,8 @@ class Cookies(commands.Cog):
         emb.add_field(name="• **__Joined Members__**", value="> *No one joined yet, use the button below to join*", inline=False)
         emb.set_footer(text="Party will start in 10 seconds")
         components = [dc.Button(label="Join", style=dc.ButtonStyle.blue, emoji=utils.get_emoji(self.bot, config.emojis.check))]
-        msg = await utils.send_embed(ctx, emb, components=components)
-        members = list( )
+        msg = await ctx.reply(embed=emb, components=components, mention_author=False)
+        members = list()
         slashn = "\n"
 
         def check(i):
@@ -234,25 +197,7 @@ class Cookies(commands.Cog):
         emb.description = f"**{str(message.author)}** won in `{duration:.2f}` seconds!"
         await msg.edit(content=None, embed=emb, components=[])
 
-    @cog_ext.cog_slash(name="gift", description="Gift some cookies to a member", options=[
-        create_option(
-            name="member",
-            description="Member to send cookies",
-            option_type=6,
-            required=True
-        ), create_option(
-            name="cookies",
-            description="Number of cookies to gift",
-            option_type=4,
-            required=True
-        )
-    ])
-    async def gift_slash(self, ctx: SlashContext, member, cookies):
-        "Gift some cookies to a member"
-
-        await self.gift(ctx, member, cookies)
-
-    @commands.command(aliases=["send"])
+    @commands.command(aliases=["send", "pay"])
     async def gift(self, ctx, member: discord.Member, cookies):
         "Gift some cookies to a member"
 

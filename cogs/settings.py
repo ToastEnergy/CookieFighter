@@ -1,15 +1,9 @@
 import discord, utils, config, asyncio
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option, create_choice
 
 class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @cog_ext.cog_slash(name="settings", description="Check server settings")
-    async def settings_slash(self, ctx: SlashContext):
-        await self.settings(ctx)
 
     @commands.command()
     @commands.guild_only()
@@ -19,50 +13,9 @@ class Settings(commands.Cog):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         emoji = settings["emoji"] if settings["emoji"] not in config.emojis.default else " / ".join(config.emojis.default)
         emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`\n• **Spawn:** `{'enabled' if settings['spawn'] else 'disabled'}`\n• **Spawn Rate:** `{settings['spawnrate']}%`", colour=settings["colour"])
-        emb.set_author(name=f"{ctx.guild.name} settings", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
+        emb.set_author(name=f"{ctx.guild.name} settings", icon_url=str(ctx.guild.icon.replace(static_format="png")))
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
-
-    @cog_ext.cog_slash(name="editsettings", description="Edit server settings", options=[create_option(
-            name="option",
-            description="The setting you want to edit",
-            option_type=3,
-            required=True,
-            choices=[
-                  create_choice(
-                    name="Emoji",
-                    value="emoji"
-                  ),
-                  create_choice(
-                    name="Colour",
-                    value="colour"
-                  ),
-                  create_choice(
-                    name="Timeout",
-                    value="timeout"
-                  ), create_choice(
-                    name="Prefix",
-                    value="prefix"
-                  ),
-                  create_choice(
-                    name="Spawn",
-                    value="spawn"
-                  ),
-                  create_choice(
-                    name="Spawn Rate",
-                    value="spawnrate"
-                  )
-                ]
-        ), create_option(
-            name="value",
-            description="The new value",
-            option_type=3,
-            required=True
-        )])
-    async def settings_slash(self, ctx: SlashContext, option, value):
-        "Edit server settings"
-
-        await self.editsettings(ctx, option, value)
 
     @commands.command(name="edit-settings", aliases=["editsetting", "edit-setting", "editsettings"])
     @commands.has_permissions(manage_messages=True)

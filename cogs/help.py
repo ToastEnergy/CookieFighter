@@ -1,33 +1,9 @@
 import discord, utils, config
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option, create_choice
-
-command_names = []
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        global command_names
-        command_names = [create_choice(name=command.name, value=command.name) for command in self.bot.commands if not command.hidden]
-
-    @cog_ext.cog_slash(name="help", description="Get some help", options=[
-        create_option(
-            name="command",
-            description="Need help for a single command?",
-            option_type=3,
-            required=False,
-            choices=command_names
-        )
-    ])
-    async def helpslash(self, ctx: SlashContext, command=None):
-        "Get some help"
-
-        print(command_names)
-        await self.help(ctx, command=command)
 
     @commands.command(hidden = True)
     async def help(self, ctx, *, command=None):
@@ -39,8 +15,8 @@ class Help(commands.Cog):
             settings = await utils.get_settings(self.bot.db)
         prefix = settings['prefix']
         emb = discord.Embed(colour=settings['colour'])
-        emb.set_author(name=self.bot.user.name, icon_url=str(self.bot.user.avatar.replace(static_format="png", size=1024)))
-        emb.set_footer(text=ctx.author, icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
+        emb.set_author(name=self.bot.user.name, icon_url=str(self.bot.user.avatar_url_as(static_format="png", size=1024)))
+        emb.set_footer(text=ctx.author, icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
         error = discord.Embed(description=f"""```sh
 Command "{command}" not found
 ```""", colour=settings['colour'])
@@ -113,7 +89,7 @@ Command "{command}" not found
 Server Prefix: **{prefix}**
 
 {res}"""
-        emb.set_footer(text=f"Need more help? Use \"{prefix}help <command>\".", icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
+        emb.set_footer(text=f"Need more help? Use \"{prefix}help <command>\".", icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
         await utils.send_embed(ctx, embed=emb)
 
 def setup(bot):

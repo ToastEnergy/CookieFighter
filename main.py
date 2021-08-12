@@ -1,7 +1,5 @@
 import discord, config, aiosqlite, utils, os
 from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
-from discord_slash.utils.manage_commands import create_option
 import discord_components as dc
 
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
@@ -22,7 +20,6 @@ async def get_prefix(bot, message):
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=intents, case_insensitive=True)
-slash = SlashCommand(bot, sync_commands=True, override_type=True)
 bot.load_extension("jishaku")
 bot.remove_command("help")
 

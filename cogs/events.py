@@ -1,4 +1,4 @@
-import discord, utils, config
+import discord, utils, config, datetime
 from discord.ext import commands
 
 class Events(commands.Cog):
@@ -46,7 +46,7 @@ class Events(commands.Cog):
             elif isinstance(error, commands.NSFWChannelRequired):
                 errors.append("This command works only on NSFW channels")
         elif isinstance(error, commands.CommandNotFound):
-            pass
+            return
         elif isinstance(error, commands.DisabledCommand):
             erros.append("This command is currently disabled")
         elif isinstance(error, commands.CommandInvokeError):
@@ -110,7 +110,36 @@ class Events(commands.Cog):
         if len(errors) == 0:
             errors.append(str(error))
 
+        channel = self.bot.get_channel(config.bot.errors)
+        time = round(datetime.datetime.timestamp(datetime.datetime.now()))
+        emb = discord.Embed(colour=discord.Colour.red())
+        emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
+        emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
+        emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
+        emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
+        emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
+        emb.add_field(name="Error", value=f"```py\n{error}\n```")
+        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
+        await channel.send(embed=emb)
+
         await utils.error(ctx, "\n".join(errors))
+
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        channel = self.bot.get_channel(config.bot.logs)
+        time = round(datetime.datetime.timestamp(datetime.datetime.now()))
+        # emb = discord.Embed(description=f"**Message:** `{ctx.message.content}`\n**Author:** `{str(ctx.author)}` (`{ctx.author.id}`)\n**Channel:** `{ctx.channel.name}` (`{ctx.channel.id}`)\n**Guild:** `{ctx.guild.name}` (`{ctx.guild.id}`)\n**When:** <t:{time}:f>", colour=settings["colour"])
+        emb = discord.Embed(colour=settings["colour"])
+        emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
+        emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
+        emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
+        emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
+        emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
+        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
+        await channel.send(embed=emb)
 
 def setup(bot):
     bot.add_cog(Events(bot))
