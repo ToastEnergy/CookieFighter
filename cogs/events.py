@@ -1,5 +1,6 @@
 import discord, utils, config, datetime
 from discord.ext import commands
+import discord_components as dc
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -108,37 +109,49 @@ class Events(commands.Cog):
             errors.append(f"There are 2 commands with the same name (`{error.name}`)!")
 
         if len(errors) == 0:
-            errors.append(str(error))
+            if not str(error).startswith("The global check functions for command"):
+                errors.append(str(error))
+            else:
+                emb = discord.Embed(description=f"{config.emojis.fail} | This bot doesn't work in DM", colour=discord.Colour.red())
+                await ctx.send(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=utils.invite_url(self.bot.user.id), emoji=utils.get_emoji(self.bot, config.emojis.zigzag))])
 
         channel = self.bot.get_channel(config.bot.errors)
         time = round(datetime.datetime.timestamp(datetime.datetime.now()))
         emb = discord.Embed(colour=discord.Colour.red())
         emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
         emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
-        emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
-        emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
+        if ctx.guild:
+            emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
+            emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
+            emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
+        else:
+            emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
         emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
-        emb.add_field(name="Error", value=f"```py\n{error}\n```")
+        emb.add_field(name="Error", value=f"```py\n{str(error)}\n```")
         emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
-        emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
         await channel.send(embed=emb)
 
-        await utils.error(ctx, "\n".join(errors))
+        if len(errors) != 0:
+            await utils.error(ctx, "\n".join(errors))
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        g = None if not ctx.guild else ctx.guild.id
+        settings = await utils.get_settings(self.bot.db, g)
         channel = self.bot.get_channel(config.bot.logs)
         time = round(datetime.datetime.timestamp(datetime.datetime.now()))
         # emb = discord.Embed(description=f"**Message:** `{ctx.message.content}`\n**Author:** `{str(ctx.author)}` (`{ctx.author.id}`)\n**Channel:** `{ctx.channel.name}` (`{ctx.channel.id}`)\n**Guild:** `{ctx.guild.name}` (`{ctx.guild.id}`)\n**When:** <t:{time}:f>", colour=settings["colour"])
         emb = discord.Embed(colour=settings["colour"])
         emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
         emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
-        emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
-        emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
+        if ctx.guild:
+            emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
+            emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
+            emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
+        else:
+            emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
         emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
         emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
-        emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
         await channel.send(embed=emb)
 
 def setup(bot):

@@ -24,11 +24,12 @@ class Shop(commands.Cog):
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         roles = await utils.get_roles(self.bot.db, ctx.guild)
+        cookies = await utils.get_cookies(self.bot.db, ctx.author.id, ctx.guild.id)
 
         if not roles:
             return await self.empty_shop(ctx, settings)
 
-        emb = discord.Embed(title="Cookies Shop!", description=f"Use `{settings['prefix']}buy <item number>` to buy something.\n\n", colour=settings['colour'])
+        emb = discord.Embed(title="Cookies Shop!", description=f"__Your cookies:__ `{cookies}` {settings['emoji']}\n\nUse `{settings['prefix']}buy <item number>` to buy something.\n\n", colour=settings['colour'])
         count = 0
         for role in roles:
             count += 1

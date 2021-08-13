@@ -8,14 +8,14 @@ os.environ["JISHAKU_HIDE"] = "True"
 
 async def get_prefix(bot, message):
   if message.guild is None:
-    prefix = commands.when_mentioned_or(f"{config.bot.prefix} ", config.bot.prefix)(bot, message)
+    prefix = commands.when_mentioned_or(f"{config.bot.prefix} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]}" ,config.bot.prefix)(bot, message)
   else:
     data = await (await bot.db.execute("SELECT prefix FROM settings WHERE guild=?", (message.guild.id,))).fetchone()
     if data:
       new_prefix = str(data[0])
-      prefix = commands.when_mentioned_or(f"{new_prefix} ", new_prefix)(bot, message)
+      prefix = commands.when_mentioned_or(f"{new_prefix} ",  f"{new_prefix[0].upper()}{new_prefix[1:]} ",  f"{new_prefix[0].upper()}{new_prefix[1:]}" , new_prefix)(bot, message)
     else:
-      prefix = commands.when_mentioned_or(f"{config.bot.prefix} ", config.bot.prefix)(bot, message)
+      prefix = commands.when_mentioned_or(f"{config.bot.prefix} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]}" ,config.bot.prefix)(bot, message)
   return prefix
 
 intents = discord.Intents.default()
@@ -31,6 +31,12 @@ async def on_ready():
     bot.command_prefix=get_prefix
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{config.bot.prefix}help"), status=discord.Status.idle)
     print("ready as", bot.user)
+
+@bot.check
+async def bot_check(ctx):
+    if not ctx.guild and ctx.command.name != "help":
+        return False
+    return True
 
 for file in os.listdir("./cogs"):
     if file.endswith(".py"):

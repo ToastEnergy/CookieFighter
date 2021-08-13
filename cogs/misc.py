@@ -1,4 +1,4 @@
-import discord, utils, time, config
+import discord, utils, time, config, random
 from discord.ext import commands
 import discord_components as dc
 
@@ -28,6 +28,10 @@ class Misc(commands.Cog):
         url = utils.invite_url(self.bot.user.id)
         emb = discord.Embed(description="Thanks for inviting me!", colour=settings["colour"])
         await ctx.reply(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=url, emoji=utils.get_emoji(self.bot, config.emojis.zigzag))], mention_author=False)
+
+    @commands.command(hidden=True)
+    async def cock(self, ctx):
+        await ctx.reply(random.choice(["why", "no u", "°-°", "¿.¿", "•_•", ">.<"]), mention_author=False)
 
 def setup(bot):
     bot.add_cog(Misc(bot))

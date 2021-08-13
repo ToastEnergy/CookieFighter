@@ -35,7 +35,7 @@ class Stats(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
-    @commands.command(aliases=["info", "stats", "stat", "bal", "balance"])
+    @commands.command(aliases=["info", "stats", "stat", "bal", "balance", "me"])
     async def cookies(self, ctx, member: discord.Member=None):
         "Get how many cookies a member has"
 
@@ -83,6 +83,10 @@ class Stats(commands.Cog):
         emb = discord.Embed(description="", colour=settings["colour"])
         emb.set_author(name="Hall of Fame", icon_url=self.bot.user.avatar_url_as(static_format="png"))
 
+        if not users:
+            emb.description = "*Nothing to see here*"
+            return await ctx.reply(embed=emb, mention_author=False)
+
         count = 1
         for user in users:
             u = self.bot.get_user(user)
@@ -94,6 +98,8 @@ class Stats(commands.Cog):
             if u:
                 emb.description += f"**{count}.** `{str(u)}` - **{users[user]} {settings['emoji']}**\n"
                 count += 1
+
+        await ctx.reply(embed=emb, mention_author=False)
 
 def setup(bot):
     bot.add_cog(Stats(bot))

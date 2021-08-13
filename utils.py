@@ -11,14 +11,18 @@ async def success(ctx, message, colour=None):
     except: await ctx.send(embed=emb)
 
 async def get_settings(db, guild=None):
+    default = {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default), "spawn": config.bot.spawn, "spawnrate": config.bot.spawnrate}
     if not guild:
-        return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default), "spawn": config.bot.spawn, "spawnrate": config.bot.spawnrate}
+        return default
+
+    try: guild.id
+    except AttributeError: return default
 
     data = await (await db.execute("SELECT prefix, colour, timeout, emoji, spawn, spawnrate FROM settings WHERE guild=?", (guild,))).fetchone()
     if not data:
         await db.execute("INSERT INTO settings (guild, prefix, colour, timeout, spawn, spawnrate) VALUES (?, ?, ?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout, config.bot.spawn, config.bot.spawnrate))
         await db.commit()
-        return {"prefix": config.bot.prefix, "colour": config.bot.colour, "timeout": config.bot.timeout, "emoji": random.choice(config.emojis.default), "spawn": config.bot.spawn, "spawnrate": config.bot.spawnrate}
+        return default
 
     emoji = data[3] or random.choice(config.emojis.default)
     spawn = True if int(data[4]) == 1 else False
@@ -33,7 +37,7 @@ async def check_db(db):
     await db.execute("CREATE TABLE IF NOT EXISTS spawn (guild id, enabled id, spawn_perc id)")
     await db.execute("CREATE TABLE IF NOT EXISTS spawn_channels (channel id)")
     await db.execute("CREATE TABLE IF NOT EXISTS spawn_messages (guild id, channel id, message id, time text, emoji text)")
-    await db.execute("CREATE TABLE IF NOT EXISTS spawn_messages (user id, cookies id)")
+    await db.execute("CREATE TABLE IF NOT EXISTS halloffame (user id, cookies id)")
     await db.commit()
 
 async def countdown(message, embed):
@@ -75,7 +79,7 @@ async def check_other_users(user, message, embed):
     others = "\n".join([f"**{str(u)}**" for u in users if u.id != user.id and not u.bot])
 
     if len(others) >= 1:
-        embed.description += f"\n__Other players:__\n\n>>> {others}"
+        embed.description += f"\n\n__Other players:__\n>>> {others}"
         await msg.edit(embed=embed)
 
 async def get_users(db, guild):
@@ -220,4 +224,4 @@ async def halloffame(db):
     data = await (await db.execute("SELECT * FROM halloffame")).fetchall()
     if len(data) == 0:
         return None
-    return {int(user[0]): int(user[1]) for user in users}
+    return {int(user[0]): int(user[1]) for user in data}

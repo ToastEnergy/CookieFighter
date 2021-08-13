@@ -114,7 +114,7 @@ class Cookies(commands.Cog):
 
     @commands.command(aliases=["coin", "flip"])
     async def bet(self, ctx, cookies):
-        "Bet come cookies!"
+        "Bet some cookies!"
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         av_cookies = await utils.get_cookies(self.bot.db, ctx.author.id, ctx.guild.id)
@@ -122,7 +122,7 @@ class Cookies(commands.Cog):
         if not cookies.isdigit():
             return await utils.error(ctx, "Please specify a number")
 
-        cookies = int(cookies)
+        cookies = int(cookies) 
 
         if cookies <= 0:
             return await utils.error(ctx, "Please specify a number higher than `0`")
