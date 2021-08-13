@@ -33,6 +33,7 @@ async def check_db(db):
     await db.execute("CREATE TABLE IF NOT EXISTS spawn (guild id, enabled id, spawn_perc id)")
     await db.execute("CREATE TABLE IF NOT EXISTS spawn_channels (channel id)")
     await db.execute("CREATE TABLE IF NOT EXISTS spawn_messages (guild id, channel id, message id, time text, emoji text)")
+    await db.execute("CREATE TABLE IF NOT EXISTS spawn_messages (user id, cookies id)")
     await db.commit()
 
 async def countdown(message, embed):
@@ -214,3 +215,9 @@ def get_emoji(bot, emoji):
 
 def invite_url(id):
     return discord.utils.oauth_url(id, scopes=('bot',), permissions=discord.Permissions(permissions=280640))
+
+async def halloffame(db):
+    data = await (await db.execute("SELECT * FROM halloffame")).fetchall()
+    if len(data) == 0:
+        return None
+    return {int(user[0]): int(user[1]) for user in users}

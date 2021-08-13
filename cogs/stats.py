@@ -74,5 +74,26 @@ class Stats(commands.Cog):
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
+    @commands.command()
+    async def halloffame(self, ctx):
+        "The Cookie Fighter Hall of Fame, from the old version, when cookies were global"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        users = await utils.halloffame(self.bot.db)
+        emb = discord.Embed(description="", colour=settings["colour"])
+        emb.set_author(name="Hall of Fame", icon_url=self.bot.user.avatar_url_as(static_format="png"))
+
+        count = 1
+        for user in users:
+            u = self.bot.get_user(user)
+            if not u:
+                try:
+                    u = await self.bot.fetch_user(user)
+                except discord.errors.NotFound:
+                    pass
+            if u:
+                emb.description += f"**{count}.** `{str(u)}` - **{users[user]} {settings['emoji']}**\n"
+                count += 1
+
 def setup(bot):
     bot.add_cog(Stats(bot))
