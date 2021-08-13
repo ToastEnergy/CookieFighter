@@ -77,7 +77,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             emb = discord.Embed(description=f"```py\n{data}\n```", colour=settings["colour"])
             await ctx.send(embed = emb)
 
-        await db.commit()
+        await self.bot.db.commit()
         await ctx.message.add_reaction(config.emojis.check)
 
     @commands.command(name="add-cookies", aliases=["addcookies"])
