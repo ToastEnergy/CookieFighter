@@ -2,3 +2,4 @@ discord.py
 aiosqlite
 jishaku
 discord-components
+topggpy

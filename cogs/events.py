@@ -1,10 +1,25 @@
-import discord, utils, config, datetime
+import discord, utils, config, datetime, json
 from discord.ext import commands
 import discord_components as dc
 
 class Events(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        update_stats.start()
+
+    @tasks.loop(minutes=30)
+    async def update_stats(self):
+        """This function runs every 30 minutes to automatically update your server count."""
+        try:
+            headers = {"Content-Type": "application/json", "Authorization": config.tokens.discordbotsgg}
+            await self.bot.session.post(f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats", headers=headers, data=json.dumps({"guildCount": len(self.bot.guilds)}))
+            await self.bot.topggpy.post_guild_count()
+            print(f"Posted server count ({bot.topggpy.guild_count})")
+        except Exception as e:
+            print(f"Failed to post server count\n{e.class.name}: {e}")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
