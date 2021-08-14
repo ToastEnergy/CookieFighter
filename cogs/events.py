@@ -18,7 +18,7 @@ class Events(commands.Cog):
             headers = {"Content-Type": "application/json", "Authorization": config.tokens.discordbotsgg}
             await self.bot.session.post(f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats", headers=headers, data=json.dumps({"guildCount": len(self.bot.guilds)}))
             await self.bot.topggpy.post_guild_count()
-            print(f"Posted server count ({bot.topggpy.guild_count})")
+            print(f"Posted server count ({self.bot.topggpy.guild_count})")
         except Exception as e:
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 

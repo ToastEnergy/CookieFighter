@@ -10,6 +10,7 @@ class Spawn(commands.Cog):
     async def on_ready(self):
         await asyncio.sleep(0.1)
         self.spawn_loop.start()
+        self.bot.add_listener(self.on_message, 'on_message')
 
     @tasks.loop(seconds=10)
     async def spawn_loop(self):
@@ -49,7 +50,6 @@ class Spawn(commands.Cog):
             msg = await channel.fetch_message(payload.message_id)
             await msg.clear_reaction(payload.emoji)
 
-    @commands.Cog.listener()
     async def on_message(self, message):
         for word in ["spongebob", "sponge bob", "sponj bob", "sponjbob"]:
             if word in message.content.lower():
