@@ -1,4 +1,4 @@
-import discord, config, aiosqlite, utils, os, topgg, aiohttp
+import discord, config, aiosqlite, utils, os, topgg, aiohttp, datetime
 from discord.ext import commands
 import discord_components as dc
 
@@ -20,6 +20,8 @@ async def get_prefix(bot, message):
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=intents, case_insensitive=True)
+bot.owner_ids = config.bot.devs
+bot.launchtime = datetime.datetime.utcnow()
 bot.topggpy = topgg.DBLClient(bot, config.tokens.topgg)
 bot.load_extension("jishaku")
 bot.remove_command("help")

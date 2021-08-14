@@ -84,9 +84,9 @@ Command "{command}" not found
 
         emb.description = f"""```
 {config.bot.banner}```
-[Invite me]({utils.invite_url(self.bot.user.id)})
-[Support Server]({config.bot.support_server})
-Server Prefix: **{prefix}**
+• [Invite me]({utils.invite_url(self.bot.user.id)})
+• [Support Server]({config.bot.support_server})
+• Server Prefix: **{prefix}**
 
 {res}"""
         emb.set_footer(text=f"Need more help? Use \"{prefix}help <command>\".", icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))

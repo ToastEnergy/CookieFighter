@@ -129,7 +129,7 @@ class Events(commands.Cog):
                 errors.append(str(error))
             else:
                 emb = discord.Embed(description=f"{config.emojis.fail} | This bot doesn't work in DM", colour=discord.Colour.red())
-                await ctx.send(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=utils.invite_url(self.bot.user.id), emoji=utils.get_emoji(self.bot, config.emojis.zigzag))])
+                await ctx.send(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=utils.invite_url(self.bot.user.id), emoji=utils.get_emoji(self.bot, config.emojis.invite))])
 
         channel = self.bot.get_channel(config.bot.errors)
         time = round(datetime.datetime.timestamp(datetime.datetime.now()))

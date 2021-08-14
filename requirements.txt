@@ -3,3 +3,4 @@ aiosqlite
 jishaku
 discord-components
 topggpy
+psutil
