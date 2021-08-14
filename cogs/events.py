@@ -1,5 +1,5 @@
-import discord, utils, config, datetime, json
-from discord.ext import commands
+import discord, utils, config, datetime, json, asyncio
+from discord.ext import commands, tasks
 import discord_components as dc
 
 class Events(commands.Cog):
@@ -8,7 +8,8 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        update_stats.start()
+        await asyncio.sleep(0.1)
+        self.update_stats.start()
 
     @tasks.loop(minutes=30)
     async def update_stats(self):
@@ -19,7 +20,7 @@ class Events(commands.Cog):
             await self.bot.topggpy.post_guild_count()
             print(f"Posted server count ({bot.topggpy.guild_count})")
         except Exception as e:
-            print(f"Failed to post server count\n{e.class.name}: {e}")
+            print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
