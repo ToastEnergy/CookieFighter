@@ -51,10 +51,6 @@ class Spawn(commands.Cog):
             await msg.clear_reaction(payload.emoji)
 
     async def on_message(self, message):
-        for word in ["spongebob", "sponge bob", "sponj bob", "sponjbob"]:
-            if word in message.content.lower():
-                await message.reply("https://www.youtube.com/watch?v=68mb97t87y4")
-                break
 
         if not message.guild or message.author.bot:
             return
