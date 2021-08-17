@@ -155,7 +155,7 @@ class Cookies(commands.Cog):
         slashn = "\n"
 
         def check(i):
-            if i.message.id == msg.id and not i.user.bot and i.component.label == "Join":
+            if i.message.id == msg.id and not i.user.bot and i.component.label == "Join" and i.user not in members:
                 members.append(i.user)
                 new_emb = discord.Embed(title=emb.title, colour=emb.colour)
                 new_emb.add_field(name="• **__How does this work__**", value="> I'll chose a random emoji, you have to be fast to find the emoji and send it before the others", inline=False)
