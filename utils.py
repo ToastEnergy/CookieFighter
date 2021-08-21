@@ -15,9 +15,6 @@ async def get_settings(db, guild=None):
     if not guild:
         return default
 
-    try: guild.id
-    except AttributeError: return default
-
     data = await (await db.execute("SELECT prefix, colour, timeout, emoji, spawn, spawnrate FROM settings WHERE guild=?", (guild,))).fetchone()
     if not data:
         await db.execute("INSERT INTO settings (guild, prefix, colour, timeout, spawn, spawnrate) VALUES (?, ?, ?, ?, ?, ?)", (guild, config.bot.prefix, config.bot.colour, config.bot.timeout, config.bot.spawn, config.bot.spawnrate))
