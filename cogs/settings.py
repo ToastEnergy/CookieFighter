@@ -4,6 +4,7 @@ from discord.ext import commands
 class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.EmojiConverter = commands.EmojiConverter()
 
     @commands.command()
     @commands.guild_only()
@@ -21,7 +22,16 @@ class Settings(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     @commands.guild_only()
     async def edit_settings(self, ctx, option, value):
-        "Edit server settings"
+        """
+        Edit server settings, you can edit timeout, colour, emoji, spawn and spawnrate
+
+        timeout requires a number higher than 0
+        colour requires an hex value like #000000
+        emoji requires an emoji, an emoji name or an emoji id
+        spawn required enabled or disabled
+        spawnrate requires a percentage between 0 and 61
+
+        """
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         option = option.lower().replace("color", "colour").replace("spawn-rate", "spawnrate", )
@@ -64,11 +74,15 @@ class Settings(commands.Cog):
 
             try: await msg.add_reaction(value)
             except:
-                emb.colour = discord.Colour.red()
-                emb.description = f"{config.emojis.fail} | Invalid emoji!"
-                return await msg.edit(embed=emb)
+                try: emoji = await self.EmojiConverter.convert(ctx, value)
+                except commands.errors.EmojiNotFound:
+                    emb.colour = discord.Colour.red()
+                    emb.description = f"{config.emojis.fail} | Invalid emoji!"
+                    return await msg.edit(embed=emb)
+                value = str(emoji)
 
-            await msg.remove_reaction(value, ctx.guild.me)
+            try: await msg.remove_reaction(value, ctx.guild.me)
+            except commands.errors.CommandInvokeError: pass
             await self.bot.db.execute(f"UPDATE settings SET {option}=? WHERE guild=?", (value, ctx.guild.id))
             await self.bot.db.commit()
             settings = await utils.get_settings(self.bot.db, ctx.guild.id)
