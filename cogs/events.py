@@ -109,7 +109,7 @@ class Events(commands.Cog):
             retry_after = utils.get_time(round(error.retry_after))
             errors.append(f"You can use this command in {retry_after}")
         elif isinstance(error, commands.MaxConcurrencyReached):
-            errors.append("This command is being used too many times")
+            errors.append("This command is being used by someone else")
         elif isinstance(error, commands.ExtensionError):
             if isinstance(error, commands.ExtensionAlreadyLoaded):
                 errors.append("Extension is already loaded")
@@ -148,7 +148,7 @@ class Events(commands.Cog):
         await channel.send(embed=emb)
 
         if len(errors) != 0:
-            await utils.error(ctx, "\n".join(errors))
+            await utils.error(ctx, "\n".join(errors), delete_after=10)
 
     @commands.Cog.listener()
     async def on_command(self, ctx):

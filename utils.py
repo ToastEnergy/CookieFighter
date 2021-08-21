@@ -1,9 +1,9 @@
 import discord, config, random, asyncio, datetime
 
-async def error(ctx, message):
+async def error(ctx, message, delete_after=None):
     emb = discord.Embed(description=f"{config.emojis.fail} | {message}", colour=discord.Colour.red())
-    try: await ctx.reply(embed=emb, mention_author=False)
-    except: await ctx.send(embed=emb)
+    try: await ctx.reply(embed=emb, delete_after=delete_after, mention_author=False)
+    except: await ctx.send(embed=emb, delete_after=delete_after)
 
 async def success(ctx, message, colour=None):
     emb = discord.Embed(description=f"{config.emojis.check} | {message}", colour=colour or discord.Colour.green())

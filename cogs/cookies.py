@@ -7,7 +7,7 @@ class Cookies(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["c"])
-    @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.guild)
     async def cookie(self, ctx):
         "Catch the cookie!"
 
@@ -44,7 +44,7 @@ class Cookies(commands.Cog):
         except: pass
 
     @commands.command(aliases=["m"])
-    @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.guild)
     async def milk(self, ctx):
         "Drink the milk!"
 
@@ -81,6 +81,7 @@ class Cookies(commands.Cog):
         except: pass
 
     @commands.command(name="type", aliases=["t"])
+    @commands.max_concurrency(1, commands.BucketType.guild)
     async def type_(self, ctx):
         "Send the cookie!"
 
@@ -122,7 +123,7 @@ class Cookies(commands.Cog):
         if not cookies.isdigit():
             return await utils.error(ctx, "Please specify a number")
 
-        cookies = int(cookies) 
+        cookies = int(cookies)
 
         if cookies <= 0:
             return await utils.error(ctx, "Please specify a number higher than `0`")
@@ -140,6 +141,7 @@ class Cookies(commands.Cog):
 
         await ctx.reply(embed=emb, mention_author=False)
 
+    @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.command()
     async def party(self, ctx):
         "Who's ready to party?"
