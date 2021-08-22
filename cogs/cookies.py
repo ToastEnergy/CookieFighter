@@ -237,6 +237,9 @@ class Cookies(commands.Cog):
 
         cookies = int(cookies)
 
+        if cookies > 9223372036854775807:
+            return await utils.error(ctx, "You can't add more than `9223372036854775807` at time")
+
         if cookies <= 0:
             return await utils.error(ctx, 'Please specify a number higher than `0`')
 
