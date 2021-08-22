@@ -225,5 +225,39 @@ class Cookies(commands.Cog):
 
         await utils.success(ctx, f"Transfered `{cookies}` {'cookie' if cookies == 1 else 'cookies'} from {ctx.author.mention} to {member.mention}")
 
+    @commands.command(name="add-cookies", aliases=["addcookies"])
+    @commands.has_permissions(manage_guild=True)
+    async def add_cookies(self, ctx, member: discord.Member, cookies):
+        "Add cookies to a member"
+
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+
+        if not cookies.isdigit():
+            return await utils.error(ctx, 'Please specify a number')
+
+        cookies = int(cookies)
+
+        if cookies <= 0:
+            return await utils.error(ctx, 'Please specify a number higher than `0`')
+
+        await utils.add_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
+        await ctx.message.add_reaction(config.emojis.check)
+
+    @commands.command(name="remove-cookies", aliases=["removecookies"])
+    @commands.has_permissions(manage_guild=True)
+    async def remove_cookies(self, ctx, member: discord.Member, cookies):
+        "Remove cookies from a member"
+
+        if not cookies.isdigit():
+            return await utils.error(ctx, 'Please specify a number')
+
+        cookies = int(cookies)
+
+        if cookies <= 0:
+            return await utils.error(ctx, 'Please specify a number higher than `0`')
+
+        await utils.remove_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
+        await ctx.message.add_reaction(config.emojis.check)
+
 def setup(bot):
     bot.add_cog(Cookies(bot))

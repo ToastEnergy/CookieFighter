@@ -9,31 +9,32 @@ class Stats(commands.Cog):
     async def leaderboard(self, ctx):
         "Who's the best?"
 
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        users = await utils.get_users(self.bot.db, ctx.guild.id)
+        async with ctx.typing():
+            settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+            users = await utils.get_users(self.bot.db, ctx.guild.id)
 
-        emb = discord.Embed(description="", colour=settings["colour"])
-        emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png", size=1024)))
+            emb = discord.Embed(description="", colour=settings["colour"])
+            emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png", size=1024)))
 
-        if not users:
-            emb.description = "*no one's here*"
+            if not users:
+                emb.description = "*no one's here*"
+                try: await ctx.reply(embed=emb, mention_author=False)
+                except: await ctx.send(embed=emb)
+                return
+
+            lb = sorted(users, key=lambda x : users[x], reverse=True)
+            count = 0
+            for x in lb:
+                count += 1
+                if count > 10:
+                    break
+                u = self.bot.get_user(x)
+                if not u:
+                    u = await self.bot.fetch_user(x)
+                emb.description += f"**{count}.** `{str(u)}` - **{users[x]}** {settings['emoji']}\n"
+
             try: await ctx.reply(embed=emb, mention_author=False)
             except: await ctx.send(embed=emb)
-            return
-
-        lb = sorted(users, key=lambda x : users[x], reverse=True)
-        count = 0
-        for x in lb:
-            count += 1
-            if count > 10:
-                break
-            u = self.bot.get_user(x)
-            if not u:
-                u = await self.bot.fetch_user(x)
-            emb.description += f"**{count}.** `{str(u)}` - **{users[x]}** {settings['emoji']}\n"
-
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
 
     @commands.command(aliases=["info", "stats", "stat", "bal", "balance", "me"])
     async def cookies(self, ctx, member: discord.Member=None):

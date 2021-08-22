@@ -14,9 +14,8 @@ class Shop(commands.Cog):
         except: await ctx.send(embed=emb)
 
     async def invalid_role_id(self, ctx):
-        emb = discord.Embed(description=f"{config.emojis.fail} | Invalid `role id`!", colour=discord.Colour.red())
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
+        emb = discord.Embed(description=f"{config.emojis.fail} | Invalid `role id`!\nYou can find the role ID before the role name in the `shop` command", colour=discord.Colour.red())
+        await ctx.reply(embed=emb, mention_author=False)
 
     @commands.command()
     async def shop(self, ctx):

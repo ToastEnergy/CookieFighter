@@ -80,37 +80,5 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         await self.bot.db.commit()
         await ctx.message.add_reaction(config.emojis.check)
 
-    @commands.command(name="add-cookies", aliases=["addcookies"])
-    @commands.is_owner()
-    async def add_cookies(self, ctx, member: discord.Member, cookies):
-        "Add cookies to a member"
-
-        if not cookies.isdigit():
-            return await utils.error(ctx, 'not a number')
-
-        cookies = int(cookies)
-
-        if cookies <= 0:
-            return await utils.error(ctx, 'not a number higher than `0`')
-
-        await utils.add_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
-        await ctx.message.add_reaction(config.emojis.check)
-
-    @commands.command(name="remove-cookies", aliases=["removecookies"])
-    @commands.is_owner()
-    async def remove_cookies(self, ctx, member: discord.Member, cookies):
-        "Remove cookies from a member"
-
-        if not cookies.isdigit():
-            return await utils.error(ctx, 'not a number')
-
-        cookies = int(cookies)
-
-        if cookies <= 0:
-            return await utils.error(ctx, 'not a number higher than `0`')
-
-        await utils.remove_cookies(self.bot.db, member.id, ctx.guild.id, cookies)
-        await ctx.message.add_reaction(config.emojis.check)
-
 def setup(bot):
     bot.add_cog(Owner(bot))
