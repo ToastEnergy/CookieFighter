@@ -36,16 +36,31 @@ class Stats(commands.Cog):
             try: await ctx.reply(embed=emb, mention_author=False)
             except: await ctx.send(embed=emb)
 
-    @commands.command(aliases=["info", "stats", "stat", "bal", "balance", "me"])
-    async def cookies(self, ctx, member: discord.Member=None):
-        "Get how many cookies a member has"
+    @commands.command(aliases=["info", "stats", "stat", "bal", "balance", "me", "cookies"])
+    async def profile(self, ctx, member: discord.Member=None):
+        "Check a user profile"
 
         member = member or ctx.author
 
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         cookies = await utils.get_cookies(self.bot.db, member.id, ctx.guild.id)
-        emb = discord.Embed(description=f"**{cookies}** Cookies {settings['emoji']}", colour=settings['colour'])
+        badges = await utils.get_badges(self.bot, member.id)
+
+        emb = discord.Embed(description=f"{' '.join(badges)}\n\n**{cookies}** Cookies {settings['emoji']}", colour=settings['colour'])
         emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png", size=1024)))
+        await ctx.reply(embed=emb, mention_author=False)
+
+    @commands.command(aliases=["badge"])
+    async def badges(self, ctx, member: discord.Member=None):
+        "Check badges"
+
+        member = member or ctx.author
+        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        badges = await utils.get_badges(self.bot, member.id)
+        emb = discord.Embed(colour=settings['colour'])
+        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png")))
+        emb.add_field(name="Unlocked", value=' '.join(badges), inline=False)
+        emb.add_field(name="All", value='\n'.join([f"{config.emojis.badges[badge]['emoji']} - {config.emojis.badges[badge]['description']}" for badge in config.emojis.badges]), inline=False)
         await ctx.reply(embed=emb, mention_author=False)
 
     @commands.command(name="reset-leaderboard", aliases=["resetleaderboard"])

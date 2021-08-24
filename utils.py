@@ -222,3 +222,13 @@ async def halloffame(db):
     if len(data) == 0:
         return None
     return {int(user[0]): int(user[1]) for user in data}
+
+async def get_badges(bot, user):
+    badges = list()
+    guild = bot.get_guild(config.bot.guild)
+    member = guild.get_member(user)
+    if not member:
+        try: member = await guild.fetch_member(user)
+        except discord.errors.NotFound: pass
+    if member: badges.append(config.emojis.badges['guild']['emoji'])
+    return badges
