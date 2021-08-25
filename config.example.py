@@ -18,6 +18,7 @@ class bot:
     guild = 1234
     logs = 1234
     errors = 1234
+    guilds_logs = 1234
     countdown = [
 """
        ██████╗
