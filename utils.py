@@ -208,7 +208,7 @@ async def is_ignored(db, channel):
 
 async def send_embed(ctx, embed):
     try: msg = await ctx.reply(embed=embed, mention_author=False)
-    except: msg = await ctx.send(embed=embed, components=components)
+    except: msg = await ctx.send(embed=embed)
     return msg
 
 def get_emoji(bot, emoji):
