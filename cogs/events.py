@@ -130,9 +130,16 @@ class Events(commands.Cog):
             else:
                 emb = discord.Embed(description=f"{config.emojis.fail} | This bot doesn't work in DM", colour=discord.Colour.red())
                 await ctx.send(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=utils.invite_url(self.bot.user.id), emoji=utils.get_emoji(self.bot, config.emojis.invite))])
+        else:
+            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+               await utils.error(ctx, "\n".join(errors), delete_after=10)
+            else:
+                slashn = "\n"
+                await ctx.reply(f"**I don't have the embed links permissions to send embed messages!**\n\n{slashn.join(errors)}")
 
         channel = self.bot.get_channel(config.bot.errors)
         time = round(datetime.datetime.timestamp(datetime.datetime.now()))
+        
         emb = discord.Embed(colour=discord.Colour.red())
         emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
         emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
@@ -146,9 +153,6 @@ class Events(commands.Cog):
         emb.add_field(name="Error", value=f"```py\n{str(error)}\n```")
         emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
         await channel.send(embed=emb)
-
-        if len(errors) != 0:
-            await utils.error(ctx, "\n".join(errors), delete_after=10)
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
