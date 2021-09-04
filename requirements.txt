@@ -1,6 +1,6 @@
 discord.py
 aiosqlite
 jishaku
-discord-components=1.0.0
+discord-components==1.0.0
 topggpy
 psutil
