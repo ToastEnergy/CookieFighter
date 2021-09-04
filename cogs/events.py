@@ -135,7 +135,7 @@ class Events(commands.Cog):
                await utils.error(ctx, "\n".join(errors), delete_after=10)
             else:
                 slashn = "\n"
-                await ctx.reply(f"**I don't have the embed links permissions to send embed messages!**\n\n{slashn.join(errors)}")
+                await ctx.reply(f"**I don't have the embed links permissions to send embed messages!**\n\n{slashn.join(errors)}", mention_author=False)
 
         channel = self.bot.get_channel(config.bot.errors)
         time = round(datetime.datetime.timestamp(datetime.datetime.now()))
