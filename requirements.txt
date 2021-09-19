@@ -1,6 +1,5 @@
-discord.py
+git+https://github.com/iDevision/enhanced-discord.py#egg=discord.py
 aiosqlite
 jishaku
-discord-components==1.0.0
 topggpy
 psutil

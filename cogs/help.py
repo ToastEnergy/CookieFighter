@@ -15,8 +15,8 @@ class Help(commands.Cog):
             settings = await utils.get_settings(self.bot.db)
         prefix = settings['prefix']
         emb = discord.Embed(colour=settings['colour'])
-        emb.set_author(name=self.bot.user.name, icon_url=str(self.bot.user.avatar_url_as(static_format="png", size=1024)))
-        emb.set_footer(text=ctx.author, icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        emb.set_author(name=self.bot.user.name, icon_url=str(self.bot.user.avatar.replace(static_format="png", size=1024)))
+        emb.set_footer(text=ctx.author, icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
         error = discord.Embed(description=f"""```sh
 Command "{command}" not found
 ```""", colour=settings['colour'])
@@ -89,7 +89,7 @@ Command "{command}" not found
 • Server Prefix: **{prefix}**
 
 {res}"""
-        emb.set_footer(text=f"Need more help? Use \"{prefix}help <command>\".", icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        emb.set_footer(text=f"Need more help? Use \"{prefix}help <command>\".", icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
         await utils.send_embed(ctx, embed=emb)
 
 def setup(bot):

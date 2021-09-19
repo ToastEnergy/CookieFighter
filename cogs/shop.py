@@ -167,7 +167,7 @@ class Shop(commands.Cog):
         inv = await utils.get_inventory(self.bot.db, member.id, ctx.guild.id)
 
         emb = discord.Embed(colour=settings["colour"])
-        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png", size=1024)))
+        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png", size=1024)))
 
         if not inv:
             emb.description = "*Nothing to see here...*"

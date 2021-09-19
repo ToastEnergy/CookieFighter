@@ -14,7 +14,7 @@ class Stats(commands.Cog):
             users = await utils.get_users(self.bot.db, ctx.guild.id)
 
             emb = discord.Embed(description="", colour=settings["colour"])
-            emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon_url_as(static_format="png", size=1024)))
+            emb.set_author(name=f"{ctx.guild.name}'s Leaderboard", icon_url=str(ctx.guild.icon.replace(static_format="png", size=1024)))
 
             if not users:
                 emb.description = "*no one's here*"
@@ -47,7 +47,7 @@ class Stats(commands.Cog):
         badges = await utils.get_badges(self.bot, member.id)
 
         emb = discord.Embed(description=f"{' '.join(badges)}\n\n**{cookies}** Cookies {settings['emoji']}", colour=settings['colour'])
-        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png", size=1024)))
+        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png", size=1024)))
         await ctx.reply(embed=emb, mention_author=False)
 
     @commands.command(aliases=["badge"])
@@ -58,7 +58,7 @@ class Stats(commands.Cog):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         badges = await utils.get_badges(self.bot, member.id)
         emb = discord.Embed(colour=settings['colour'])
-        emb.set_author(name=str(member), icon_url=str(member.avatar_url_as(static_format="png")))
+        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png")))
         emb.add_field(name="Unlocked", value=' '.join(badges), inline=False)
         emb.add_field(name="All", value='\n'.join([f"{config.emojis.badges[badge]['emoji']} - {config.emojis.badges[badge]['description']}" for badge in config.emojis.badges]), inline=False)
         await ctx.reply(embed=emb, mention_author=False)
@@ -97,7 +97,7 @@ class Stats(commands.Cog):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         users = await utils.halloffame(self.bot.db)
         emb = discord.Embed(description="", colour=settings["colour"])
-        emb.set_author(name="Hall of Fame", icon_url=self.bot.user.avatar_url_as(static_format="png"))
+        emb.set_author(name="Hall of Fame", icon_url=self.bot.user.avatar.replace(static_format="png"))
 
         if not users:
             emb.description = "*Nothing to see here*"

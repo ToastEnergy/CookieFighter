@@ -1,6 +1,5 @@
 import discord, config, aiosqlite, utils, os, topgg, aiohttp, datetime
 from discord.ext import commands
-import discord_components as dc
 
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
@@ -18,8 +17,7 @@ async def get_prefix(bot, message):
       prefix = commands.when_mentioned_or(f"{config.bot.prefix} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]}" ,config.bot.prefix)(bot, message)
   return prefix
 
-intents = discord.Intents.default()
-bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=intents, case_insensitive=True)
+bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=discord.Intents(guilds=True, messages=True), case_insensitive=True)
 bot.owner_ids = config.bot.devs
 bot.launchtime = datetime.datetime.utcnow()
 bot.topggpy = topgg.DBLClient(bot, config.tokens.topgg)
@@ -28,7 +26,6 @@ bot.remove_command("help")
 
 @bot.event
 async def on_ready():
-    dc.DiscordComponents(bot)
     bot.db = await aiosqlite.connect("db.db")
     bot.session = aiohttp.ClientSession()
     await utils.check_db(bot.db)

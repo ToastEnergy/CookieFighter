@@ -1,6 +1,5 @@
 import discord, utils, time, config, random, psutil, datetime
 from discord.ext import commands
-import discord_components as dc
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -60,7 +59,11 @@ discord.py: {library}
 CPU: {cpu}%
 Memory: {memory}%```""")
 
-            await ctx.reply(embed=emb, mention_author=False, components=[[dc.Button(style=dc.ButtonStyle.URL, url=invite_url, label='Invite Me', emoji=utils.get_emoji(self.bot, config.emojis.invite)), dc.Button(style=dc.ButtonStyle.URL, url=f"https://top.gg/bot/{self.bot.user.id}/vote", label='Vote me', emoji=utils.get_emoji(self.bot, config.emojis.upvote)),  dc.Button(style=dc.ButtonStyle.URL, url=config.bot.support_server, label='Support Server', emoji=utils.get_emoji(self.bot, config.emojis.support))]])
+            view = discord.ui.View()
+            view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, url=invite_url, label='Invite Me', emoji=config.emojis.invite))
+            view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, url=f"https://top.gg/bot/{self.bot.user.id}/vote", label='Vote Me', emoji=config.emojis.upvote))
+            view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, url=config.bot.support_server, label='Support Server', emoji=config.emojis.support))
+            await ctx.reply(embed=emb, mention_author=False, view=view)
 
     @commands.command(aliases = ["ut"])
     async def uptime(self, ctx):

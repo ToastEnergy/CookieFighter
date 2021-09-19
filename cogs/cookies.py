@@ -1,6 +1,37 @@
 import discord, config, utils, asyncio, time, random
 from discord.ext import commands
-import discord_components as dc
+
+class PartyView(discord.ui.View):
+    def __init__(self, ctx, embed):
+        self.ctx = ctx
+        self.embed = embed
+        self.users = list()
+        super().__init__(timeout=10)
+
+    async def interaction_check(self, interaction):
+        if interaction.user.bot:
+            await interaction.response.send_message("this isn't for u", ephemeral=True)
+            return False
+        return True
+
+    async def update_embed(self, interaction):
+        slashn = "\n"
+        new_emb = discord.Embed(title=self.embed.title, colour=self.embed.colour)
+        new_emb.add_field(name="• **__How does this work__**", value="> I'll chose a random emoji, you have to be fast to find the emoji and send it before the others", inline=False)
+        new_emb.add_field(name="• **__Joined Members__**", value=f"> • {f'{slashn}> • '.join([f'**{str(u)}**' for u in self.users]) if len(self.users) > 0 else '''*No one's here...*'''}", inline=False)
+        new_emb.set_footer(text="Party will start in 10 seconds")
+
+        await interaction.response.edit_message(content=None, embed=new_emb)
+
+    @discord.ui.button(label="Join", style=discord.ButtonStyle.blurple, emoji=config.emojis.check)
+    async def join(self, button: discord.ui.Button, interaction: discord.Interaction):
+
+        if interaction.user in self.users:
+            self.users.remove(interaction.user)
+        else:
+            self.users.append(interaction.user)
+
+        await self.update_embed(interaction)
 
 class Cookies(commands.Cog):
     def __init__(self, bot):
@@ -19,6 +50,8 @@ class Cookies(commands.Cog):
         await utils.countdown(msg, emb)
 
         def check(reaction, user):
+            print(str(reaction.emoji))
+            print(settings['emoji'])
             return str(reaction.emoji) == settings["emoji"] and not user.bot
 
         emb = discord.Embed(description = f"First to **catch** the cookie {settings['emoji']} wins!", colour=settings['colour'])
@@ -151,39 +184,26 @@ class Cookies(commands.Cog):
         emb.add_field(name="• **__How does this work__**", value="> I'll chose a random emoji, you have to be fast to find the emoji and send it before the others", inline=False)
         emb.add_field(name="• **__Joined Members__**", value="> *No one joined yet, use the button below to join*", inline=False)
         emb.set_footer(text="Party will start in 10 seconds")
-        components = [dc.Button(label="Join", style=dc.ButtonStyle.blue, emoji=utils.get_emoji(self.bot, config.emojis.check))]
-        msg = await ctx.reply(embed=emb, components=components, mention_author=False)
-        members = list()
-        slashn = "\n"
+        
+        view = PartyView(ctx=ctx, embed=emb)
+        msg = await ctx.reply(embed=emb, view=view, mention_author=False)
 
-        def check(i):
-            if i.message.id == msg.id and not i.user.bot and i.component.label == "Join" and i.user not in members:
-                members.append(i.user)
-                new_emb = discord.Embed(title=emb.title, colour=emb.colour)
-                new_emb.add_field(name="• **__How does this work__**", value="> I'll chose a random emoji, you have to be fast to find the emoji and send it before the others", inline=False)
-                new_emb.add_field(name="• **__Joined Members__**", value=f"> • {f'{slashn}> • '.join([f'**{str(m)}**' for m in members])}", inline=False)
-                new_emb.set_footer(text="Party will start in 10 seconds")
-                self.bot.loop.create_task(msg.edit(embed=new_emb, content=None, components=components))
-                self.bot.loop.create_task(i.respond(embed=discord.Embed(description=f"{config.emojis.check} | You joined the party", colour=settings['colour'])))
-            return False
+        await asyncio.sleep(10)
 
-        try: interaction = await self.bot.wait_for("button_click", check=check, timeout=10)
-        except asyncio.TimeoutError: pass
-
-        if len(members) == 0:
+        if len(view.users) == 0:
             emb = discord.Embed(description="*No one joined the party*", colour=settings['colour'])
-            return await msg.edit(embed=emb, components=[])
+            return await msg.edit(embed=emb, view=None)
 
-        elif len(members) == 1:
+        elif len(view.users) == 1:
             emb = discord.Embed(description="The party can't start with `1` member", colour=settings['colour'])
-            return await msg.edit(embed=emb, components=[])
+            return await msg.edit(embed=emb, view=None)
 
         emoji = random.choice(config.emojis.discord)
         emb = discord.Embed(title=emb.title, description=f"First one to send the emoji {emoji} wins", colour=emb.colour)
-        await msg.edit(content=None, embed=emb, components=[])
+        await msg.edit(content=None, embed=emb, view=None)
 
         def check_message(m):
-            return m.author.id in [m_.id for m_ in members] and m.content.lower() == emoji
+            return m.author.id in [m_.id for m_ in view.users] and m.content.lower() == emoji
 
         start = time.perf_counter()
         try: message = await self.bot.wait_for("message", check=check_message, timeout=settings['timeout'])
@@ -197,7 +217,7 @@ class Cookies(commands.Cog):
         await message.add_reaction(config.emojis.tada)
         await utils.add_cookie(self.bot.db, message.author.id, ctx.guild.id, duration, 'party')
         emb.description = f"**{str(message.author)}** won in `{duration:.2f}` seconds!"
-        await msg.edit(content=None, embed=emb, components=[])
+        await msg.edit(content=None, embed=emb, view=None)
 
     @commands.command(aliases=["send", "pay"])
     async def gift(self, ctx, member: discord.Member, cookies):

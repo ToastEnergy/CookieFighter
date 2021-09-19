@@ -1,6 +1,5 @@
 import discord, utils, config, datetime, json, asyncio
 from discord.ext import commands, tasks
-import discord_components as dc
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -65,7 +64,7 @@ class Events(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             return
         elif isinstance(error, commands.DisabledCommand):
-            erros.append("This command is currently disabled")
+            errors.append("This command is currently disabled")
         elif isinstance(error, commands.CommandInvokeError):
             pass
         elif isinstance(error, commands.UserInputError):
@@ -146,12 +145,12 @@ class Events(commands.Cog):
         if ctx.guild:
             emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
             emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
-            emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
+            emb.set_thumbnail(url=ctx.guild.icon.replace(static_format="png", size=1024))
         else:
             emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
         emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
         emb.add_field(name="Error", value=f"```py\n{str(error)}\n```")
-        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
         await channel.send(embed=emb)
 
     @commands.Cog.listener()
@@ -167,11 +166,11 @@ class Events(commands.Cog):
         if ctx.guild:
             emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
             emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
-            emb.set_thumbnail(url=ctx.guild.icon_url_as(static_format="png", size=1024))
+            emb.set_thumbnail(url=ctx.guild.icon.replace(static_format="png", size=1024))
         else:
             emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
         emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
-        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url_as(static_format="png", size=1024)))
+        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
         await channel.send(embed=emb)
 
     @commands.Cog.listener()
@@ -179,8 +178,8 @@ class Events(commands.Cog):
         channel = self.bot.get_channel(config.bot.guilds_logs)
         owner = await self.bot.fetch_user(guild.owner_id)
         emb = discord.Embed(title="New Server", colour=discord.Colour.green())
-        emb.set_author(name=guild.name, icon_url=str(guild.icon_url_as(static_format="png")))
-        emb.set_thumbnail(url=str(guild.icon_url_as(static_format="png")))
+        emb.set_author(name=guild.name, icon_url=str(guild.icon.replace(static_format="png")))
+        emb.set_thumbnail(url=str(guild.icon.replace(static_format="png")))
         emb.add_field(name="ID", value=f"`{guild.id}`")
         emb.add_field(name="Members", value=guild.member_count)
         emb.add_field(name="Owner", value=f"`{str(owner)}` (`{owner.id}`)", inline=False)
@@ -192,8 +191,8 @@ class Events(commands.Cog):
     async def on_guild_remove(self, guild):
         channel = self.bot.get_channel(config.bot.guilds_logs)
         emb = discord.Embed(title="Adios", colour=discord.Colour.red())
-        emb.set_author(name=guild.name, icon_url=str(guild.icon_url_as(static_format="png")))
-        emb.set_thumbnail(url=str(guild.icon_url_as(static_format="png")))
+        emb.set_author(name=guild.name, icon_url=str(guild.icon.replace(static_format="png")))
+        emb.set_thumbnail(url=str(guild.icon.replace(static_format="png")))
         emb.add_field(name="ID", value=f"`{guild.id}`")
         emb.add_field(name="Members", value=guild.member_count)
         emb.add_field(name="Owner", value=f"`{guild.owner_id}`", inline=False)

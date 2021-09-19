@@ -14,7 +14,7 @@ class Settings(commands.Cog):
         settings = await utils.get_settings(self.bot.db, ctx.guild.id)
         emoji = settings["emoji"] if settings["emoji"] not in config.emojis.default else " / ".join(config.emojis.default)
         emb = discord.Embed(description=f"• **Emoji:** {emoji}\n• **Colour:** `{str(discord.Colour(settings['colour']))}`\n• **Timeout:** `{settings['timeout']}`\n• **Spawn:** `{'enabled' if settings['spawn'] else 'disabled'}`\n• **Spawn Rate:** `{settings['spawnrate']}%`", colour=settings["colour"])
-        emb.set_author(name=f"{ctx.guild.name} settings", icon_url=str(ctx.guild.icon_url_as(static_format="png")))
+        emb.set_author(name=f"{ctx.guild.name} settings", icon_url=str(ctx.guild.icon.replace(static_format="png")))
         try: await ctx.reply(embed=emb, mention_author=False)
         except: await ctx.send(embed=emb)
 
