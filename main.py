@@ -17,7 +17,7 @@ async def get_prefix(bot, message):
       prefix = commands.when_mentioned_or(f"{config.bot.prefix} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]}" ,config.bot.prefix)(bot, message)
   return prefix
 
-bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=discord.Intents(guilds=True, messages=True), case_insensitive=True)
+bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=discord.Intents(guilds=True, messages=True, reactions=True), case_insensitive=True)
 bot.owner_ids = config.bot.devs
 bot.launchtime = datetime.datetime.utcnow()
 bot.topggpy = topgg.DBLClient(bot, config.tokens.topgg)
