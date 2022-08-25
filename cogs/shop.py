@@ -4,7 +4,7 @@ import config
 from discord.ext import commands
 from discord import app_commands
 
-
+@app_commands.guild_only()
 class Shop(commands.GroupCog, name="shop"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -39,7 +39,7 @@ class Shop(commands.GroupCog, name="shop"):
             cookies = user_cookies_query['cookies']
 
         emb = discord.Embed(
-            title="Cookies Shop!", description=f"__Your cookies:__ `{cookies}` {config.emojis.cookie}\n\nUse `/buy <item number>` to buy something.\n\n", colour=config.colour)
+            title="Cookies Shop!", description=f"__Your cookies:__ `{cookies}` {config.emojis.cookie}\n\nUse `/shop buy <item number>` to buy something.\n\n", colour=config.colour)
         count = 0
         for role in roles:
             count += 1
@@ -49,7 +49,7 @@ class Shop(commands.GroupCog, name="shop"):
 
     @app_commands.command(name="add")
     @app_commands.guild_only()
-    @app_commands.default_permissions(manage_guild=True)
+    @app_commands.checks.has_permissions(manage_messages=True)
     async def add_item(self, interaction: discord.Interaction, role: discord.Role, cookies: int):
         "Add an item to the shop"
 
@@ -66,7 +66,7 @@ class Shop(commands.GroupCog, name="shop"):
 
     @app_commands.command(name="remove")
     @app_commands.guild_only()
-    @app_commands.default_permissions(manage_guild=True)
+    @app_commands.checks.has_permissions(manage_messages=True)
     async def remove_item(self, interaction: discord.Interaction, role: discord.Role):
         "Remove an item from the shop"
 

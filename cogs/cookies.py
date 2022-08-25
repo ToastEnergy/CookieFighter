@@ -14,15 +14,20 @@ class Cookies(commands.Cog):
     async def cookie(self, interaction: discord.Interaction) -> None:
         "Catch the cookie!"
 
-        await interaction.response.send_message('catch the cookie in: 3')
+        emb = discord.Embed(description="Catch the cookie in: **3**", color=config.colour)
+
+        await interaction.response.send_message(embed=emb)
         msg = await interaction.original_response()
 
         await asyncio.sleep(1)
         for x in range(2):
-            await msg.edit(content=f'catch the cookie in: {2 - x}')
+            emb.description = f'Catch the cookie in: **{2 - x}**'
+            await msg.edit(content=None, embed=emb)
             await asyncio.sleep(1)
 
-        await msg.edit(content=f'catch the cookie!')
+        emb.description = "Catch the cookie!"
+
+        await msg.edit(content=None, embed=emb)
         await msg.add_reaction(config.emojis.cookie)
 
         def check(reaction, user):
@@ -31,7 +36,9 @@ class Cookies(commands.Cog):
         try:
             _, user = await self.bot.wait_for('reaction_add', check=check, timeout=10)
         except asyncio.TimeoutError:
-            await msg.edit(content="you're all losers")
+            emb.description = "you're all losers!"
+            await msg.edit(content=None, embed=emb)
+
             if interaction.channel.permissions_for(interaction.guild.me).manage_messages:
                 await msg.clear_reactions()
             else:
@@ -44,7 +51,8 @@ class Cookies(commands.Cog):
             await msg.remove_reaction(config.emojis.cookie, self.bot.user)
 
         data = await self.bot.db.fetchrow("INSERT INTO cookies (guild_id, user_id, cookies) VALUES ($1, $2, 1) ON CONFLICT (guild_id, user_id) DO UPDATE SET cookies = cookies.cookies + 1 RETURNING cookies", interaction.guild.id, user.id)
-        await msg.edit(content=f"{user.mention} won, they now have a total of {data['cookies']} cookies")
+        emb.description = f"{user.mention} won, they now have a total of `{data['cookies']}` {'cookie' if data['cookies'] == 1 else 'cookies'} {config.emojis.cookie}"
+        await msg.edit(content=None, embed=emb)
 
     @app_commands.command(name="leaderboard")
     @app_commands.guild_only()
