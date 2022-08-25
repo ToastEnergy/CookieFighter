@@ -1,5 +1,4 @@
-git+https://github.com/iDevision/enhanced-discord.py#egg=discord.py
-aiosqlite
+git+https://github.com/Rapptz/discord.py
 jishaku
+asyncpg
 topggpy
-psutil

@@ -1,46 +1,43 @@
-import discord, config, aiosqlite, utils, os, topgg, aiohttp, datetime
+import discord
+import os
+import asyncpg
+import aiohttp
+import config
+import topgg
 from discord.ext import commands
+from discord import app_commands
 
-os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
-os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
-os.environ["JISHAKU_HIDE"] = "True"
+os.environ['JISHAKU_NO_UNDERSCORE'] = 'true'
+os.environ["JISHAKU_NO_DM_TRACEBACK"] = 'true'
+os.environ["JISHAKU_HIDE"] = 'true'
 
-async def get_prefix(bot, message):
-  if message.guild is None:
-    prefix = commands.when_mentioned_or(f"{config.bot.prefix} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]}" ,config.bot.prefix)(bot, message)
-  else:
-    data = await (await bot.db.execute("SELECT prefix FROM settings WHERE guild=?", (message.guild.id,))).fetchone()
-    if data:
-      new_prefix = str(data[0])
-      prefix = commands.when_mentioned_or(f"{new_prefix} ",  f"{new_prefix[0].upper()}{new_prefix[1:]} ",  f"{new_prefix[0].upper()}{new_prefix[1:]}" , new_prefix)(bot, message)
-    else:
-      prefix = commands.when_mentioned_or(f"{config.bot.prefix} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]} ",  f"{config.bot.prefix[0].upper()}{config.bot.prefix[1:]}" ,config.bot.prefix)(bot, message)
-  return prefix
+intents = discord.Intents.default()
 
-bot = commands.Bot(command_prefix=None, description=config.bot.description, intents=discord.Intents(guilds=True, messages=True, reactions=True), case_insensitive=True)
-bot.owner_ids = config.bot.devs
-bot.launchtime = datetime.datetime.utcnow()
-bot.topggpy = topgg.DBLClient(bot, config.tokens.topgg)
-bot.load_extension("jishaku")
-bot.remove_command("help")
+class CookieFighter(commands.Bot):
+    def __init__(self):
+        super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
-@bot.event
-async def on_ready():
-    bot.db = await aiosqlite.connect("db.db")
-    bot.session = aiohttp.ClientSession()
-    await utils.check_db(bot.db)
-    bot.command_prefix=get_prefix
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{config.bot.prefix}help"), status=discord.Status.idle)
-    print("ready as", bot.user)
+    async def setup_hook(self):
+        self.db = await asyncpg.create_pool(config.POSTGRES_URL)
+        await self.db.execute("""
+        CREATE TABLE IF NOT EXISTS cookies (guild_id BIGINT, user_id BIGINT, cookies BIGINT NOT NULL DEFAULT 0, PRIMARY KEY(guild_id, user_id));
+        CREATE TABLE IF NOT EXISTS shop (guild_id BIGINT, role_id BIGINT, cookies BIGINT, PRIMARY KEY(guild_id, role_id));
+        CREATE TABLE IF NOT EXISTS inventory (guild_id BIGINT, user_id BIGINT, role_id BIGINT, PRIMARY KEY(guild_id, user_id, role_id));
+        """)
 
-@bot.check
-async def bot_check(ctx):
-    if not ctx.guild and ctx.command.name != "help":
-        return False
-    return True
+        self.session = aiohttp.ClientSession()
+        self.topggpy = topgg.DBLClient(bot, config.botlists.topgg)
 
-for file in os.listdir("./cogs"):
-    if file.endswith(".py"):
-        bot.load_extension(f"cogs.{file[:-3]}")
+        for cog in os.listdir("cogs"):
+            if cog.endswith(".py") and not cog.startswith("_"):
+                cog = f"cogs.{cog.replace('.py', '')}"
+                await self.load_extension(cog)
 
-bot.run(config.tokens.bot)
+    async def on_ready(self):
+        await self.load_extension('jishaku')
+        await self.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.listening, name="/cookie"))
+
+        print('Logged in as', self.user)
+
+bot = CookieFighter()
+bot.run(config.token)

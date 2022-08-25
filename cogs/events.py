@@ -1,4 +1,8 @@
-import discord, utils, config, datetime, json, asyncio
+import asyncio
+import json
+import datetime
+import config
+import discord
 from discord.ext import commands, tasks
 
 class Events(commands.Cog):
@@ -7,198 +11,17 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await asyncio.sleep(0.1)
         self.update_stats.start()
 
     @tasks.loop(minutes=30)
     async def update_stats(self):
-        """This function runs every 30 minutes to automatically update your server count."""
         try:
-            headers = {"Content-Type": "application/json", "Authorization": config.tokens.discordbotsgg}
+            headers = {"Content-Type": "application/json",
+                       "Authorization": config.botlists.discordbotsgg}
             await self.bot.session.post(f"https://discord.bots.gg/api/v1/bots/{self.bot.user.id}/stats", headers=headers, data=json.dumps({"guildCount": len(self.bot.guilds)}))
             await self.bot.topggpy.post_guild_count()
-            print(f"Posted server count ({self.bot.topggpy.guild_count})")
         except Exception as e:
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        errors = list()
-        if isinstance(error, commands.ConversionError):
-            errors.append("Something went wrong converting an item")
-        elif isinstance(error, commands.CheckFailure):
-            if isinstance(error, commands.PrivateMessageOnly):
-                errors.append("This commands works only in DMs")
-            elif isinstance(error, commands.NoPrivateMessage):
-                errors.append("This commands works only in servers")
-            elif isinstance(error, commands.CheckAnyFailure):
-                errors.append("This commands doesn't work with the current context")
-            elif isinstance(error, commands.NotOwner):
-                errors.append("This command is for the developers")
-            elif isinstance(error, commands.MissingPermissions):
-                if len(error.missing_perms) == 1:
-                    errors.append(f"You are missing the `{error.missing_perms[0]}` permission")
-                else:
-                    errors.append(f"You are missing {' '.join([f'`{perm}`' for perm in error.missing_perms])} permissions")
-            elif isinstance(error, commands.BotMissingPermissions):
-                if len(error.missing_perms) == 1:
-                    errors.append(f"I'm missing the `{error.missing_perms[0]}` permission")
-                else:
-                    errors.append(f"I'm missing {' '.join([f'`{perm}`' for perm in error.missing_perms])} permissions")
-            elif isinstance(error, commands.MissingRole):
-                errors.append(f"You're missing the `{error.missing_role}` role")
-            elif isinstance(error, commands.BotMissingRole):
-                errors.append(f"I'm missing the `{error.missing_role}` role")
-            elif isinstance(error, commands.MissingAnyRole):
-                if len(error.missing_roles) == 1:
-                    errors.append(f"You're missing the `{error.missing_roles[0]}` role")
-                else:
-                    errors.append(f"You're missing {' '.join([f'`{perm}`' for perm in error.missing_roles])} roles")
-            elif isinstance(error, commands.BotMissingAnyRole):
-                if len(error.missing_roles) == 1:
-                    errors.append(f"I'm missing the `{error.missing_roles[0]}` role")
-                else:
-                    errors.append(f"I'm missing {' '.join([f'`{perm}`' for perm in error.missing_roles])} roles")
-            elif isinstance(error, commands.NSFWChannelRequired):
-                errors.append("This command works only on NSFW channels")
-        elif isinstance(error, commands.CommandNotFound):
-            return
-        elif isinstance(error, commands.DisabledCommand):
-            errors.append("This command is currently disabled")
-        elif isinstance(error, commands.CommandInvokeError):
-            pass
-        elif isinstance(error, commands.UserInputError):
-            if isinstance(error, commands.MissingRequiredArgument):
-                errors.append(f"Please specify `{error.param.name}`")
-            elif isinstance(error, commands.ArgumentParsingError):
-                if isinstance(error, commands.UnexpectedQuoteError):
-                    errors.append(error)
-                elif isinstance(error, commands.InvalidEndOfQuotedStringError):
-                    errors.append(error)
-                elif isinstance(error, commands.ExpectedClosingQuoteError):
-                    errors.append(error)
-            elif isinstance(error, commands.BadArgument):
-                if isinstance(error, commands.MessageNotFound):
-                    errors.append("Couldn't find that message")
-                elif isinstance(error, commands.MemberNotFound):
-                    errors.append(f"Couldn't find member `{error.argument}`")
-                elif isinstance(error, commands.GuildNotFound):
-                    errors.append(f"Couldn't find guild `{error.argument}`")
-                elif isinstance(error, commands.UserNotFound):
-                    errors.append(f"Couldn't find user `{error.argument}`")
-                elif isinstance(error, commands.ChannelNotFound):
-                    errors.append(f"Couldn't find channel `{error.argument}`")
-                elif isinstance(error, commands.ChannelNotReadable):
-                    errors.append(f"I don't have enough permissions to read {error.argument.mention}")
-                elif isinstance(error, commands.BadColourArgument):
-                    errors.append(f"{error.argument} isn't a invalid colour")
-                elif isinstance(error, commands.RoleNotFound):
-                    errors.append(f"Couldn't find role `{error.argument}`")
-                elif isinstance(error, commands.BadInviteArgument):
-                    errors.append("Invalid invite")
-                elif isinstance(error, commands.EmojiNotFound):
-                    errors.append(f"Couldn't find emoji **{error.argument}**")
-                elif isinstance(error, commands.PartialEmojiConversionFailure):
-                    errors.append(f"{error.argument} is an invalid emoji")
-                elif isinstance(error, commands.BadBoolArgument):
-                    errors.append(f"Couldn't convert `{error.argument}` to `True` or `False`")
-            elif isinstance(error, commands.TooManyArguments):
-                errors.append("You passed too many arguments")
-        elif isinstance(error, commands.CommandOnCooldown):
-            retry_after = utils.get_time(round(error.retry_after))
-            errors.append(f"You can use this command in {retry_after}")
-        elif isinstance(error, commands.MaxConcurrencyReached):
-            errors.append("This command is being used by someone else")
-        elif isinstance(error, commands.ExtensionError):
-            if isinstance(error, commands.ExtensionAlreadyLoaded):
-                errors.append("Extension is already loaded")
-            elif isinstance(error, commands.ExtensionNotLoaded):
-                errors.append("Extension not loaded")
-            elif isinstance(error, commands.NoEntryPointError):
-                errors.append("Missing `setup` function")
-            elif isinstance(error, commands.ExtensionFailed):
-                errors.append("Extension has loaded")
-            elif isinstance(error, commands.ExtensionNotFound):
-                errors.append("Extension not found")
-        elif isinstance(error, commands.CommandRegistrationError):
-            errors.append(f"There are 2 commands with the same name (`{error.name}`)!")
-
-        if len(errors) == 0:
-            if not str(error).startswith("The global check functions for command"):
-                errors.append(str(error))
-            else:
-                emb = discord.Embed(description=f"{config.emojis.fail} | This bot doesn't work in DM", colour=discord.Colour.red())
-                await ctx.send(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=utils.invite_url(self.bot.user.id), emoji=utils.get_emoji(self.bot, config.emojis.invite))])
-        else:
-            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-               await utils.error(ctx, "\n".join(errors), delete_after=10)
-            else:
-                slashn = "\n"
-                await ctx.reply(f"**I don't have the embed links permissions to send embed messages!**\n\n{slashn.join(errors)}", mention_author=False)
-
-        channel = self.bot.get_channel(config.bot.errors)
-        time = round(datetime.datetime.timestamp(datetime.datetime.now()))
-        
-        emb = discord.Embed(colour=discord.Colour.red())
-        emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
-        emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
-        if ctx.guild:
-            emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
-            emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
-            emb.set_thumbnail(url=ctx.guild.icon.replace(static_format="png", size=1024))
-        else:
-            emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
-        emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
-        emb.add_field(name="Error", value=f"```py\n{str(error)}\n```")
-        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
-        await channel.send(embed=emb)
-
-    @commands.Cog.listener()
-    async def on_command(self, ctx):
-        g = None if not ctx.guild else ctx.guild.id
-        settings = await utils.get_settings(self.bot.db, g)
-        channel = self.bot.get_channel(config.bot.logs)
-        time = round(datetime.datetime.timestamp(datetime.datetime.now()))
-        # emb = discord.Embed(description=f"**Message:** `{ctx.message.content}`\n**Author:** `{str(ctx.author)}` (`{ctx.author.id}`)\n**Channel:** `{ctx.channel.name}` (`{ctx.channel.id}`)\n**Guild:** `{ctx.guild.name}` (`{ctx.guild.id}`)\n**When:** <t:{time}:f>", colour=settings["colour"])
-        emb = discord.Embed(colour=settings["colour"])
-        emb.add_field(name="Message", value=f"`{ctx.message.content}` (`{ctx.message.id}`)", inline=False)
-        emb.add_field(name="Author", value=f"`{str(ctx.author)}` (`{ctx.author.id}`)", inline=False)
-        if ctx.guild:
-            emb.add_field(name="Channel", value=f"`#{ctx.channel.name}` (`{ctx.channel.id}`)", inline=False)
-            emb.add_field(name="Guild", value=f"`{ctx.guild.name}` (`{ctx.guild.id}`)", inline=False)
-            emb.set_thumbnail(url=ctx.guild.icon.replace(static_format="png", size=1024))
-        else:
-            emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
-        emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
-        emb.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar.replace(static_format="png", size=1024)))
-        await channel.send(embed=emb)
-
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        channel = self.bot.get_channel(config.bot.guilds_logs)
-        owner = await self.bot.fetch_user(guild.owner_id)
-        emb = discord.Embed(title="New Server", colour=discord.Colour.green())
-        emb.set_author(name=guild.name, icon_url=str(guild.icon.replace(static_format="png")))
-        emb.set_thumbnail(url=str(guild.icon.replace(static_format="png")))
-        emb.add_field(name="ID", value=f"`{guild.id}`")
-        emb.add_field(name="Members", value=guild.member_count)
-        emb.add_field(name="Owner", value=f"`{str(owner)}` (`{owner.id}`)", inline=False)
-        if guild.banner:
-            emb.set_image(url=guild.banner_url_as(format="png"))
-        await channel.send(embed=emb)
-
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-        channel = self.bot.get_channel(config.bot.guilds_logs)
-        emb = discord.Embed(title="Adios", colour=discord.Colour.red())
-        emb.set_author(name=guild.name, icon_url=str(guild.icon.replace(static_format="png")))
-        emb.set_thumbnail(url=str(guild.icon.replace(static_format="png")))
-        emb.add_field(name="ID", value=f"`{guild.id}`")
-        emb.add_field(name="Members", value=guild.member_count)
-        emb.add_field(name="Owner", value=f"`{guild.owner_id}`", inline=False)
-        if guild.banner:
-            emb.set_image(url=guild.banner_url_as(format="png"))
-        await channel.send(embed=emb)
-
-def setup(bot):
-    bot.add_cog(Events(bot))
+async def setup(bot):
+    await bot.add_cog(Events(bot))

@@ -1,82 +1,36 @@
-import discord, utils, time, config, random, psutil, datetime
+import asyncio
+import discord
+import config
 from discord.ext import commands
+from discord import app_commands
 
 class Misc(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
-    @commands.command()
-    async def ping(self, ctx):
-        "Check bot latency and response"
-
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-
-        start = time.perf_counter()
-        msg = await ctx.reply("Pinging...", mention_author=False)
-        end = time.perf_counter()
-        duration = (end - start) * 1000
-        pong = round(self.bot.latency * 1000)
-        emb = discord.Embed(description = f"**{config.bot.loading} Response:** `{duration:.2f}ms`\n**🏓 Latency:** `{pong}ms`", colour = settings["colour"])
-        await msg.edit(content="", embed=emb)
-
-    @commands.command()
-    async def invite(self, ctx):
+    @app_commands.command(name="invite")
+    # @app_commands.guilds(discord.Object(id=config.test_guild))
+    async def invite(self, interaction: discord.Interaction) -> None:
         "Invite the bot to your server"
 
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        url = utils.invite_url(self.bot.user.id)
-        emb = discord.Embed(description="Thanks for inviting me!", colour=settings["colour"])
-        await ctx.reply(embed=emb, components=[dc.Button(label="Invite me", style=dc.ButtonStyle.URL, url=url, emoji=utils.get_emoji(self.bot, config.emojis.invite))], mention_author=False)
+        url = discord.utils.oauth_url(self.bot.user.id, scopes=('bot', 'applications.commands'), permissions=discord.Permissions(permissions=10304))
+        await interaction.response.send_message(url)
 
-    @commands.command(hidden=True)
-    async def cock(self, ctx):
-        await ctx.reply(random.choice(["why", "no u", "°-°", "¿.¿", "•_•", ">.<"]), mention_author=False)
+    @app_commands.command(name="help")
+    # @app_commands.guilds(discord.Object(id=config.test_guild))
+    async def help(self, interaction: discord.Interaction) -> None:
+        "Get a list of commands"
 
-    @commands.command()
-    async def about(self, ctx):
-        "About the bot"
+        res = ""
+        for command in self.bot._BotBase__tree.get_commands():
+            if type(command) == discord.app_commands.Group:
+                for sub_command in command.commands:
+                    res += f"`/{command.name} {sub_command.name}` - {sub_command.description}\n"
+            else:
+                res += f"`/{command.name}` - {command.description}\n"
 
-        async with ctx.typing():
-            settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-            library = discord.__version__
-            memory = psutil.virtual_memory()[2]
-            cpu = psutil.cpu_percent()
-            owners = [str(await self.bot.fetch_user(a)) for a in self.bot.owner_ids]
-            invite_url = utils.invite_url(self.bot.user.id)
-            emb = discord.Embed(colour=settings['colour'], description=f"""```
-{config.bot.banner}
-```
-> Default Prefix: `{config.bot.prefix}`
-> Server Prefix: `{settings['prefix']}`
+        emb = discord.Embed(description=res, color=config.colour)
+        await interaction.response.send_message(embed=emb)
 
-[Invite Me]({invite_url}) | [Vote the Bot](https://top.gg/bot/{self.bot.user.id}/vote) | [Support Server]({config.bot.support_server})""")
-            emb.add_field(name = "Info", value = f"""```prolog
-Devs: {" & ".join(owners)}
-Guilds: {len(self.bot.guilds)}
-```""")
-            emb.add_field(name="Stats", value=f"""```prolog
-discord.py: {library}
-CPU: {cpu}%
-Memory: {memory}%```""")
-
-            view = discord.ui.View()
-            view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, url=invite_url, label='Invite Me', emoji=config.emojis.invite))
-            view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, url=f"https://top.gg/bot/{self.bot.user.id}/vote", label='Vote Me', emoji=config.emojis.upvote))
-            view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, url=config.bot.support_server, label='Support Server', emoji=config.emojis.support))
-            await ctx.reply(embed=emb, mention_author=False, view=view)
-
-    @commands.command(aliases = ["ut"])
-    async def uptime(self, ctx):
-        "Check bot uptime"
-
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        uptime = datetime.datetime.utcnow() - self.bot.launchtime
-        hours, remainder = divmod(int(uptime.total_seconds()), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        days, hours = divmod(hours, 24)
-
-        emb = discord.Embed(description=f"**`{days}` days `{hours}` hours `{minutes}` minutes `{seconds}` seconds**", colour=settings['colour'])
-        await ctx.reply(embed=emb, mention_author=False)
-
-def setup(bot):
-    bot.add_cog(Misc(bot))
+async def setup(bot):
+    await bot.add_cog(Misc(bot))

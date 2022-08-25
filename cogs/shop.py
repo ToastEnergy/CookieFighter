@@ -1,185 +1,187 @@
-import discord, utils, time, config
+import discord
+import utils
+import config
 from discord.ext import commands
+from discord import app_commands
 
-class Shop(commands.Cog):
+
+class Shop(commands.GroupCog, name="shop"):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
+        super().__init__()
 
-    async def empty_shop(self, ctx, settings):
-        emb = discord.Embed(title="Cookies Shop!", description=f"*The shop for {ctx.guild.name} is empty*", colour=settings["colour"])
-        if ctx.author.guild_permissions.manage_guild:
-            emb.description += f"\n\nUse `{settings['prefix']}additem <role> <cookies>` to add an item to the shop."
+    async def empty_shop(self, interaction: discord.Interaction):
+        emb = discord.Embed(
+            title="Cookies Shop!", description=f"*The shop for {interaction.guild.name} is empty*", colour=config.colour)
+        if interaction.user.guild_permissions.manage_guild:
+            emb.description += f"\n\nUse `/shop add <role> <cookies>` to add an item to the shop."
 
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
+        await interaction.response.send_message(embed=emb)
 
-    async def invalid_role_id(self, ctx):
-        emb = discord.Embed(description=f"{config.emojis.fail} | Invalid `role id`!\nYou can find the role ID before the role name in the `shop` command", colour=discord.Colour.red())
-        await ctx.reply(embed=emb, mention_author=False)
+    async def invalid_role_id(self, interaction: discord.Interaction):
+        emb = discord.Embed(
+            description=f"{config.emojis.fail} | Invalid `role id`!\nYou can find the role ID before the role name in the `/shop list` command", colour=discord.Colour.red())
+        await interaction.response.send_message(embed=emb, ephemeral=True)
 
-    @commands.command()
-    async def shop(self, ctx):
+    @app_commands.command(name="list")
+    @app_commands.guild_only()
+    async def shop_list(self, interaction: discord.Interaction) -> None:
         "Buy roles with cookies"
 
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        roles = await utils.get_roles(self.bot.db, ctx.guild)
-        cookies = await utils.get_cookies(self.bot.db, ctx.author.id, ctx.guild.id)
+        roles = await utils.get_roles(self.bot.db, interaction.guild)
 
         if not roles:
-            return await self.empty_shop(ctx, settings)
+            return await self.empty_shop(interaction)
 
-        emb = discord.Embed(title="Cookies Shop!", description=f"__Your cookies:__ `{cookies}` {settings['emoji']}\n\nUse `{settings['prefix']}buy <item number>` to buy something.\n\n", colour=settings['colour'])
+        user_cookies_query = await self.bot.db.fetchrow("SELECT cookies FROM cookies WHERE guild_id = $1 AND user_id = $2", interaction.guild.id, interaction.user.id)
+        cookies = 0
+        if user_cookies_query:
+            cookies = user_cookies_query['cookies']
+
+        emb = discord.Embed(
+            title="Cookies Shop!", description=f"__Your cookies:__ `{cookies}` {config.emojis.cookie}\n\nUse `/buy <item number>` to buy something.\n\n", colour=config.colour)
         count = 0
         for role in roles:
             count += 1
-            emb.description += f"`{count}.` {role.mention} **{roles[role]} {settings['emoji']}**\n"
+            emb.description += f"`{count}.` {role.mention} **{roles[role]} {config.emojis.cookie}**\n"
 
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
+        await interaction.response.send_message(embed=emb)
 
-    @commands.command(name="add-item", aliases=["additem"])
-    @commands.has_permissions(manage_guild=True)
-    async def add_item(self, ctx, role: discord.Role, cookies):
+    @app_commands.command(name="add")
+    @app_commands.guild_only()
+    @app_commands.default_permissions(manage_guild=True)
+    async def add_item(self, interaction: discord.Interaction, role: discord.Role, cookies: int):
         "Add an item to the shop"
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-
-        try:
-            cookies = int(cookies)
-        except:
-            emb = discord.Embed(description=f"{config.emojis.fail} | Please specify a number", colour=discord.Colour.red())
-            try: await ctx.reply(embed=emb, mention_author=False)
-            except: await ctx.send(embed=emb)
-            return
 
         if cookies < 1:
-            emb = discord.Embed(description=f"{config.emojis.fail} | Please specify a number higher than `0`", colour=discord.Colour.red())
-            try: await ctx.reply(embed=emb, mention_author=False)
-            except: await ctx.send(embed=emb)
+            emb = discord.Embed(
+                description=f"{config.emojis.fail} | Please specify a number higher than `0`", colour=discord.Colour.red())
+            await interaction.response.send_message(embed=emb)
             return
 
-        await utils.add_to_shop(self.bot.db, ctx.guild, role.id, cookies)
-        emb = discord.Embed(description=f"{config.emojis.check} | Item added to the shop", colour=settings["colour"])
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
+        await self.bot.db.execute("INSERT INTO shop (guild_id, role_id, cookies) VALUES ($1, $2, $3) ON CONFLICT (guild_id, role_id) DO UPDATE SET cookies=$3", interaction.guild.id, role.id, cookies)
+        emb = discord.Embed(
+            description=f"{config.emojis.success} | {role.mention} is now available on the shop for **{cookies} {config.emojis.cookie}**", colour=config.colour)
+        await interaction.response.send_message(embed=emb)
 
-    @commands.command(name="remove-item", aliases=["removeitem"])
-    @commands.has_permissions(manage_guild=True)
-    async def remove_item(self, ctx, role_id):
-        "Add an item to the shop"
+    @app_commands.command(name="remove")
+    @app_commands.guild_only()
+    @app_commands.default_permissions(manage_guild=True)
+    async def remove_item(self, interaction: discord.Interaction, role: discord.Role):
+        "Remove an item from the shop"
 
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        roles = await utils.get_roles(self.bot.db, ctx.guild)
+        await self.bot.db.execute("DELETE FROM shop WHERE guild_id = $1 AND role_id = $2", interaction.guild.id, role.id)
 
-        try: role_id = int(role_id)
-        except: return await self.invalid_role_id(ctx)
+        emb = discord.Embed(
+            description=f"{config.emojis.success} | Item removed from the shop", colour=config.colour)
+        await interaction.response.send_message(embed=emb)
 
-        try: role = list(roles.keys())[role_id-1]
-        except: return await self.invalid_role_id(ctx)
-
-        await utils.remove_from_shop(self.bot.db, ctx.guild.id, role.id)
-
-        emb = discord.Embed(description=f"{config.emojis.check} | Item removed from the shop", colour=settings["colour"])
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
-
-    @commands.command()
-    async def buy(self, ctx, role_id):
+    @app_commands.command(name="buy")
+    @app_commands.guild_only()
+    async def buy(self, interaction: discord.Interaction, role_id: int):
         "Buy something from the shop"
 
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        roles = await utils.get_roles(self.bot.db, ctx.guild)
+        roles = await utils.get_roles(self.bot.db, interaction.guild)
 
         if not roles:
-            return await self.empty_shop(ctx, settings)
+            return await self.empty_shop(interaction)
 
-        try: role_id = int(role_id)
-        except: return await self.invalid_role_id(ctx)
+        try:
+            role_id = int(role_id)
+        except:
+            return await self.invalid_role_id(interaction)
 
-        try: role = list(roles.keys())[role_id-1]
-        except: return await self.invalid_role_id(ctx)
+        try:
+            role = list(roles.keys())[role_id-1]
+        except:
+            return await self.invalid_role_id(interaction)
 
-        inv = await utils.get_inventory(self.bot.db, ctx.author.id, ctx.guild.id)
-        if inv:
-            if role.id in inv:
-                emb = discord.Embed(description=f"{config.emojis.fail} | You already have that item!", colour=discord.Colour.red())
-                try: await ctx.reply(embed=emb, mention_author=False)
-                except: await ctx.send(embed=emb)
-                return
+        data = await self.bot.db.fetchrow("SELECT role_id FROM inventory WHERE user_id = $1 AND guild_id = $2 AND role_id = $3", interaction.user.id, interaction.guild.id, role.id)
+
+        if data:
+            emb = discord.Embed(
+                description=f"{config.emojis.fail} | You already have that item!", colour=discord.Colour.red())
+            await interaction.response.send_message(embed=emb, ephemeral=True)
+            return
 
         cookies = roles[role]
-        av_cookies = await utils.get_cookies(self.bot.db, ctx.author.id, ctx.guild.id)
+        data = await self.bot.db.fetchrow("SELECT cookies FROM cookies WHERE guild_id = $1 AND user_id = $2", interaction.guild.id, interaction.user.id)
+
+        av_cookies = 0
+        if data:
+            av_cookies = data['cookies']
 
         if av_cookies < cookies:
-            emb = discord.Embed(description=f"{config.emojis.fail} | You don't have enough cookies to buy this item", colour=discord.Colour.red())
-            try: await ctx.reply(embed=emb, mention_author=False)
-            except: await ctx.send(embed=emb)
+            emb = discord.Embed(
+                description=f"{config.emojis.fail} | You don't have enough cookies to buy this item", colour=discord.Colour.red())
+            await interaction.response.send_message(embed=emb, ephemeral=True)
             return
 
-        try: await ctx.author.add_roles(role)
+        try:
+            await interaction.user.add_roles(role)
         except:
-            emb = discord.Embed(description=f"{config.emojis.fail} | It looks like I don't have enough permissions to add you that role...", colour=discord.Colour.red())
-            try: await ctx.reply(embed=emb, mention_author=False)
-            except: await ctx.send(embed=emb)
+            emb = discord.Embed(
+                description=f"{config.emojis.fail} | It looks like I don't have enough permissions to add you that role...", colour=discord.Colour.red())
+            await interaction.response.send_message(embed=emb, ephemeral=True)
             return
 
-        await utils.remove_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
-        await utils.update_inventory(self.bot.db, ctx.author.id, ctx.guild.id, role.id)
-        emb = discord.Embed(description=f"{config.emojis.check} | You have successfully bought the role {role.mention}", colour=settings["colour"])
+        await self.bot.db.execute("INSERT INTO cookies (guild_id, user_id, cookies) VALUES ($1, $2, $3) ON CONFLICT (guild_id, user_id) DO UPDATE SET cookies=cookies.cookies + $3", interaction.guild.id, interaction.user.id, -cookies)
+        await self.bot.db.execute("INSERT INTO inventory (guild_id, user_id, role_id) VALUES ($1, $2, $3)", interaction.guild.id, interaction.user.id, role.id)
+        emb = discord.Embed(
+            description=f"{config.emojis.success} | You have successfully bought the role {role.mention}", colour=config.colour)
+        await interaction.response.send_message(embed=emb)
 
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
-
-    @commands.command()
-    async def sell(self, ctx, role_id):
+    @app_commands.command(name="sell")
+    @app_commands.guild_only()
+    async def sell(self, interaction: discord.Interaction, role_id: int):
         "Sell an item (it must be in the shop)"
 
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
+        roles = await utils.get_roles(self.bot.db, interaction.guild)
 
-        try: role_id = int(role_id)
-        except: return await self.invalid_role_id(ctx)
+        try:
+            role = list(roles.keys())[role_id-1]
+        except:
+            return await self.invalid_role_id(interaction)
 
-        roles = await utils.get_roles(self.bot.db, ctx.guild)
-
-        try: role = list(roles.keys())[role_id-1]
-        except: return await self.invalid_role_id(ctx)
-
-        inv = await utils.get_inventory(self.bot.db, ctx.author.id, ctx.guild.id)
-        if not inv or role.id not in inv:
-            emb = discord.Embed(description=f"{config.emojis.fail} | That role isn't in your inventory!", colour=discord.Colour.red())
-            try: await ctx.reply(embed=emb, mention_author=False)
-            except: await ctx.send(embed=emb)
+        data = await self.bot.db.fetchrow("SELECT role_id FROM inventory WHERE user_id = $1 AND guild_id = $2 AND role_id = $3", interaction.user.id, interaction.guild.id, role.id)
+        if not data:
+            emb = discord.Embed(
+                description=f"{config.emojis.fail} | That role isn't in your inventory!", colour=discord.Colour.red())
+            await interaction.response.send_message(embed=emb, ephemeral=True)
             return
 
         cookies = roles[role]
-        await utils.remove_from_inventory(self.bot.db, ctx.author.id, ctx.guild.id, role.id)
-        await utils.add_cookies(self.bot.db, ctx.author.id, ctx.guild.id, cookies)
+        await self.bot.db.execute("DELETE FROM inventory WHERE guild_id = $1 AND user_id = $2 AND role_id = $3", interaction.guild.id, interaction.user.id, role.id)
+        await self.bot.db.execute("INSERT INTO cookies (guild_id, user_id, cookies) VALUES ($1, $2, $3) ON CONFLICT (guild_id, user_id) DO UPDATE SET cookies=cookies.cookies + $3", interaction.guild.id, interaction.user.id, cookies)
 
-        emb = discord.Embed(description=f"{config.emojis.check} | You have successfully sold the role {role.mention}", colour=settings['colour'])
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
+        emb = discord.Embed(
+            description=f"{config.emojis.success} | You have successfully sold the role {role.mention}", colour=config.colour)
+        await interaction.response.send_message(embed=emb)
 
-    @commands.command(aliases=["inv"])
-    async def inventory(self, ctx, *, member: discord.Member=None):
+    @app_commands.command(name="inventory")
+    @app_commands.guild_only()
+    async def inventory(self, interaction: discord.Interaction, member: discord.Member = None):
         "Check the inventory of a member"
 
-        member = member or ctx.author
-        settings = await utils.get_settings(self.bot.db, ctx.guild.id)
-        inv = await utils.get_inventory(self.bot.db, member.id, ctx.guild.id)
+        member = member or interaction.user
+        inv = await self.bot.db.fetch("SELECT role_id FROM inventory WHERE guild_id = $1 AND user_id = $2", interaction.guild.id, member.id)
 
-        emb = discord.Embed(colour=settings["colour"])
-        emb.set_author(name=str(member), icon_url=str(member.avatar.replace(static_format="png", size=1024)))
+        emb = discord.Embed(colour=config.colour)
+        emb.set_author(name=str(member), icon_url=str(
+            member.avatar.replace(static_format="png", size=1024)))
 
-        if not inv:
+        if len(inv) == 0:
             emb.description = "*Nothing to see here...*"
         else:
             emb.description = ""
-            for role_id in inv:
-                role = ctx.guild.get_role(role_id)
+            for item in inv:
+                role = interaction.guild.get_role(item['role_id'])
                 if role:
                     emb.description += f"• {role.mention}\n"
 
-        try: await ctx.reply(embed=emb, mention_author=False)
-        except: await ctx.send(embed=emb)
+        await interaction.response.send_message(embed=emb)
 
-def setup(bot):
-    bot.add_cog(Shop(bot))
+
+async def setup(bot):
+    # await bot.add_cog(Shop(bot), guilds=[discord.Object(id=config.test_guild)])
+    await bot.add_cog(Shop(bot))
