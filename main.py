@@ -49,7 +49,6 @@ async def on_app_command_error(interaction: discord.Interaction, error: discord.
     await interaction.response.send_message(embed=emb, ephemeral=True)
 
     channel = bot.get_channel(config.logs.errors)
-    time = round(datetime.datetime.timestamp(datetime.datetime.now()))
     
     emb = discord.Embed(colour=discord.Colour.red())
     emb.add_field(name="Command", value=f"`{interaction.command.name}`", inline=False)
@@ -60,7 +59,7 @@ async def on_app_command_error(interaction: discord.Interaction, error: discord.
         emb.set_thumbnail(url=interaction.guild.icon.replace(static_format="png", size=1024))
     else:
         emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
-    emb.add_field(name="When", value=f"<t:{time}:f>", inline=False)
+    emb.add_field(name="When", value=f"<t:{int(datetime.datetime.now().timestamp())}:f>", inline=False)
     emb.add_field(name="Error", value=f"```py\n{str(error)}\n```")
     emb.set_author(name=str(interaction.user), icon_url=str(interaction.user.avatar))
     await channel.send(embed=emb)
