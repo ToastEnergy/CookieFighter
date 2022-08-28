@@ -19,6 +19,7 @@ class CookieFighter(commands.Bot):
         super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
     async def setup_hook(self):
+        self.remove_command('help')
         self.db = await asyncpg.create_pool(config.POSTGRES_URL)
         await self.db.execute("""
         CREATE TABLE IF NOT EXISTS cookies (guild_id BIGINT, user_id BIGINT, cookies BIGINT NOT NULL DEFAULT 0, PRIMARY KEY(guild_id, user_id));
@@ -37,7 +38,6 @@ class CookieFighter(commands.Bot):
     async def on_ready(self):
         await self.load_extension('jishaku')
         await self.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.listening, name="/cookie"))
-        bot.remove_command('help')
 
         print('Logged in as', self.user)
 

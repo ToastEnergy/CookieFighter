@@ -18,9 +18,10 @@ class Misc(commands.Cog):
             'bot', 'applications.commands'), permissions=discord.Permissions(permissions=10304))
         await interaction.response.send_message(url)
 
-    @app_commands.command(name="help")
+    @commands.hybrid_command(name="help", with_app_command=True)
+    # @app_commands.command(name="help")
     # @app_commands.guilds(discord.Object(id=config.test_guild))
-    async def help(self, interaction: discord.Interaction) -> None:
+    async def help(self, ctx) -> None:
         "Get a list of commands"
 
         url = discord.utils.oauth_url(self.bot.user.id, scopes=(
@@ -38,7 +39,7 @@ If you need any help feel free to ask in the [support server](https://discord.gg
                 res += f"`/{command.name}` - {command.description}\n"
 
         emb = discord.Embed(description=res, color=config.colour)
-        await interaction.response.send_message(embed=emb)
+        await ctx.send(embed=emb)
 
     @app_commands.command(name="about")
     # @app_commands.guilds(discord.Object(id=config.test_guild))
