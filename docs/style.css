@@ -1,0 +1,137 @@
+@font-face {
+  font-family: "Whitney";
+  src: url("./cdn/whitneybook.otf");
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Whitney;
+  background-color: #18191a;
+  color: white;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.205) 1px, transparent 0);
+  background-size: 40px 40px;
+  background-position: -19px -19px;
+}
+
+.container {
+  min-height: calc(100vh - 80px);
+  margin: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+.container h1,
+.container h2,
+.container h3 {
+  margin: 0;
+}
+.container .short-description {
+  text-align: center;
+  font-weight: unset;
+  font-style: italic;
+}
+.container .try {
+  text-align: center;
+  font-weight: unset;
+}
+.container .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+.container .buttons a {
+  text-decoration: none;
+  color: unset;
+  background-color: #5865f2;
+  padding: 10px;
+  border-radius: 5px;
+}
+.container .buttons a:hover {
+  background-color: #515cd8;
+}
+
+.message-parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.message {
+  display: flex;
+  width: 250px;
+  gap: 18px;
+}
+.message p {
+  margin: 0;
+}
+.message img {
+  border-radius: 50%;
+}
+.message .content .username {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.message .content .username p {
+  font-size: 20px;
+}
+.message .content .username .bot {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background-color: #5865f2;
+  border-radius: 3px;
+  padding: 3px;
+  font-size: 12px;
+}
+.message .content .embed {
+  display: inline-flex;
+  align-items: center;
+  background-color: #101111;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 3px solid #d8ae6a;
+  height: 30px;
+}
+.message .content .reaction {
+  cursor: pointer;
+  margin-top: 5px;
+  display: inline-flex;
+  background-color: #101111;
+  align-items: center;
+  gap: 5px;
+  border-radius: 8px;
+  padding: 5px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.message .content .reaction:hover {
+  outline: 0.5px solid white;
+}
+.message .content .active {
+  background-color: #27294b;
+}
+
+footer {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+footer p a {
+  text-decoration: none;
+  color: #d8ae6a;
+}
+footer p a:hover {
+  text-decoration: underline;
+}/*# sourceMappingURL=style.css.map */
