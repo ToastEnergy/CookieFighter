@@ -4,6 +4,32 @@ import config
 from discord.ext import commands
 from discord import app_commands
 
+fetched_roles = dict()
+
+async def buy_autocomplete(interaction: discord.Interaction, current: str):
+    if not fetched_roles.get(interaction.guild.id):
+        fetched_roles[interaction.guild.id] = list((await utils.get_roles(interaction.client.db, interaction.guild)).keys())
+    roles = fetched_roles[interaction.guild.id]
+    x = 0
+    completion = []
+    for role in roles:
+        x += 1
+        if role.name.lower().startswith(current.lower()):
+            completion.append(app_commands.Choice(name=role.name, value=x))
+    return completion
+
+async def sell_autocomplete(interaction: discord.Interaction, current: str):
+    if not fetched_roles.get(interaction.guild.id):
+        fetched_roles[interaction.guild.id] = list((await utils.get_roles(interaction.client.db, interaction.guild)).keys())
+    roles = fetched_roles[interaction.guild.id]
+    x = 0
+    completion = []
+    for role in roles:
+        x += 1
+        if role.name.lower().startswith(current.lower()):
+            completion.append(app_commands.Choice(name=role.name, value=x))
+    return completion
+
 @app_commands.guild_only()
 class Shop(commands.GroupCog, name="shop"):
     def __init__(self, bot):
@@ -50,6 +76,7 @@ class Shop(commands.GroupCog, name="shop"):
     @app_commands.command(name="add")
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(manage_messages=True)
+    @app_commands.describe(role="The role to add to the shop", cookies="The amount of cookies needed to buy the role")
     async def add_item(self, interaction: discord.Interaction, role: discord.Role, cookies: int):
         "Add an item to the shop"
 
@@ -67,6 +94,7 @@ class Shop(commands.GroupCog, name="shop"):
     @app_commands.command(name="remove")
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(manage_messages=True)
+    @app_commands.describe(role="The role to remove from the shop")
     async def remove_item(self, interaction: discord.Interaction, role: discord.Role):
         "Remove an item from the shop"
 
@@ -78,8 +106,13 @@ class Shop(commands.GroupCog, name="shop"):
 
     @app_commands.command(name="buy")
     @app_commands.guild_only()
+    @app_commands.describe(role_id="The ID of the role to buy")
+    @app_commands.autocomplete(role_id=buy_autocomplete)
     async def buy(self, interaction: discord.Interaction, role_id: int):
         "Buy something from the shop"
+
+        if fetched_roles.get(interaction.guild.id):
+            del fetched_roles[interaction.guild.id]
 
         roles = await utils.get_roles(self.bot.db, interaction.guild)
 
@@ -133,8 +166,13 @@ class Shop(commands.GroupCog, name="shop"):
 
     @app_commands.command(name="sell")
     @app_commands.guild_only()
+    @app_commands.describe(role_id="The ID of the role to sell")
+    @app_commands.autocomplete(role_id=sell_autocomplete)
     async def sell(self, interaction: discord.Interaction, role_id: int):
         "Sell an item (it must be in the shop)"
+
+        if fetched_roles.get(interaction.guild.id):
+            del fetched_roles[interaction.guild.id]
 
         roles = await utils.get_roles(self.bot.db, interaction.guild)
 
@@ -160,6 +198,7 @@ class Shop(commands.GroupCog, name="shop"):
 
     @app_commands.command(name="inventory")
     @app_commands.guild_only()
+    @app_commands.describe(member="The member you want to check the inventory of, ignore if you want to check your own balance")
     async def inventory(self, interaction: discord.Interaction, member: discord.Member = None):
         "Check the inventory of a member"
 

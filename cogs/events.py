@@ -9,6 +9,27 @@ from discord.ext import commands, tasks
 class Events(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.tree.on_error = self.on_command_error
+
+    async def on_command_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+        emb = discord.Embed(description=config.emojis.fail + ' | ' + str(error), colour=discord.Color.red())
+        await interaction.response.send_message(embed=emb, ephemeral=True)
+
+        channel = self.bot.get_channel(config.logs.errors)
+        
+        emb = discord.Embed(colour=discord.Colour.red())
+        emb.add_field(name="Command", value=f"`{interaction.command.name}`", inline=False)
+        emb.add_field(name="Author", value=f"`{str(interaction.user)}` (`{interaction.user.id}`)", inline=False)
+        if interaction.guild:
+            emb.add_field(name="Channel", value=f"`#{interaction.channel.name}` (`{interaction.channel.id}`)", inline=False)
+            emb.add_field(name="Guild", value=f"`{interaction.guild.name}` (`{interaction.guild.id}`)", inline=False)
+            emb.set_thumbnail(url=interaction.guild.icon.replace(static_format="png", size=1024))
+        else:
+            emb.add_field(name="Channel", value=f"`DM Channel`", inline=False)
+        emb.add_field(name="When", value=f"<t:{int(datetime.datetime.now().timestamp())}:f>", inline=False)
+        emb.add_field(name="Error", value=f"```py\n{str(error)}\n```")
+        emb.set_author(name=str(interaction.user), icon_url=str(interaction.user.avatar))
+        await channel.send(embed=emb)
 
     @commands.Cog.listener()
     async def on_ready(self):

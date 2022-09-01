@@ -7,12 +7,19 @@ from discord import app_commands
 class Cookies(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.busy_channels = []
 
     @app_commands.command(name="cookie")
     @app_commands.guild_only()
     # @app_commands.guilds(discord.Object(id=config.test_guild))
     async def cookie(self, interaction: discord.Interaction) -> None:
         "Catch the cookie!"
+
+        if interaction.channel.id in self.busy_channels:
+            await interaction.response.send_message("Someone is already playing in this channel.", ephemeral=True)
+            return
+
+        self.busy_channels.append(interaction.channel.id)
 
         emb = discord.Embed(description="Catch the cookie in: **3**", color=config.colour)
 
@@ -54,6 +61,8 @@ class Cookies(commands.Cog):
         emb.description = f"{user.mention} won, they now have a total of `{data['cookies']}` {'cookie' if data['cookies'] == 1 else 'cookies'} {config.emojis.cookie}"
         await msg.edit(content=None, embed=emb)
 
+        self.busy_channels.remove(interaction.channel.id)
+
     @app_commands.command(name="leaderboard")
     @app_commands.guild_only()
     # @app_commands.guilds(discord.Object(id=config.test_guild))
@@ -70,6 +79,7 @@ class Cookies(commands.Cog):
 
     @app_commands.command(name="balance")
     @app_commands.guild_only()
+    @app_commands.describe(member="The member you want to check the balance of, ignore if you want to check your own balance")
     # @app_commands.guilds(discord.Object(id=config.test_guild))
     async def balance(self, interaction: discord.Interaction, member: discord.Member = None) -> None:
         "Check how many cookies do you have"
