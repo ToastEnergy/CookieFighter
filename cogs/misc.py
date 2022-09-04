@@ -22,7 +22,7 @@ class Misc(commands.Cog):
     async def vote(self, interaction: discord.Interaction) -> None:
         "Vote for the bot"
 
-        await interaction.response.send_message(f"Thanks for voting!\n\nhttps://top.gg/bot/{self.bot.user.id}/vote")
+        await interaction.response.send_message(f"Use the following link to vote for the bot, thanks!\n\n<https://top.gg/bot/{self.bot.user.id}/vote>")
 
     @commands.hybrid_command(name="help", with_app_command=True)
     # @app_commands.command(name="help")
