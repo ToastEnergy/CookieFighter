@@ -95,5 +95,9 @@ class Cookies(commands.Cog):
 
         await interaction.response.send_message(embed=emb)
 
+    @commands.command(name="cookie", aliases=['c'])
+    async def old_cookie(self, ctx):
+        await ctx.send("This command is now an application command, use `/cookie` instead")
+
 async def setup(bot):
     await bot.add_cog(Cookies(bot))

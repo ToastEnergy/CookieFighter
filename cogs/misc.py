@@ -62,5 +62,11 @@ It has been created <t:{round(datetime.datetime.timestamp(self.bot.user.created_
         emb = discord.Embed(description=text, color=config.colour)
         await interaction.response.send_message(embed=emb)
 
+    @app_commands.command(name="support")
+    async def support(self, interaction: discord.Interaction) -> None:
+        "Get the support server invite"
+
+        await interaction.response.send_message("https://discord.gg/ayJn6Hys2r")
+
 async def setup(bot):
     await bot.add_cog(Misc(bot))
