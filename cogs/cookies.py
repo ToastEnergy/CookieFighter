@@ -58,7 +58,7 @@ class Cookies(commands.Cog):
             await msg.remove_reaction(config.emojis.cookie, self.bot.user)
 
         data = await self.bot.db.fetchrow("INSERT INTO cookies (guild_id, user_id, cookies) VALUES ($1, $2, 1) ON CONFLICT (guild_id, user_id) DO UPDATE SET cookies = cookies.cookies + 1 RETURNING cookies", interaction.guild.id, user.id)
-        emb.description = f"{user.mention} won, they now have a total of `{data['cookies']}` {'cookie' if data['cookies'] == 1 else 'cookies'} {config.emojis.cookie}\n\n*Like the bot? Help us [voting it](https://top.gg/bot/{self.bot.user.id}/vote)!*"
+        emb.description = f"{user.mention} won, they now have a total of `{data['cookies']}` {'cookie' if data['cookies'] == 1 else 'cookies'} {config.emojis.cookie}\n\n*Like the bot? Help us by [voting it](https://top.gg/bot/{self.bot.user.id}/vote)!*"
         await msg.edit(content=None, embed=emb)
 
         self.busy_channels.remove(interaction.channel.id)
