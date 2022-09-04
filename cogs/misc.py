@@ -18,6 +18,12 @@ class Misc(commands.Cog):
             'bot', 'applications.commands'), permissions=discord.Permissions(permissions=10304))
         await interaction.response.send_message(url)
 
+    @app_commands.command(name="vote")
+    async def vote(self, interaction: discord.Interaction) -> None:
+        "Vote for the bot"
+
+        await interaction.response.send_message(f"Thanks for voting!\n\nhttps://top.gg/bot/{self.bot.user.id}/vote")
+
     @commands.hybrid_command(name="help", with_app_command=True)
     # @app_commands.command(name="help")
     # @app_commands.guilds(discord.Object(id=config.test_guild))
