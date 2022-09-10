@@ -43,6 +43,7 @@ class Cookies(commands.Cog):
         try:
             _, user = await self.bot.wait_for('reaction_add', check=check, timeout=10)
         except asyncio.TimeoutError:
+            self.busy_channels.remove(interaction.channel.id)
             emb.description = "you're all losers!"
             await msg.edit(content=None, embed=emb)
 
