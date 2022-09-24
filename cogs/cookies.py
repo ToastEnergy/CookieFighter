@@ -4,6 +4,7 @@ import config
 from discord.ext import commands
 from discord import app_commands
 
+
 class Cookies(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -21,7 +22,8 @@ class Cookies(commands.Cog):
 
         self.busy_channels.append(interaction.channel.id)
 
-        emb = discord.Embed(description="Catch the cookie in: **3**", color=config.colour)
+        emb = discord.Embed(
+            description="Catch the cookie in: **3**", color=config.colour)
 
         await interaction.response.send_message(embed=emb)
         msg = await interaction.original_response()
@@ -85,13 +87,14 @@ class Cookies(commands.Cog):
     async def balance(self, interaction: discord.Interaction, member: discord.Member = None) -> None:
         "Check how many cookies do you have"
 
-        member = member or interaction.user;
+        member = member or interaction.user
 
         data = await self.bot.db.fetchrow("SELECT cookies FROM cookies WHERE guild_id = $1 AND user_id = $2", interaction.guild.id, member.id)
         cookies = 0
         if data:
             cookies = data['cookies']
-        emb = discord.Embed(description=f"**{cookies}** {'cookie' if cookies == 1 else 'cookies'} {config.emojis.cookie}", color=config.colour)
+        emb = discord.Embed(
+            description=f"**{cookies}** {'cookie' if cookies == 1 else 'cookies'} {config.emojis.cookie}", color=config.colour)
         emb.set_author(name=str(member), icon_url=member.avatar.url)
 
         await interaction.response.send_message(embed=emb)
@@ -99,6 +102,39 @@ class Cookies(commands.Cog):
     @commands.command(name="cookie", aliases=['c'])
     async def old_cookie(self, ctx):
         await ctx.send("This command is now an application command, use `/cookie` instead")
+
+    @app_commands.command(name="gift")
+    @app_commands.guild_only()
+    @app_commands.describe(member="The member to gift the cookies to", cookies="The amount of cookies to gift")
+    # @app_commands.guilds(discord.Object(id=config.test_guild))
+    async def gift(self, interaction: discord.Interaction, member: discord.Member, cookies: int):
+        "Gift cookies to another user"
+
+        if cookies < 1:
+            await interaction.response.send_message("You can't gift less than 1 cookie", ephemeral=True)
+            return
+
+        if member.bot:
+            await interaction.response.send_message(f"Robots like {member.mention} can't eat", ephemeral=True)
+            return
+
+        member_cookies_row = await self.bot.db.fetchrow("SELECT cookies FROM cookies WHERE guild_id = $1 AND user_id = $2", interaction.guild.id, interaction.user.id)
+
+        user_cookies = 0
+        if member_cookies_row:
+            user_cookies = member_cookies_row['cookies']
+
+        if user_cookies < cookies:
+            await interaction.response.send_message(f"You don't have **{cookies} {config.emojis.cookie}** cookies!\nYou currently have **{user_cookies} {config.emojis.cookie}** cookies", ephemeral=True)
+            return
+
+        await self.bot.db.execute("UPDATE cookies SET cookies = cookies - $1 WHERE guild_id = $2 AND user_id = $3", cookies, interaction.guild.id, interaction.user.id)
+        await self.bot.db.fetchrow("INSERT INTO cookies (guild_id, user_id, cookies) VALUES ($1, $2, $3) ON CONFLICT (guild_id, user_id) DO UPDATE SET cookies = cookies.cookies + $3 RETURNING cookies", interaction.guild.id, member.id, cookies)
+
+        emb = discord.Embed(
+            description=f"You gifted **{cookies} {config.emojis.cookie}** to {member.mention}", color=config.colour)
+        await interaction.response.send_message(embed=emb)
+
 
 async def setup(bot):
     await bot.add_cog(Cookies(bot))
